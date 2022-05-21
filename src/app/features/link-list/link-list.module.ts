@@ -1,17 +1,27 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LinkListIndexComponent } from './pages/link-list-index/link-list-index.component';
+import { LinksIndexPage } from './pages/links-index/links-index.page';
 import { LinkRoutingModule } from './link-list-routing.module';
-
-
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { CdkAccordionModule } from '@angular/cdk/accordion';
+import { ReactiveFormsModule } from '@angular/forms';
+import { LinkFormComponent } from './components/link-form/link-form.component';
+import { LinkItemComponent } from './components/link-item/link-item.component';
+import { LinkListComponent } from './components/link-list/link-list.component';
 
 @NgModule({
   declarations: [
-    LinkListIndexComponent
+    LinksIndexPage,
+    LinkFormComponent,
+    LinkItemComponent,
+    LinkListComponent
   ],
   imports: [
     CommonModule,
-    LinkRoutingModule
+    LinkRoutingModule,
+    DragDropModule,
+    CdkAccordionModule,
+    ReactiveFormsModule
   ]
 })
 export class LinkListModule { }

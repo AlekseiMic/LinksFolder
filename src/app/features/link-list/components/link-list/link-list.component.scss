@@ -1,0 +1,27 @@
+
+.droplist {
+  width: 100vw;
+  height: 80vh;
+  display: grid;
+  column-gap: 30px;
+  grid-template-columns: repeat(5, 100px);
+}
+
+.drop-place {
+  height: 1000px;
+  width: 100px;
+  background: lightgray;
+}
+
+.cdk-drop-list-dragging .cdk-drag {
+  transition: transform 0.2s ease-in-out;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 300ms cubic-bezier(0, 0, 0.2, 1);
+}
+

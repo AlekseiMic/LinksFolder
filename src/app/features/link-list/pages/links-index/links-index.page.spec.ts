@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LinkListIndexComponent } from './link-list-index.component';
+import { LinksIndexPage } from './links-index.page';
 
 describe('LinkListIndexComponent', () => {
-  let component: LinkListIndexComponent;
-  let fixture: ComponentFixture<LinkListIndexComponent>;
+  let component: LinksIndexPage;
+  let fixture: ComponentFixture<LinksIndexPage>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ LinkListIndexComponent ]
+      declarations: [ LinksIndexPage ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LinkListIndexComponent);
+    fixture = TestBed.createComponent(LinksIndexPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

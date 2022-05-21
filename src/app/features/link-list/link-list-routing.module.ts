@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { LinkListIndexComponent } from './pages/link-list-index/link-list-index.component';
+import { LinksIndexPage } from './pages/links-index/links-index.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: LinkListIndexComponent
+    component: LinksIndexPage
   }
 ];
 
