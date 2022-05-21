@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, Input, OnInit } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
 
 
@@ -9,6 +9,8 @@ import { FormBuilder } from "@angular/forms";
 export class LinkFormComponent implements OnInit {
   ngOnInit(): void {}
 
+  @Input() create?: (url: string) => void;
+
   constructor(private formBuilder: FormBuilder) { }
 
   newLinkForm = this.formBuilder.group({
@@ -16,7 +18,9 @@ export class LinkFormComponent implements OnInit {
   });
 
   onSubmit(): void {
-    console.log(this.newLinkForm);
+    if (this.create) {
+      this.create(this.newLinkForm.value.link);
+    }
     // this.items.push(this.newLinkForm.value.link);
   }
 

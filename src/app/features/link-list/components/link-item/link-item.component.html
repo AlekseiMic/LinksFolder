@@ -1,1 +1,5 @@
-<div class="item">{{text}}</div>
+<div class="item">
+  <span>{{text}}-{{id}}</span>
+  <button (click)="onDelete()">Delete</button>
+  <button (click)="onEdit()">Edit</button>
+</div>

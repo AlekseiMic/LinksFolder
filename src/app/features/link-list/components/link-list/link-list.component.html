@@ -1,7 +1,7 @@
 <div class="droplist" cdkDropListGroup>
   <div class="drop-place" #firstList="cdkDropList" [cdkDropListData]="items" (cdkDropListDropped)="drop($event)" cdkDropList>
-    <div *ngFor="let item of items" cdkDrag>
-      <app-link-item [text]='item'>
+    <div *ngFor="let item of items; let i = index" cdkDrag>
+      <app-link-item [id]="i" [text]='item' [delete]='onDeleteItem' [edit]='onEditItem'>
       </app-link-item>
     </div>
   </div>

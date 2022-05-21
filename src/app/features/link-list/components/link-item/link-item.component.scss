@@ -5,5 +5,7 @@
   color: #223;
   height: 100px;
   background: cyan;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 }
