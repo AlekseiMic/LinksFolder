@@ -8,6 +8,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { LinkFormComponent } from './components/link-form/link-form.component';
 import { LinkItemComponent } from './components/link-item/link-item.component';
 import { LinkListComponent } from './components/link-list/link-list.component';
+import { LinkListService } from './services/link-list.service';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,10 @@ import { LinkListComponent } from './components/link-list/link-list.component';
     LinkRoutingModule,
     DragDropModule,
     CdkAccordionModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+  ],
+  providers: [
+    LinkListService
   ]
 })
 export class LinkListModule { }

@@ -12,18 +12,18 @@ export class LinkListComponent implements OnInit {
 
   @Input() drop: (event:CdkDragDrop<string[], any, any>) => void = () =>{};
 
-  @Input() delete?: (list: any[], id: string | number) => void;
+  @Input() delete?: (id: string | number, list?: any[]) => void;
 
-  @Input() edit?: (list: any[], id: string | number) => void;
+  @Input() edit?: ( id: string | number, list?: any[]) => void;
 
   onDeleteItem = (id: string | number) => {
     if (!this.delete) return;
-    this.delete(this.items, id);
+    this.delete(id, this.items);
   }
 
   onEditItem = (id: string | number) => {
     if (!this.edit) return;
-    this.edit(this.items, id);
+    this.edit(id, this.items);
   }
 
   ngOnInit(): void {

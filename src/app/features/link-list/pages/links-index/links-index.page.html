@@ -1,6 +1,6 @@
-<p>link-list-index works!</p>
+<p>list-list-index works!</p>
 
-<app-link-form [create]='create'></app-link-form>
-<div *ngFor="let item of items">
-  <app-link-list [delete]='delete' [edit]='edit' [items]='item.items' [drop]='drop'></app-link-list>
+<app-link-form [create]="listService.addToList"></app-link-form>
+<div *ngFor="let item of listService.activeLists">
+  <app-link-list [delete]='listService.deleteFromList' [edit]='listService.editInList' [items]='item.items' [drop]='drop'></app-link-list>
 </div>
