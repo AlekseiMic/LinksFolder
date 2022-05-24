@@ -1,5 +1,6 @@
 import { CdkDragDrop } from "@angular/cdk/drag-drop";
 import { Component, Input, OnInit } from "@angular/core";
+import { TreeFolder, TreeItem } from "../../models/TreeItem";
 
 @Component({
   selector: 'app-link-list',
@@ -8,16 +9,22 @@ import { Component, Input, OnInit } from "@angular/core";
 })
 export class LinkListComponent implements OnInit {
 
-  @Input() items: string[]=[];
+  @Input() items?: TreeFolder;
 
-  @Input() drop: (event:CdkDragDrop<string[], any, any>) => void = () =>{};
+  @Input() drop: (event:CdkDragDrop<TreeFolder, any, any>) => void = () =>{};
 
-  @Input() delete?: (id: string | number, list?: any[]) => void;
+  @Input() delete?: (id: string | number, list: TreeFolder) => void;
 
-  @Input() edit?: ( id: string | number, list?: any[]) => void;
+  @Input() edit?: ( id: string | number, list?: TreeFolder) => void;
+
+  @Input() openFolder: (folder?: TreeItem, side?: boolean) => void = () => {};
+
+  @Input() isHome = true;
+
+  @Input() goToParentFolder?: (folder: TreeFolder) => void;
 
   onDeleteItem = (id: string | number) => {
-    if (!this.delete) return;
+    if (!this.delete || !this.items) return;
     this.delete(id, this.items);
   }
 

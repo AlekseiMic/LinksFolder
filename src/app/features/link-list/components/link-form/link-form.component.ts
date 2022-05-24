@@ -11,16 +11,30 @@ export class LinkFormComponent implements OnInit {
 
   @Input() create?: (url: string) => void;
 
+  @Input() createFolder?: (name: string) => void;
+
   constructor(private formBuilder: FormBuilder) { }
 
   newLinkForm = this.formBuilder.group({
     link: '',
+    folder: '',
   });
 
-  onSubmit(): void {
+  onCreateLink(): void {
     if (this.create) {
       this.create(this.newLinkForm.value.link);
+      this.newLinkForm.controls['link'].reset();
     }
+  }
+
+  onCreateFolder(): void {
+    if (this.createFolder) {
+      this.createFolder(this.newLinkForm.value.folder);
+      this.newLinkForm.controls['folder'].reset();
+    }
+  }
+
+  onSubmit(): void {
     // this.items.push(this.newLinkForm.value.link);
   }
 

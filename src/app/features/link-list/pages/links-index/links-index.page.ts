@@ -1,5 +1,6 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
+import { TreeFolder } from '../../models/TreeItem';
 import { LinkListService } from '../../services/link-list.service';
 
 @Component({
@@ -12,10 +13,11 @@ export class LinksIndexPage implements OnInit {
   constructor(public listService: LinkListService) {}
 
   ngOnInit(): void {
+    this.listService.openFolder();
   }
 
-  drop(event: CdkDragDrop<string[]>) {
-    moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+  drop(event: CdkDragDrop<TreeFolder>) {
+    moveItemInArray(event.container.data.children, event.previousIndex, event.currentIndex);
   }
 
 }

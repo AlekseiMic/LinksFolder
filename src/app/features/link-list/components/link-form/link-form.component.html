@@ -1,5 +1,5 @@
 
-<form [formGroup]="newLinkForm" (ngSubmit)="onSubmit()">
-  <input type="text" formControlName="link" id="link">
-  <button type="submit">Submit</button>
+<form [formGroup]="newLinkForm">
+  <input type="text" formControlName="link" (keyup.enter)='onCreateLink()' id="link"><br>
+  <input type="text" formControlName="folder" (keyup.enter)='onCreateFolder()' id="folder">
 </form>

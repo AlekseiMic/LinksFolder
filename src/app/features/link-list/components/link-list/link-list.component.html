@@ -1,8 +1,27 @@
-<div class="droplist" cdkDropListGroup>
-  <div class="drop-place" #firstList="cdkDropList" [cdkDropListData]="items" (cdkDropListDropped)="drop($event)" cdkDropList>
-    <div *ngFor="let item of items; let i = index" cdkDrag>
-      <app-link-item [id]="i" [text]='item' [delete]='onDeleteItem' [edit]='onEditItem'>
-      </app-link-item>
+<div class="droplist" cdkDropList>
+  <div *ngIf="items" class="drop-place" >
+    <div *ngIf="!isHome">
+      <button (click)="openFolder()">home</button>
+      <button *ngIf="items && goToParentFolder" (click)="goToParentFolder(items)">..</button>
+    </div>
+    <div *ngFor="let item of items.children; let i = index" cdkDrag>
+      <div *ngIf="item.type=='link'; else elseBlock">
+        <app-link-item [id]="i" [text]='item.name || item.url' [delete]='onDeleteItem' [edit]='onEditItem'>
+        </app-link-item>
+      </div>
+      <ng-template #elseBlock>
+        <div class="controls">
+        <button (click)="openFolder(item)">
+          {{item.name}}
+        </button>
+        <button (click)="openFolder(item, true)">
+          open right
+        </button>
+        <button (click)="onDeleteItem(i)">
+          Delete
+        </button>
+        </div>
+      </ng-template>
     </div>
   </div>
 </div>
