@@ -1,4 +1,3 @@
-import { CdkDragDrop } from "@angular/cdk/drag-drop";
 import { Component, Input, OnInit } from "@angular/core";
 import { TreeFolder, TreeItem } from "../../models/TreeItem";
 
@@ -11,7 +10,7 @@ export class LinkListComponent implements OnInit {
 
   @Input() items?: TreeFolder;
 
-  @Input() drop: (event:CdkDragDrop<TreeFolder, any, any>) => void = () =>{};
+  @Input() drop: any;
 
   @Input() delete?: (id: string | number, list: TreeFolder) => void;
 

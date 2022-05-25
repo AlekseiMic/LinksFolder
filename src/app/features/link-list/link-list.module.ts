@@ -9,13 +9,23 @@ import { LinkFormComponent } from './components/link-form/link-form.component';
 import { LinkItemComponent } from './components/link-item/link-item.component';
 import { LinkListComponent } from './components/link-list/link-list.component';
 import { LinkListService } from './services/link-list.service';
+import {
+  DragNDropManagerDirective,
+  DragNDropManagerRootDirective,
+} from './directives/drag-n-drop-manager.directive';
+import { DragNDropManagerService } from './services/drag-n-drop-manager.service';
+import { MatCardModule } from '@angular/material/card';
+import { AppItem } from './components/item/item.component';
 
 @NgModule({
   declarations: [
     LinksIndexPage,
     LinkFormComponent,
     LinkItemComponent,
-    LinkListComponent
+    LinkListComponent,
+    DragNDropManagerDirective,
+    DragNDropManagerRootDirective,
+    AppItem,
   ],
   imports: [
     CommonModule,
@@ -23,9 +33,8 @@ import { LinkListService } from './services/link-list.service';
     DragDropModule,
     CdkAccordionModule,
     ReactiveFormsModule,
+    MatCardModule
   ],
-  providers: [
-    LinkListService
-  ]
+  providers: [LinkListService, DragNDropManagerService],
 })
-export class LinkListModule { }
+export class LinkListModule {}
