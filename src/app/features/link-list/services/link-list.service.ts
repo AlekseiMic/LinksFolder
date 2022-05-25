@@ -1,52 +1,83 @@
 import { Injectable } from '@angular/core';
-import { TreeFolder, TreeItem } from '../models/TreeItem';
+import { Folder, Link, TreeItem } from '../models/Item';
+
+const mockData = [
+  {
+    id: '1',
+    type: 'folder',
+    name: 'cats',
+  },
+  {
+    id: '2',
+    type: 'folder',
+    name: 'dogs',
+  },
+  {
+    id: '3',
+    type: 'link',
+    name: 'example',
+    url: 'example.com',
+  },
+  {
+    id: '4',
+    parent: '1',
+    type: 'link',
+    name: 'Kitty',
+    url: 'kitty.example.com',
+  },
+  {
+    id: '5',
+    parent: '2',
+    type: 'link',
+    name: 'Spike',
+    url: 'spike.example.com/spike.jpg',
+  },
+];
 
 @Injectable({
   providedIn: 'root',
 })
 export class LinkListService {
-  private allLists: TreeFolder = {
-    type: 'folder',
-    name: 'home',
-    id: '1',
-    children: [
-      {
-        type: 'folder',
-        id: '2',
-        name: 'nudes',
-        children: [
-          { id: '3', type: 'link', url: 'cool' },
-          { id: '4', type: 'link', url: '1233' },
-        ],
-      },
-      { id: '5', type: 'link', url: '1' },
-      { id: '6', type: 'link', url: '2', name: 'wow' },
-    ],
-  };
-  private _activeLists: TreeFolder[] = [];
+  private allLists: Folder = new Folder();
+  private _activeLists: Folder[] = [];
 
   constructor() {
+    this.allLists = this.createTreeFromArray(mockData);
     this.openFolder();
   }
 
-  public isHome(folder?: TreeItem) {
-    return this.allLists === folder || (!folder && this.allLists === this._activeLists[0]);
+  private createTreeFromArray(array: any[]) {
+    const tree: Folder = new Folder();
+    tree.name = 'home';
+    const itemsById: Record<string, TreeItem | Folder | Link> = {};
+
+    for (const item of array) {
+      const curItem =
+        itemsById[item.id] ?? new (item.type === 'folder' ? Folder : Link)();
+      if (item.type === 'folder' && !itemsById[item.id]) {
+        itemsById[item.id] = curItem;
+      }
+      curItem.id = item.id;
+      curItem.name = item.name;
+      if (item.parent && !itemsById[item.parent]) {
+        itemsById[item.parent] = new Folder();
+      }
+      if (item.parent) {
+        itemsById[item.parent].children.push(curItem);
+        curItem.parent = itemsById[item.parent];
+      } else {
+        tree.children.push(curItem);
+        curItem.parent = tree;
+      }
+    }
+    return tree;
   }
 
-  public getParentFolder(folder: TreeItem, searchFolder?: TreeFolder) {
-    if (this.isHome(folder)) return undefined;
-    const workFolder = searchFolder || this.allLists;
-    if (workFolder.type !== 'folder') return undefined;
-    let parent: TreeItem | undefined = undefined;
-    workFolder.children.forEach((el) => {
-      if (parent || el.type !== 'folder') return;
-      if (el === folder) {
-        parent = workFolder;
-        return;
-      }
-      parent = this.getParentFolder(folder, el);
-    });
-    return parent;
+  public isHome(folder?: TreeItem) {
+    return (
+      this.allLists === folder ||
+      (!folder && this.allLists === this._activeLists[0])
+    );
   }
 
   public get activeLists() {
@@ -56,32 +87,42 @@ export class LinkListService {
   openFolder = (folder?: TreeItem, side = false) => {
     let newFolder = folder;
     if (!newFolder) newFolder = this.allLists;
-    if (newFolder.type !== 'folder' || (this._activeLists.includes(newFolder) && side)) return;
+    if (
+      !(newFolder instanceof Folder) ||
+      (this._activeLists.includes(newFolder) && side)
+    )
+      return;
     this._activeLists = [...(side ? this._activeLists : []), newFolder];
   };
 
-  openParentFolder = (folder: TreeFolder) => {
-    const parent = this.getParentFolder(folder);
-    if (!parent) return;
+  openParentFolder = (folder: Folder) => {
+    const parent = folder.parent;
+    if (!parent || !parent['type'] || parent['type'] !== 'Folder') return;
     const idx = this._activeLists.findIndex((el) => el === folder);
     if (idx === -1) return;
-    this._activeLists[idx]=parent;
-  }
+    this._activeLists[idx] = parent as Folder;
+  };
 
-  addFolder = (name: string, folder?: TreeFolder) => {
+  addFolder = (name: string, folder?: Folder) => {
     const parent = folder ?? this._activeLists[0] ?? this.allLists;
-    parent.children.unshift({ id: (new Date).getTime()+'', type: 'folder', name, children: []});
-  }
+    const newFolder = new Folder();
+    newFolder.name = name;
+    newFolder.id = new Date().getTime() + '';
+    parent.children.unshift(newFolder);
+  };
 
   addToList = (item: string, list?: TreeItem) => {
     const arr = this.getWorkList(list);
-    if (arr === undefined || arr.type !== 'folder') return;
-    arr.children.push({ id: (new Date).getTime()+'', type: 'link', url: item });
+    if (arr === undefined || !(arr instanceof Folder)) return;
+    const newLink = new Link();
+    newLink.name = 'name';
+    newLink.url = item;
+    arr.children.push(newLink);
   };
 
-  private getWorkList(list?: TreeItem): TreeFolder | undefined {
+  private getWorkList(list?: TreeItem): Folder | undefined {
     const arr = list || this.activeLists[0];
-    if (!arr || arr.type !== 'folder') return undefined;
+    if (!arr || !(arr instanceof Folder)) return undefined;
     return arr;
   }
 
@@ -95,7 +136,7 @@ export class LinkListService {
     const arr = this.getWorkList(list);
     const index = parseInt(id + '');
     const element = arr?.children?.[index];
-    if (element === undefined || element.type !== 'link') return;
+    if (element === undefined || !(element instanceof Link)) return;
     const newUrl = prompt('Enter new URL');
     element.url = newUrl ?? ''; // TODO::Find index by id and only then replace
   };

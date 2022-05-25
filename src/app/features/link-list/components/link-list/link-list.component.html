@@ -14,10 +14,10 @@
         >..</button>
     </div>
     <div *ngFor="let item of items.children; let i = index" cdkDrag>
-      <div *ngIf="item.type=='link'; else elseBlock">
+      <div *ngIf="item['type']=='Link'; else elseBlock">
         <app-link-item
           [id]="i"
-          [text]='item.name || item.url'
+          [text]='item.name || item["url"]'
           [delete]='onDeleteItem'
           [edit]='onEditItem'
           ></app-link-item>

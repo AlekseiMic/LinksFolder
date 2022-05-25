@@ -15,7 +15,6 @@ import {
 } from './directives/drag-n-drop-manager.directive';
 import { DragNDropManagerService } from './services/drag-n-drop-manager.service';
 import { MatCardModule } from '@angular/material/card';
-import { AppItem } from './components/item/item.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +24,6 @@ import { AppItem } from './components/item/item.component';
     LinkListComponent,
     DragNDropManagerDirective,
     DragNDropManagerRootDirective,
-    AppItem,
   ],
   imports: [
     CommonModule,

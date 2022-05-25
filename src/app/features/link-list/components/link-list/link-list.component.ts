@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from "@angular/core";
-import { TreeFolder, TreeItem } from "../../models/TreeItem";
+import { Folder, TreeItem } from "../../models/Item";
 
 @Component({
   selector: 'app-link-list',
@@ -8,19 +8,19 @@ import { TreeFolder, TreeItem } from "../../models/TreeItem";
 })
 export class LinkListComponent implements OnInit {
 
-  @Input() items?: TreeFolder;
+  @Input() items?: Folder;
 
   @Input() drop: any;
 
-  @Input() delete?: (id: string | number, list: TreeFolder) => void;
+  @Input() delete?: (id: string | number, list: Folder) => void;
 
-  @Input() edit?: ( id: string | number, list?: TreeFolder) => void;
+  @Input() edit?: ( id: string | number, list?: Folder) => void;
 
   @Input() openFolder: (folder?: TreeItem, side?: boolean) => void = () => {};
 
   @Input() isHome = true;
 
-  @Input() goToParentFolder?: (folder: TreeFolder) => void;
+  @Input() goToParentFolder?: (folder: Folder) => void;
 
   onDeleteItem = (id: string | number) => {
     if (!this.delete || !this.items) return;
