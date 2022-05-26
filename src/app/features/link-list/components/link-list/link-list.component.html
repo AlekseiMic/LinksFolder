@@ -6,7 +6,7 @@
   (cdkDropListDropped)="drop($event)"
   >
   <div *ngIf="items" class="drop-place" >
-    <div *ngIf="!isHome">
+    <div *ngIf="!isExpanded && !isHome">
       <button (click)="openFolder()">home</button>
       <button
         *ngIf="items && goToParentFolder"
@@ -23,17 +23,36 @@
           ></app-link-item>
       </div>
       <ng-template #elseBlock>
-        <div class="controls">
-        <button (click)="openFolder(item)">
-          {{item.name}}
-        </button>
-        <button (click)="openFolder(item, true)">
-          open right
-        </button>
-        <button (click)="onDeleteItem(i)">
-          Delete
-        </button>
-        </div>
+        <div *ngIf="expanded?.includes(item['id']); else controlsBlock">
+          <button (click)="collapseFolder(item)">collapse</button>
+          <app-link-list
+            [goToParentFolder]='goToParentFolder'
+            [isHome]="false"
+            [openFolder]='openFolder'
+            [delete]='delete'
+            [edit]='edit'
+            [items]='item'
+            [drop]='drop'
+            [isExpanded]="true"
+            >
+          </app-link-list>
+          </div>
+          <ng-template #controlsBlock>
+          <div class="controls">
+          <button (click)="openFolder(item)">
+            {{item.name}}
+          </button>
+          <button (click)="expandFolder(item)">
+            expand
+          </button>
+          <button (click)="openFolder(item, true)">
+            open right
+          </button>
+          <button (click)="onDeleteItem(i)">
+            Delete
+          </button>
+          </div>
+        </ng-template>
       </ng-template>
     </div>
   </div>

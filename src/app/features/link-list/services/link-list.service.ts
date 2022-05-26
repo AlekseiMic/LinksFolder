@@ -39,7 +39,7 @@ const mockData = [
 })
 export class LinkListService {
   private allLists: Folder = new Folder();
-  private _activeLists: Folder[] = [];
+  private _activeLists: {expanded: string[]; folder: Folder}[] = [];
 
   constructor() {
     this.allLists = this.createTreeFromArray(mockData);
@@ -76,7 +76,7 @@ export class LinkListService {
   public isHome(folder?: TreeItem) {
     return (
       this.allLists === folder ||
-      (!folder && this.allLists === this._activeLists[0])
+      (!folder && this.allLists === this._activeLists[0].folder)
     );
   }
 
@@ -89,22 +89,22 @@ export class LinkListService {
     if (!newFolder) newFolder = this.allLists;
     if (
       !(newFolder instanceof Folder) ||
-      (this._activeLists.includes(newFolder) && side)
+      (this._activeLists.findIndex((el) => el.folder ===newFolder)!==-1 && side)
     )
       return;
-    this._activeLists = [...(side ? this._activeLists : []), newFolder];
+    this._activeLists = [...(side ? this._activeLists : []), {folder: newFolder, expanded: []}];
   };
 
-  openParentFolder = (folder: Folder) => {
+  openParentFolder = (folder: TreeItem) => {
     const parent = folder.parent;
     if (!parent || !parent['type'] || parent['type'] !== 'Folder') return;
-    const idx = this._activeLists.findIndex((el) => el === folder);
+    const idx = this._activeLists.findIndex((el) => el.folder === folder);
     if (idx === -1) return;
-    this._activeLists[idx] = parent as Folder;
+    this._activeLists[idx].folder = parent as Folder;
   };
 
   addFolder = (name: string, folder?: Folder) => {
-    const parent = folder ?? this._activeLists[0] ?? this.allLists;
+    const parent = folder ?? this._activeLists?.[0]?.folder ?? this.allLists;
     const newFolder = new Folder();
     newFolder.name = name;
     newFolder.id = new Date().getTime() + '';

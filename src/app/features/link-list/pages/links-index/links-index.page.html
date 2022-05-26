@@ -8,11 +8,11 @@
   <div *ngFor="let item of listService.activeLists">
     <app-link-list
       [goToParentFolder]='listService.openParentFolder'
-      [isHome]='listService.isHome(item)'
+      [isHome]='listService.isHome(item.folder)'
       [openFolder]='listService.openFolder'
       [delete]='listService.deleteFromList'
       [edit]='listService.editInList'
-      [items]='item'
+      [items]='item.folder'
       [drop]='drop'
       ></app-link-list>
   </div>

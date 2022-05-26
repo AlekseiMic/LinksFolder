@@ -8,7 +8,7 @@ import { Folder, TreeItem } from "../../models/Item";
 })
 export class LinkListComponent implements OnInit {
 
-  @Input() items?: Folder;
+  @Input() items?: TreeItem;
 
   @Input() drop: any;
 
@@ -20,15 +20,27 @@ export class LinkListComponent implements OnInit {
 
   @Input() isHome = true;
 
-  @Input() goToParentFolder?: (folder: Folder) => void;
+  @Input() goToParentFolder?: (folder: TreeItem) => void;
+
+  @Input() isExpanded = false;
+
+  @Input() expanded: string[] = [];
+
+  expandFolder = (folder: TreeItem) => {
+    this.expanded.push(folder.id);
+  }
+
+  collapseFolder = (folder: TreeItem) => {
+    this.expanded = this.expanded.filter((el) => el !== folder.id);
+  }
 
   onDeleteItem = (id: string | number) => {
-    if (!this.delete || !this.items) return;
+    if (!this.delete || !this.items || !(this.items instanceof Folder)) return;
     this.delete(id, this.items);
   }
 
   onEditItem = (id: string | number) => {
-    if (!this.edit) return;
+    if (!this.edit || !(this.items instanceof Folder)) return;
     this.edit(id, this.items);
   }
 

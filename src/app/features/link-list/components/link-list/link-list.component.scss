@@ -1,13 +1,13 @@
 
 .droplist {
-  height: 80vh;
+  height: auto;
   display: grid;
   column-gap: 30px;
   grid-template-columns: repeat(5, 100px);
 }
 
 .drop-place {
-  height: 1000px;
+  height: auto;
   width: 100px;
   background: lightgray;
 }
