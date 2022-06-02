@@ -21,7 +21,11 @@
       "es2020",
       "dom"
     ],
-    "paths": {},
+    "paths": {
+      "@angular/*": [
+        "./node_modules/@angular/*"
+      ]
+    },
     "rootDir": "."
   },
   "angularCompilerOptions": {

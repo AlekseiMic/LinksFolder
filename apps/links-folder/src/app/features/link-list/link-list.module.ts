@@ -31,7 +31,7 @@ import { MatCardModule } from '@angular/material/card';
     DragDropModule,
     CdkAccordionModule,
     ReactiveFormsModule,
-    MatCardModule
+    MatCardModule,
   ],
   providers: [LinkListService, DragNDropManagerService],
 })

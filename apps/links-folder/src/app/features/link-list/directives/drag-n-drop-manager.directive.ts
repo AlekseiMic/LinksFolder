@@ -22,7 +22,8 @@ export class DragNDropManagerDirective {
   }
 
   ngOnDestroy(): void {
-    this.manager.unsubscribe();
+    // this.manager.unsubscribe();
+    if (this.manager) this.manager.unsubscribe();
   }
 }
 
