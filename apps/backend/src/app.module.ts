@@ -3,6 +3,10 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
+import { resolve} from 'path';
+
+const envFilePath = resolve(__dirname + '/common/env/.env');
 
 @Module({
   imports: [
@@ -16,6 +20,7 @@ import { AuthModule } from './auth/auth.module';
       autoLoadModels: true,
       models: []
     }),
+    ConfigModule.forRoot({ envFilePath, isGlobal: true}),
     AuthModule
   ],
   controllers: [AppController],

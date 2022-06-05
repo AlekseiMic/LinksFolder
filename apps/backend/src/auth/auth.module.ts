@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { PassportModule } from "@nestjs/passport";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { User } from "../user/user.model";
 import { UserService } from "../user/user.service";
@@ -9,7 +10,7 @@ import { Session } from "./session.model";
 import { SessionService } from "./session.service";
 
 @Module({
-  imports: [SequelizeModule.forFeature([User, Session])],
+  imports: [SequelizeModule.forFeature([User, Session]), PassportModule],
   providers: [AuthService, UserService, SessionService, JwtService],
   controllers: [AuthController]
 })
