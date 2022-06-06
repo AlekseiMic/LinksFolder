@@ -8,10 +8,11 @@ import { AuthService } from "./auth.service";
 import { JwtService } from "./jwt.service";
 import { Session } from "./session.model";
 import { SessionService } from "./session.service";
+import { JwtStrategy } from "./strategies/jwt.strategy";
 
 @Module({
   imports: [SequelizeModule.forFeature([User, Session]), PassportModule],
-  providers: [AuthService, UserService, SessionService, JwtService],
+  providers: [AuthService, UserService, SessionService, JwtService, JwtStrategy],
   controllers: [AuthController]
 })
 export class AuthModule {}

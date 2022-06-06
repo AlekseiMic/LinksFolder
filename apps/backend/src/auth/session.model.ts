@@ -10,7 +10,8 @@ export class Session extends Model {
   @BelongsTo(() => User)
   user: User
 
-  @Column
+
+  @Column({ unique: 'idx_refresh-token'})
   token: string
 
   @Column

@@ -22,4 +22,9 @@ export class SessionService {
     const session = await this.sessionModel.findOne({ where: { token } });
     return session;
   }
+
+  async removeByToken(token: string): Promise<boolean> {
+    const result = await this.sessionModel.destroy({ where: { token }});
+    return result !== 0;
+  }
 }

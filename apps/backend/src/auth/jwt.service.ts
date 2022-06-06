@@ -1,18 +1,25 @@
-import { Inject, Injectable } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { sign, SignOptions } from 'jsonwebtoken';
 
 @Injectable()
 export class JwtService {
-  @Inject(ConfigService)
-  private config: ConfigService;
+  private defaultOptions: SignOptions;
 
-  private defaultOptions: SignOptions = {
-    algorithm: 'RS256'
-  };
+  constructor(@Inject(ConfigService) private config: ConfigService) {
+    this.defaultOptions = {
+      algorithm: 'HS512',
+      expiresIn: this.config.get('JWTTTL') || 10,
+      notBefore: 0,
+    };
+  }
 
   create(payload: Record<string, any>) {
-    console.log(this.config.getOrThrow('SECRETKEY'));
-    return sign(payload, this.config.getOrThrow('SECRETKEY'), this.defaultOptions);
+    return sign(
+      payload,
+      this.config.getOrThrow('SECRETKEY'),
+      this.defaultOptions
+    );
   }
+
 }

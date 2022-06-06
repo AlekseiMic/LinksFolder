@@ -36,4 +36,9 @@ export class AuthService {
     const token = this.jwtService.create({ id: user.id });
     return { user, session, token };
   }
+
+  async logout(refreshToken: string) {
+    const result = await this.sessionService.removeByToken(refreshToken);
+    return result;
+  }
 }
