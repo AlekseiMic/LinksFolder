@@ -5,7 +5,8 @@
   <li><a [routerLink]="['/profile']">Profile</a></li>
 </ul>
 
-<app-signin></app-signin>
+<button mat-raised-button (click)="openSigninDialog()">Signin</button>
+<button mat-raised-button (click)="openSignupDialog()">Signup</button>
 
 <div>
   <router-outlet></router-outlet>

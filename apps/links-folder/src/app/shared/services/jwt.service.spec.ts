@@ -6,8 +6,9 @@ const invalidToken =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjE1MTYyMzAwMDB9.7Pc53YlGdd2L1qXIla_qCmTovzvJn5cVj8shbJCB1nk';
 
 describe('JwtService', () => {
+  let service = new JwtService();
   it('should parse token and return valid data', () => {
-    const data = JwtService.parse(validToken);
+    const data = service.parse(validToken);
     expect(data).toBeTruthy();
     expect(data).toEqual(
       jasmine.objectContaining({
@@ -17,12 +18,12 @@ describe('JwtService', () => {
   });
 
   it('should return null on invalid token', () => {
-    expect(JwtService.parse('')).toBeNull();
+    expect(service.parse('')).toBeNull();
   });
 
   it('should throw "Token expired" error', () => {
     expect(function () {
-      JwtService.parse(invalidToken);
+      service.parse(invalidToken);
     }).toThrow(new Error('Token expired'));
   });
 });

@@ -4,18 +4,18 @@ import { AuthEmitter } from '../../emitters/AuthEmitter';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
-  selector: 'app-signin',
-  templateUrl: './signin.component.html',
-  styleUrls: ['./signin.component.scss'],
+  selector: 'app-signup',
+  templateUrl: './signup.component.html',
+  styleUrls: ['./signup.component.scss'],
 })
-export class SigninComponent implements OnInit {
-  public loginForm: FormGroup;
+export class SignupComponent implements OnInit {
+  public signupForm: FormGroup;
 
   constructor(
     private formBuilder: FormBuilder,
     private authService: AuthService
   ) {
-    this.loginForm = this.formBuilder.group({
+    this.signupForm = this.formBuilder.group({
       login: '',
       password: '',
     });
@@ -25,9 +25,9 @@ export class SigninComponent implements OnInit {
 
   submit() {
     AuthEmitter.emit(false);
-    const username = this.loginForm.value.login;
-    const password = this.loginForm.value.password;
+    const username = this.signupForm.value.login;
+    const password = this.signupForm.value.password;
     if (!username || !password) return;
-    this.authService.login(username, password);
+    this.authService.signup(username, password);
   }
 }

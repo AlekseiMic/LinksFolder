@@ -19,10 +19,6 @@ export class AuthController {
     );
     response.cookie('refreshToken', session.token, {
       maxAge: 100 * 24 * 3600000,
-      httpOnly: true,
-      secure: true,
-      sameSite: true,
-      path: '/auth',
     });
     return { user, token };
   }
@@ -37,10 +33,6 @@ export class AuthController {
     const { user, token, session } = result;
     response.cookie('refreshToken', session.token, {
       maxAge: 100 * 24 * 3600000,
-      httpOnly: true,
-      secure: true,
-      sameSite: true,
-      path: '/auth',
     });
     return { user, token };
   }
@@ -50,6 +42,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) response: Response
   ): Promise<{ user: User; token: string }> {
+    console.log(req.cookies);
     const refreshToken = req.cookies['refreshToken'];
     if (!refreshToken) throw new Error('Not Authorized');
     const result = await this.authService.refreshAccessToken(refreshToken);
@@ -57,10 +50,6 @@ export class AuthController {
     const { user, token, session } = result;
     response.cookie('refreshToken', session.token, {
       maxAge: 100 * 24 * 3600000,
-      httpOnly: true,
-      secure: true,
-      sameSite: true,
-      path: '/auth',
     });
     return { user, token };
   }
@@ -71,7 +60,7 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response
   ): Promise<boolean> {
     await this.authService.logout(req.cookies['refreshToken']);
-    response.cookie('refreshToken', '', { maxAge: 0 });
+    response.clearCookie('refreshToken', {});
     return true;
   }
 }

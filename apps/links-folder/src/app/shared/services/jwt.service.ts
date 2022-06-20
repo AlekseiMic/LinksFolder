@@ -1,18 +1,22 @@
 import { Injectable } from '@angular/core';
-import jwt_decode, { JwtPayload } from 'jwt-decode';
+import { JwtPayload } from 'jsonwebtoken';
+import jwt_decode from 'jwt-decode';
+
+type JwtData = {
+  id: number;
+} & JwtPayload;
 
 Injectable();
 export class JwtService {
-  static parse(token: string): null | Record<string, any> {
-    let result: JwtPayload;
+  parse(token: string): { data?: JwtData; isValid: boolean } {
     try {
-      result = jwt_decode<JwtPayload>(token);
-    } catch {
-      return null;
+      const data = jwt_decode<JwtData>(token);
+      const isValid =
+        data.exp === undefined ? true : data.exp > new Date().getTime() / 1000;
+      return { data, isValid };
+    } catch (error: any) {
+      console.log(error);
     }
-    if (result.exp && result.exp < new Date().getTime() / 1000) {
-      throw new Error('Token expired');
-    }
-    return result;
+    return { isValid: false };
   }
 }
