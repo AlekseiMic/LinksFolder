@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { resolve} from 'path';
+import { LinkModule } from './link/link.module';
 
 const envFilePath = resolve(__dirname + '/common/env/.env');
 
@@ -21,7 +22,8 @@ const envFilePath = resolve(__dirname + '/common/env/.env');
       models: []
     }),
     ConfigModule.forRoot({ envFilePath, isGlobal: true}),
-    AuthModule
+    AuthModule,
+    LinkModule
   ],
   controllers: [AppController],
   providers: [AppService],
