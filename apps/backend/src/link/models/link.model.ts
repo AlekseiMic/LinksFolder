@@ -1,5 +1,5 @@
 import { BelongsTo, Column, ForeignKey, Model, Table } from "sequelize-typescript";
-import { User } from "../user/user.model";
+import { User } from "user/user.model";
 
 @Table
 export class Link extends Model {

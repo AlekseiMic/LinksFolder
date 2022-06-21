@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from '../user/user.model';
-import { DirectoryToUser } from './direcrtory.to.user.model';
-import { DirectoryController } from './directory.controller';
-import { Directory } from './directory.model';
-import { DirectoryService } from './directory.service';
-import { LinkController } from './link.controller';
-import { Link } from './link.model';
-import { LinkService } from './link.service';
-import { TagController } from './tag.controller';
-import { Tag } from './tag.model';
-import { TagService } from './tag.service';
-import { TagToLink } from './tag.to.link.model';
+import { DirectoryToUser } from './models/direcrtory.to.user.model';
+import { DirectoryController } from './controllers/v1/directory.controller';
+import { Directory } from './models/directory.model';
+import { DirectoryService } from './services/directory.service';
+import { LinkController } from './controllers/v1/link.controller';
+import { Link } from './models/link.model';
+import { LinkService } from './services/link.service';
+import { TagController } from './controllers/v1/tag.controller';
+import { Tag } from './models/tag.model';
+import { TagService } from './services/tag.service';
+import { TagToLink } from './models/tag.to.link.model';
 
 @Module({
   controllers: [LinkController, TagController, DirectoryController],

@@ -9,7 +9,7 @@ export class JwtService {
   constructor(@Inject(ConfigService) private config: ConfigService) {
     this.defaultOptions = {
       algorithm: 'HS512',
-      expiresIn: this.config.get('JWTTTL') || 10,
+      expiresIn: this.config.get('JWTTTL') || 60*15,
       notBefore: 0,
     };
   }

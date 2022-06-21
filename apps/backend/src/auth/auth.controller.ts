@@ -4,7 +4,7 @@ import { Request, Response, CookieOptions } from 'express';
 import { User } from '../user/user.model';
 
 const refreshCookieOptions: CookieOptions = {
-  secure: true,
+  // secure: true,
   sameSite: 'none',
   maxAge: 100 * 24 * 3600000,
 };
