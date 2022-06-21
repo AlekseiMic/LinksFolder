@@ -1,7 +1,13 @@
 import { Controller, Post, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Request, Response } from 'express';
+import { Request, Response, CookieOptions } from 'express';
 import { User } from '../user/user.model';
+
+const refreshCookieOptions: CookieOptions = {
+  secure: true,
+  sameSite: 'none',
+  maxAge: 100 * 24 * 3600000,
+};
 
 @Controller('auth')
 export class AuthController {
@@ -17,9 +23,7 @@ export class AuthController {
       username,
       password
     );
-    response.cookie('refreshToken', session.token, {
-      maxAge: 100 * 24 * 3600000,
-    });
+    response.cookie('refreshToken', session.token, refreshCookieOptions);
     return { user, token };
   }
 
@@ -31,9 +35,7 @@ export class AuthController {
     const { username, password } = req.body;
     const result = await this.authService.signin(username, password);
     const { user, token, session } = result;
-    response.cookie('refreshToken', session.token, {
-      maxAge: 100 * 24 * 3600000,
-    });
+    response.cookie('refreshToken', session.token, refreshCookieOptions);
     return { user, token };
   }
 
@@ -48,9 +50,7 @@ export class AuthController {
     const result = await this.authService.refreshAccessToken(refreshToken);
     if (!result) throw new Error('Not Authorized');
     const { user, token, session } = result;
-    response.cookie('refreshToken', session.token, {
-      maxAge: 100 * 24 * 3600000,
-    });
+    response.cookie('refreshToken', session.token, refreshCookieOptions);
     return { user, token };
   }
 
@@ -59,8 +59,9 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) response: Response
   ): Promise<boolean> {
+    console.log(req.cookies['refreshToken']);
     await this.authService.logout(req.cookies['refreshToken']);
-    response.clearCookie('refreshToken', {});
+    response.clearCookie('refreshToken', refreshCookieOptions);
     return true;
   }
 }

@@ -31,7 +31,7 @@ describe('AuthService', () => {
     httpMock.verify();
     req.flush({ token: validToken });
     await request;
-    expect(service.isLogged()).toBeTrue();
+    expect(service.isLogged).toBeTrue();
     expect(service.bearer).toEqual(`Bearer ${validToken}`);
     expect(service.user).toBeInstanceOf(User);
     expect(service.user!.id).toEqual(12);
@@ -55,7 +55,7 @@ describe('AuthService', () => {
     req.flush({ token: validToken });
     expect(await request).toBeTrue();
     expect(service.user).toBeInstanceOf(User);
-    expect(service.isLogged()).toBeTrue();
+    expect(service.isLogged).toBeTrue();
   });
   it('should not register', async () => {
     const request = service.signup('newUser', 'password0');
@@ -76,10 +76,10 @@ describe('AuthService', () => {
     req.flush(true);
     expect(await request).toBeTrue();
     expect(service.user).toBeNull();
-    expect(service.isLogged()).toBeFalse();
+    expect(service.isLogged).toBeFalse();
   });
   it('should logout guest', async () => {
-    expect(service.isLogged()).toBeFalse();
+    expect(service.isLogged).toBeFalse();
     expect(service.user).toBeNull();
     const request = service.logout();
     const req = httpMock.expectOne('/auth/logout');
@@ -88,7 +88,7 @@ describe('AuthService', () => {
     req.flush(true);
     expect(await request).toBeTrue();
     expect(service.user).toBeNull();
-    expect(service.isLogged()).toBeFalse();
+    expect(service.isLogged).toBeFalse();
   });
   it('should refresh accessToken', async () => {
     const request = service.refreshToken().then((res) => {
@@ -99,7 +99,7 @@ describe('AuthService', () => {
     httpMock.verify();
     req.flush({ token: validToken });
     await request;
-    expect(service.isLogged()).toBeTrue();
+    expect(service.isLogged).toBeTrue();
     expect(service.bearer).toEqual(`Bearer ${validToken}`);
     expect(service.user).toBeInstanceOf(User);
     expect(service.user!.id).toEqual(12);
@@ -113,6 +113,6 @@ describe('AuthService', () => {
     httpMock.verify();
     req.flush({});
     await request;
-    expect(service.isLogged()).toBeFalse();
+    expect(service.isLogged).toBeFalse();
   });
 });

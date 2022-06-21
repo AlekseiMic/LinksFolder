@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { AuthEmitter } from '../../emitters/AuthEmitter';
 import { AuthService } from '../../services/auth.service';
 
@@ -13,7 +14,8 @@ export class SignupComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private dialog: MatDialog
   ) {
     this.signupForm = this.formBuilder.group({
       login: '',
@@ -23,11 +25,13 @@ export class SignupComponent implements OnInit {
 
   ngOnInit() {}
 
-  submit() {
+  async submit() {
     AuthEmitter.emit(false);
     const username = this.signupForm.value.login;
     const password = this.signupForm.value.password;
     if (!username || !password) return;
-    this.authService.signup(username, password);
+    if (await this.authService.signup(username, password)) {
+      this.dialog.closeAll();
+    }
   }
 }

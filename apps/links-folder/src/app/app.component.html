@@ -4,9 +4,13 @@
   <li><a [routerLink]="['/list']">Links</a></li>
   <li><a [routerLink]="['/profile']">Profile</a></li>
 </ul>
-
-<button mat-raised-button (click)="openSigninDialog()">Signin</button>
-<button mat-raised-button (click)="openSignupDialog()">Signup</button>
+<div *ngIf="!isLogged; else logout">
+  <button mat-raised-button (click)="openSigninDialog()">Signin</button>
+  <button mat-raised-button (click)="openSignupDialog()">Signup</button>
+</div>
+<ng-template #logout>
+  <button mat-raised-button (click)="onLogout()">Logout</button>
+</ng-template>
 
 <div>
   <router-outlet></router-outlet>

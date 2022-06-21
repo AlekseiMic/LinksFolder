@@ -2,7 +2,7 @@ import { User } from '../models/user.model';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import pDebounce from 'p-debounce';
-import { lastValueFrom } from 'rxjs';
+import { BehaviorSubject, lastValueFrom, Subject } from 'rxjs';
 import { JwtService } from './jwt.service';
 
 let user: null | User = null;
@@ -12,45 +12,60 @@ let accessToken: null | string = null;
   providedIn: 'root',
 })
 export class AuthService {
+  isLoggedSubject: Subject<boolean> = new BehaviorSubject<boolean>(false);
+
   constructor(private http: HttpClient, private jwtService: JwtService) {}
 
   async login(username: string, password: string): Promise<boolean> {
-    const req = this.http.post<{ token: string }>('/auth/signin', {
-      username,
-      password,
-    });
+    const req = this.http.post<{ token: string }>(
+      '/auth/signin',
+      {
+        username,
+        password,
+      },
+      { withCredentials: true }
+    );
+
     const result = await lastValueFrom(req);
     if (result.token) {
       const { data, isValid } = this.jwtService.parse(result.token);
       if (!isValid || !data) {
-        user = null;
-        accessToken = null;
+        this.user = null;
+        this.accessToken = null;
         return false;
       }
-      user = new User(data.id);
-      accessToken = result.token;
+      this.user = new User(data.id);
+      this.accessToken = result.token;
       return true;
     }
+
     return false;
   }
 
   async signup(username: string, password: string): Promise<boolean> {
-    const req = this.http.post<{ token: string }>('/auth/signup', {
-      username,
-      password,
-    });
+    const req = this.http.post<{ token: string }>(
+      '/auth/signup',
+      {
+        username,
+        password,
+      },
+      { withCredentials: true }
+    );
+
     const result = await lastValueFrom(req);
+
     if (result.token) {
       const { data, isValid } = this.jwtService.parse(result.token);
       if (!isValid || !data) {
-        user = null;
-        accessToken = null;
+        this.user = null;
+        this.accessToken = null;
         return false;
       }
-      user = new User(data.id);
-      accessToken = result.token;
-      return true
+      this.user = new User(data.id);
+      this.accessToken = result.token;
+      return true;
     }
+
     return false;
   }
 
@@ -62,29 +77,33 @@ export class AuthService {
     );
     const result = await lastValueFrom(req);
     if (result) {
-      user = null;
-      accessToken = null;
+      this.user = null;
+      this.accessToken = null;
       return true;
     }
     return false;
   }
 
-  isLogged(): boolean {
-    return user !== null;
+  get isLogged(): boolean {
+    return this.user !== null;
   }
 
   public async refreshToken() {
-    const req = this.http.post<{ token: string }>('/auth/refresh', {});
+    const req = this.http.post<{ token: string }>(
+      '/auth/refresh',
+      {},
+      { withCredentials: true }
+    );
     const result = await lastValueFrom(req);
     if (result.token) {
       const { data, isValid } = this.jwtService.parse(result.token);
       if (!isValid || !data) {
-        user = null;
-        accessToken = null;
+        this.user = null;
+        this.accessToken = null;
         return false;
       }
-      user = new User(data.id);
-      accessToken = result.token;
+      this.user = new User(data.id);
+      this.accessToken = result.token;
       return true;
     }
     return false;
@@ -100,7 +119,12 @@ export class AuthService {
     return user;
   }
 
+  set accessToken(token: null | string) {
+    accessToken = token;
+  }
+
   set user(data: null | User) {
+    if (data !== user && (!user || !data)) this.isLoggedSubject.next(!!data);
     user = data;
   }
 }

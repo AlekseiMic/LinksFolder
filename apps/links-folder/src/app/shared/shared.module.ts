@@ -8,15 +8,13 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { ApiInterceptor } from './interceptors/api.interceptor';
 import { SignupComponent } from './components/signup/signup.component';
 import { MatDialogModule } from '@angular/material/dialog';
-import { SigninDialogComponent } from './dialogs/SigninDialog/signin.dialog.component';
-import { SignupDialogComponent } from './dialogs/SignupDialog/signup.dialog.component';
+import { DynamicDialogComponent } from './dialogs/DynamicDialog/dynamic.dialog.component';
 
 @NgModule({
   declarations: [
     SigninComponent,
     SignupComponent,
-    SigninDialogComponent,
-    SignupDialogComponent,
+    DynamicDialogComponent
   ],
   imports: [CommonModule, FormsModule, ReactiveFormsModule, MatDialogModule],
   providers: [

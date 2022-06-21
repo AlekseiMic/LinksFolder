@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { AuthEmitter } from '../../emitters/AuthEmitter';
 import { AuthService } from '../../services/auth.service';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-signin',
@@ -13,7 +14,8 @@ export class SigninComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private authService: AuthService
+    private auth: AuthService,
+    private dialog: MatDialog
   ) {
     this.loginForm = this.formBuilder.group({
       login: '',
@@ -23,11 +25,13 @@ export class SigninComponent implements OnInit {
 
   ngOnInit() {}
 
-  submit() {
+  async submit() {
     AuthEmitter.emit(false);
     const username = this.loginForm.value.login;
     const password = this.loginForm.value.password;
     if (!username || !password) return;
-    this.authService.login(username, password);
+    if (await this.auth.login(username, password)) {
+      this.dialog.closeAll();
+    }
   }
 }
