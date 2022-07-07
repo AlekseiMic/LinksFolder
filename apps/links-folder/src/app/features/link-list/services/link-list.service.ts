@@ -20,14 +20,12 @@ const mockData = [
   },
   {
     id: '4',
-    parent: '1',
     type: 'link',
     name: 'Kitty',
     url: 'kitty.example.com',
   },
   {
     id: '5',
-    parent: '2',
     type: 'link',
     name: 'Spike',
     url: 'spike.example.com/spike.jpg',

@@ -5,7 +5,7 @@
   [cdkDropListData]="items"
   (cdkDropListDropped)="drop($event)"
   >
-  <div *ngIf="items" class="drop-place" >
+  <ng-container *ngIf="items" >
     <div *ngIf="!isExpanded && !isHome">
       <button (click)="openFolder()">home</button>
       <button
@@ -13,19 +13,21 @@
         (click)="goToParentFolder(items)"
         >..</button>
     </div>
-    <div *ngFor="let item of items.children; let i = index" cdkDrag>
-      <div *ngIf="item['type']=='Link'; else elseBlock">
-        <app-link-item
+    <ng-container  *ngFor="let item of items.children; let i = index" >
+      <ng-container *ngIf="item['type']=='Link'; else elseBlock">
+        <div app-link-item
           [id]="i"
+          class="dragitem"
+          cdkDrag
           [text]='item.name || item["url"]'
           [delete]='onDeleteItem'
           [edit]='onEditItem'
-          ></app-link-item>
-      </div>
+          ></div>
+      </ng-container>
       <ng-template #elseBlock>
-        <div *ngIf="expanded?.includes(item['id']); else controlsBlock">
           <button (click)="collapseFolder(item)">collapse</button>
-          <app-link-list
+          <div app-link-list
+            cdkDrag
             [goToParentFolder]='goToParentFolder'
             [isHome]="false"
             [openFolder]='openFolder'
@@ -35,25 +37,24 @@
             [drop]='drop'
             [isExpanded]="true"
             >
-          </app-link-list>
           </div>
-          <ng-template #controlsBlock>
-          <div class="controls">
-          <button (click)="openFolder(item)">
-            {{item.name}}
-          </button>
-          <button (click)="expandFolder(item)">
-            expand
-          </button>
-          <button (click)="openFolder(item, true)">
-            open right
-          </button>
-          <button (click)="onDeleteItem(i)">
-            Delete
-          </button>
-          </div>
-        </ng-template>
+          <!--   <ng-template #controlsBlock> -->
+          <!--     <div class="controls"> -->
+          <!--     <button (click)="openFolder(item)"> -->
+          <!--       {{item.name}} -->
+          <!--     </button> -->
+          <!--     <button (click)="expandFolder(item)"> -->
+          <!--       expand -->
+          <!--     </button> -->
+          <!--     <button (click)="openFolder(item, true)"> -->
+          <!--       open right -->
+          <!--     </button> -->
+          <!--     <button (click)="onDeleteItem(i)"> -->
+          <!--       Delete -->
+          <!--     </button> -->
+          <!--     </div> -->
+          <!-- </ng-template> -->
       </ng-template>
-    </div>
-  </div>
+    </ng-container>
+  </ng-container>
 </div>

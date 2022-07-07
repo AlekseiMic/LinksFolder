@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from "@angular/core";
 import { Folder, TreeItem } from "../../models/Item";
 
 @Component({
-  selector: 'app-link-list',
+  selector: '[app-link-list]',
   templateUrl: './link-list.component.html',
   styleUrls: ['./link-list.component.scss']
 })
