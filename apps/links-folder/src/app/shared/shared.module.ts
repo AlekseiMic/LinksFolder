@@ -9,12 +9,18 @@ import { ApiInterceptor } from './interceptors/api.interceptor';
 import { SignupComponent } from './components/signup/signup.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DynamicDialogComponent } from './dialogs/DynamicDialog/dynamic.dialog.component';
+import { DefaultLayoutComponent } from './components/defaultLayout/default.layout.component';
+import { HeaderComponent } from './components/header/header.component';
+import { AppButton } from './components/button/button.component';
 
 @NgModule({
   declarations: [
     SigninComponent,
     SignupComponent,
-    DynamicDialogComponent
+    DynamicDialogComponent,
+    DefaultLayoutComponent,
+    HeaderComponent,
+    AppButton
   ],
   imports: [CommonModule, FormsModule, ReactiveFormsModule, MatDialogModule],
   providers: [
@@ -22,6 +28,6 @@ import { DynamicDialogComponent } from './dialogs/DynamicDialog/dynamic.dialog.c
     JwtService,
     { provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true },
   ],
-  exports: [SigninComponent],
+  exports: [SigninComponent, DefaultLayoutComponent],
 })
 export class SharedModule {}

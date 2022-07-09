@@ -1,0 +1,16 @@
+<header>
+  <span class="logo">LinkFolder</span>
+  <div *ngIf="!isLogged; else logout" class="actions">
+    <button btn (click)="openSigninDialog()">Signin</button>
+    <button btn (click)="openSignupDialog()">Signup</button>
+  </div>
+  <ng-template #logout>
+    <div class="actions">
+      <button class="profile-btn">
+        <span class="avatar"></span>
+        <span class="username">Username</span>
+      </button>
+      <!-- <button btn (click)="onLogout()">Logout</button> -->
+    </div>
+  </ng-template>
+</header>

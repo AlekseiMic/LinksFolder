@@ -1,0 +1,19 @@
+:host {
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  border: 0.5px solid #C7C7C7;
+
+  padding: 0 15px;
+  font-weight: 500;
+  border-radius: 0px;
+  box-shadow: none;
+  background-color: #eee;
+  color: #4F4F4F;
+  outline: none;
+  margin: none;
+  &[primary] {
+    background: red;
+  }
+}
+
