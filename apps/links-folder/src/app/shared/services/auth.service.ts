@@ -34,7 +34,7 @@ export class AuthService {
         this.accessToken = null;
         return false;
       }
-      this.user = new User(data.id);
+      this.user = new User(data.id, data.name);
       this.accessToken = result.token;
       return true;
     }
@@ -61,7 +61,7 @@ export class AuthService {
         this.accessToken = null;
         return false;
       }
-      this.user = new User(data.id);
+      this.user = new User(data.id, data.name);
       this.accessToken = result.token;
       return true;
     }
@@ -102,7 +102,7 @@ export class AuthService {
         this.accessToken = null;
         return false;
       }
-      this.user = new User(data.id);
+      this.user = new User(data.id, data.name);
       this.accessToken = result.token;
       return true;
     }
@@ -124,7 +124,8 @@ export class AuthService {
   }
 
   set user(data: null | User) {
-    if (data !== user && (!user || !data)) this.isLoggedSubject.next(!!data);
+    const shouldNotifySubscribers = data !== user && (!user || !data);
     user = data;
+    if (shouldNotifySubscribers) this.isLoggedSubject.next(!!data);
   }
 }

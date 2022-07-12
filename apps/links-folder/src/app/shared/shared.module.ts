@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SigninComponent } from './components/signin/signin.component';
+import { MatMenuModule } from '@angular/material/menu';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from './services/auth.service';
 import { JwtService } from './services/jwt.service';
@@ -20,9 +21,9 @@ import { AppButton } from './components/button/button.component';
     DynamicDialogComponent,
     DefaultLayoutComponent,
     HeaderComponent,
-    AppButton
+    AppButton,
   ],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatDialogModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatDialogModule, MatMenuModule],
   providers: [
     AuthService,
     JwtService,

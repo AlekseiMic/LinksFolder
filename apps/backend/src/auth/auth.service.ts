@@ -13,18 +13,25 @@ export class AuthService {
     private jwtService: JwtService
   ) {}
 
-  async signup(username: string, password: string): Promise<{ user: User, session: Session, token: string }> {
+  async signup(
+    username: string,
+    password: string
+  ): Promise<{ user: User; session: Session; token: string }> {
     const user = await this.userService.create(username, password);
     const session = await this.sessionService.create(user);
-    const token = this.jwtService.create({ id: user.id });
+    const token = this.jwtService.create({ name: user.username, id: user.id });
     return { user, session, token };
   }
 
-  async signin(login: string, password: string): Promise<{ user: User, session: Session, token: string }> {
+  async signin(
+    login: string,
+    password: string
+  ): Promise<{ user: User; session: Session; token: string }> {
     const user = await this.userService.findByUsername(login);
-    if (!user || !(await user.checkPassword(password)) ) throw new Error('User not found');
+    if (!user || !(await user.checkPassword(password)))
+      throw new Error('User not found');
     const session = await this.sessionService.create(user);
-    const token = this.jwtService.create({ id: user.id });
+    const token = this.jwtService.create({ name: user.username, id: user.id });
     return { user, session, token };
   }
 
@@ -33,7 +40,7 @@ export class AuthService {
     if (!session) return null;
     const user = await this.userService.findById(session.userId);
     if (!user) return null;
-    const token = this.jwtService.create({ id: user.id });
+    const token = this.jwtService.create({ name: user.username, id: user.id });
     return { user, session, token };
   }
 

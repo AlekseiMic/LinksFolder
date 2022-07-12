@@ -6,11 +6,19 @@
   </div>
   <ng-template #logout>
     <div class="actions">
-      <button class="profile-btn">
-        <span class="avatar"></span>
-        <span class="username">Username</span>
-      </button>
-      <!-- <button btn (click)="onLogout()">Logout</button> -->
+      <div ngbDropdown>
+        <button
+          mat-button
+          [matMenuTriggerFor]="profileMenu"
+          class="profile-btn"
+        >
+          <span class="avatar"></span>
+          <span class="username">{{ user?.name ?? 'Unknown' }}</span>
+        </button>
+        <mat-menu #profileMenu="matMenu">
+          <button mat-menu-item (click)="onLogout()">Logout</button>
+        </mat-menu>
+      </div>
     </div>
   </ng-template>
 </header>

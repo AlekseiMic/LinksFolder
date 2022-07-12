@@ -4,6 +4,7 @@ import jwt_decode from 'jwt-decode';
 
 type JwtData = {
   id: number;
+  name: string;
 } & JwtPayload;
 
 Injectable();
