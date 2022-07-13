@@ -1,0 +1,9 @@
+<form [formGroup]="newLinkForm">
+  <p>Paste link in the input field and press enter</p>
+  <input
+    type="text"
+    formControlName="link"
+    (keyup.enter)="onCreateLink()"
+    id="link"
+  /><br />
+</form>

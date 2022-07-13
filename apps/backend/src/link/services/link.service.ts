@@ -1,13 +1,55 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Directory } from 'link/models/directory.model';
+import { DirectoryToUser } from 'link/models/directory.to.user.model';
 import { Link } from 'link/models/link.model';
+import { User } from 'user/user.model';
 
 @Injectable()
 export class LinkService {
-  constructor(@InjectModel(Link) private readonly linkModel: typeof Link) {}
+  constructor(
+    @InjectModel(Link) private readonly linkModel: typeof Link,
+    @InjectModel(DirectoryToUser)
+    private readonly dirToUser: typeof DirectoryToUser
+  ) {}
 
-  create(name: string): Promise<Link> {
-    return this.save(new Link({ name }));
+  async create(
+    name: string,
+    directory?: string,
+    user?: User,
+    token?: string
+  ): Promise<{ link: Link; guestCode?: string; guestAuthToken?: string }> {
+    let folder: null | number = null;
+    let authToken = token;
+
+    if (authToken) {
+      const guestDir = await this.dirToUser.findOne({
+        where: { authToken },
+      });
+      folder = guestDir?.directoryId ?? null;
+    }
+
+    if (!folder) {
+      const newDirectory = new Directory({ name: 'GuestDir' });
+      await newDirectory.save();
+      folder = newDirectory.id;
+    }
+
+    const link = new Link({ directory: folder, url: name });
+    await this.save(link);
+    const code = '12nasdlasd';
+    if (!user && !authToken) {
+      authToken = 'asdasdasdjncc213213';
+
+      const guestDirAccess = new DirectoryToUser({
+        directory: folder,
+        code,
+        authToken,
+        expiresIn: new Date(),
+      });
+      await guestDirAccess.save();
+    }
+    return { link, guestCode: code };
   }
 
   save(dir: Link) {

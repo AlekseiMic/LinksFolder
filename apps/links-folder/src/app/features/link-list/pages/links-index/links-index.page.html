@@ -1,17 +1,14 @@
-<p>list-list-index works!</p>
-
-<app-link-form
-  [createFolder]="listService.addFolder"
-  [create]="listService.addToList"></app-link-form>
-
-<div app-link-list
-  appDragNDropManagerRoot
-  *ngFor="let item of listService.activeLists"
-  [goToParentFolder]='listService.openParentFolder'
-  [isHome]='listService.isHome(item.folder)'
-  [openFolder]='listService.openFolder'
-  [delete]='listService.deleteFromList'
-  [edit]='listService.editInList'
-  [items]='item.folder'
-  [drop]='drop'>
-</div>
+<app-link-form></app-link-form>
+<app-link-simple-list></app-link-simple-list>
+<!---->
+<!-- <div app-link-list -->
+<!--   appDragNDropManagerRoot -->
+<!--   *ngFor="let item of listService.activeLists" -->
+<!--   [goToParentFolder]='listService.openParentFolder' -->
+<!--   [isHome]='listService.isHome(item.folder)' -->
+<!--   [openFolder]='listService.openFolder' -->
+<!--   [delete]='listService.deleteFromList' -->
+<!--   [edit]='listService.editInList' -->
+<!--   [items]='item.folder' -->
+<!--   [drop]='drop'> -->
+<!-- </div> -->

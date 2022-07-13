@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from '../user/user.model';
-import { DirectoryToUser } from './models/direcrtory.to.user.model';
+import { DirectoryToUser } from './models/directory.to.user.model';
 import { DirectoryController } from './controllers/v1/directory.controller';
 import { Directory } from './models/directory.model';
 import { DirectoryService } from './services/directory.service';

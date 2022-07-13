@@ -5,7 +5,7 @@ import { LinkRoutingModule } from './link-list-routing.module';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CdkAccordionModule } from '@angular/cdk/accordion';
 import { ReactiveFormsModule } from '@angular/forms';
-import { LinkFormComponent } from './components/link-form/link-form.component';
+import { LinkFormComponent } from './components/link-form/link.form.component';
 import { LinkItemComponent } from './components/link-item/link-item.component';
 import { LinkListComponent } from './components/link-list/link-list.component';
 import { LinkListService } from './services/link-list.service';
@@ -15,6 +15,8 @@ import {
 } from './directives/drag-n-drop-manager.directive';
 import { DragNDropManagerService } from './services/drag-n-drop-manager.service';
 import { MatCardModule } from '@angular/material/card';
+import { LinkService } from './services/link.service';
+import { LinkSimpleList } from './components/link-simple-list/link.simple.list.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +24,7 @@ import { MatCardModule } from '@angular/material/card';
     LinkFormComponent,
     LinkItemComponent,
     LinkListComponent,
+    LinkSimpleList,
     DragNDropManagerDirective,
     DragNDropManagerRootDirective,
   ],
@@ -33,6 +36,6 @@ import { MatCardModule } from '@angular/material/card';
     ReactiveFormsModule,
     MatCardModule,
   ],
-  providers: [LinkListService, DragNDropManagerService],
+  providers: [LinkListService, LinkService, DragNDropManagerService],
 })
 export class LinkListModule {}
