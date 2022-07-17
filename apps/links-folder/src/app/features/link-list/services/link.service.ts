@@ -1,10 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, Subject, Subscription, switchMap } from 'rxjs';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class LinkService {
   private listSubject: Subject<any[]> = new BehaviorSubject<any[]>([]);
 
@@ -14,14 +13,27 @@ export class LinkService {
 
   private code?: string;
 
-  constructor(private readonly http: HttpClient) {
-    this.http.get<{ list: any[], code?: string}>('http://localhost:3333/v1/link', { withCredentials: true }).subscribe((value) => {
+  private canEditSubject: Subject<boolean> = new BehaviorSubject<boolean>(false);
+
+  private canEdit = false;
+
+  constructor(private readonly http: HttpClient, routingParam: ActivatedRoute ) {
+    const code = routingParam.snapshot.paramMap.get('id') ?? '';
+    if (!code) {
+      this.canEdit = true;
+      this.canEditSubject.next(true);
+    }
+    this.http.get<{ canEdit?: boolean; list: any[]; code?: string}>('http://localhost:3333/v1/link/'+code, { withCredentials: true }).subscribe((value) => {
       this.list = value.list;
       this.listSubject.next(this.list);
       if (value.code && value.code !== this.code) {
         this.code = value.code;
         this.codeSubject.next(this.code);
       }
+        if (value.canEdit) {
+          this.canEdit = true;
+          this.canEditSubject.next(this.canEdit);
+        }
     });
   }
 
@@ -32,6 +44,11 @@ export class LinkService {
 
   subscribeToCodeChange(callback: (code: string | undefined) => void): Subscription {
     const sub = this.codeSubject.subscribe(callback);
+    return sub;
+  }
+
+  subscribeToCanEditChange(callback: (code: boolean) => void): Subscription {
+    const sub = this.canEditSubject.subscribe(callback);
     return sub;
   }
 

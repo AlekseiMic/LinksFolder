@@ -7,15 +7,22 @@ import { LinkService } from '../../services/link.service';
 @Component({
   selector: 'app-link-list-index',
   templateUrl: './links-index.page.html',
-  styleUrls: ['./links-index.page.scss']
+  styleUrls: ['./links-index.page.scss'],
+  providers: [LinkService]
 })
 export class LinksIndexPage implements OnInit {
   private sub: Subscription;
+  private canEditSub: Subscription;
   public code?: string;
+  public canEdit: boolean;
 
   constructor(public listService: LinkService, readonly location: Location, readonly locationStrategy: LocationStrategy, @Inject(DOCUMENT) readonly document: Document) {
     this.sub = listService.subscribeToCodeChange((code?: string) => {
       this.code = code;
+    });
+    this.canEditSub = listService.subscribeToCanEditChange((can: boolean) => {
+      console.log('here', can);
+      this.canEdit = can;
     });
   }
 

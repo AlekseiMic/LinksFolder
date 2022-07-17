@@ -101,7 +101,7 @@ export class LinkService {
       const result = await this.linkModel.findAll({
         where: { directory: dir?.directoryId }
       });
-      return { list: result, code: dir?.code };
+      return { canEdit: true, list: result, code: dir?.code };
     }
 
     if (!user) return { list: []};

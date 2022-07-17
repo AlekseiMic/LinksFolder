@@ -4,9 +4,13 @@ import { LinksIndexPage } from './pages/links-index/links-index.page';
 
 const routes: Routes = [
   {
+    path: ':id',
+    component: LinksIndexPage,
+  },
+  {
     path: '',
     component: LinksIndexPage
-  }
+  },
 ];
 
 @NgModule({

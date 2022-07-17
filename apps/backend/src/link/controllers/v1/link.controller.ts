@@ -63,7 +63,7 @@ export class LinkController {
   async find(
     @Req() req: Request,
     @Param('code') code?: string,
-  ): Promise<undefined | { list: Link[], code?: string}> {
+  ): Promise<undefined | { canEdit?: boolean, list: Link[], code?: string}> {
     const token = req.cookies['token'];
     const result = this.service.find(code, undefined, undefined, token);
     return result;
