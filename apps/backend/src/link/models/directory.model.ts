@@ -1,4 +1,5 @@
-import { Column, Model, Table } from "sequelize-typescript";
+import { Column, HasMany, Model, Table } from "sequelize-typescript";
+import { DirectoryToUser } from "./directory.to.user.model";
 
 @Table
 export class Directory extends Model {
@@ -10,4 +11,7 @@ export class Directory extends Model {
 
   @Column
   parent: number
+
+  @HasMany(() => DirectoryToUser)
+  directoryToUsers: DirectoryToUser[]
 }

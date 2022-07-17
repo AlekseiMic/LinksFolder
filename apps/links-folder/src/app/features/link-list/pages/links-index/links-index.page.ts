@@ -1,7 +1,8 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { Component, OnInit } from '@angular/core';
-import { Subject } from 'rxjs';
-import { LinkListService } from '../../services/link-list.service';
+import { DOCUMENT, Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
+import { Component, Inject, OnInit } from '@angular/core';
+import { Subject, Subscription } from 'rxjs';
+import { LinkService } from '../../services/link.service';
 
 @Component({
   selector: 'app-link-list-index',
@@ -9,8 +10,14 @@ import { LinkListService } from '../../services/link-list.service';
   styleUrls: ['./links-index.page.scss']
 })
 export class LinksIndexPage implements OnInit {
+  private sub: Subscription;
+  public code?: string;
 
-  constructor(public listService: LinkListService) {}
+  constructor(public listService: LinkService, readonly location: Location, readonly locationStrategy: LocationStrategy, @Inject(DOCUMENT) readonly document: Document) {
+    this.sub = listService.subscribeToCodeChange((code?: string) => {
+      this.code = code;
+    });
+  }
 
   public onDragDrop$ = new Subject<CdkDragDrop<Array<any>>>();
 

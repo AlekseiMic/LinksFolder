@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { LinksIndexPage } from './pages/links-index/links-index.page';
 import { LinkRoutingModule } from './link-list-routing.module';
 import { DragDropModule } from '@angular/cdk/drag-drop';

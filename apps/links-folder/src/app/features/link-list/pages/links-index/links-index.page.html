@@ -1,4 +1,5 @@
 <app-link-form></app-link-form>
+<div *ngIf=code class="link">Your link: <a href="{{location.prepareExternalUrl(code)}}">{{document.location.origin}}{{location.prepareExternalUrl(code)}}</a></div>
 <app-link-simple-list></app-link-simple-list>
 <!---->
 <!-- <div app-link-list -->

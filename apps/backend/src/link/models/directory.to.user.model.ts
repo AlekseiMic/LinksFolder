@@ -1,6 +1,7 @@
-import { Column, ForeignKey, Model, Table } from 'sequelize-typescript';
+import { BelongsToMany, Column, ForeignKey, HasMany, HasOne, Model, Table } from 'sequelize-typescript';
 import { User } from 'user/user.model';
 import { Directory } from './directory.model';
+import { Link } from './link.model';
 
 @Table
 export class DirectoryToUser extends Model {
@@ -21,3 +22,4 @@ export class DirectoryToUser extends Model {
   @Column
   authToken: string;
 }
+

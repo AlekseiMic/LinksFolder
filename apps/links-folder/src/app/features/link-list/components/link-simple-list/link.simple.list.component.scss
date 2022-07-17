@@ -1,0 +1,17 @@
+.list {
+  padding: 10px 385px;
+}
+
+.item {
+  margin-top: 7px;
+  box-shadow: 0 0 3px 1px #aaa;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  padding: 0 25px;
+  font-size: 20px;
+  a {
+    text-decoration: none;
+    color: #444;
+  }
+}

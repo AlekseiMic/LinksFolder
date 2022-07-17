@@ -1,11 +1,21 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { SharedModule } from './shared/shared.module';
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
+import { RouterModule, Routes } from '@angular/router';
+
+const routes: Routes = [
+  {
+    path: '',
+    loadChildren: () =>
+      import('./features/link-list/link-list.module').then(
+        (m) => m.LinkListModule
+      ),
+  },
+];
 
 @NgModule({
   declarations: [AppComponent],
@@ -13,7 +23,7 @@ import { HttpClientModule } from '@angular/common/http';
     CoreModule,
     BrowserModule,
     HttpClientModule,
-    AppRoutingModule,
+    RouterModule.forRoot(routes),
     BrowserAnimationsModule,
     SharedModule,
   ],
