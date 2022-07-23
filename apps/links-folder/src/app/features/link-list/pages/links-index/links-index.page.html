@@ -1,6 +1,15 @@
-<ng-container *ngIf=canEdit>
-  <app-link-form></app-link-form>
-  <div *ngIf=code class="link">Your link: <a href="{{location.prepareExternalUrl(code)}}">{{document.location.origin}}{{location.prepareExternalUrl(code)}}</a></div>
+<ng-container *ngIf="canEdit">
+  <app-link-form [showDescription]="!code"></app-link-form>
+  <div *ngIf="code" class="link">
+    <span>Your link: </span>
+    <div class="link-wrapper">
+      <a href="{{location.prepareExternalUrl(code)}}"
+        >{{getLink()}}</a>
+    </div>
+    <button (click)="copyLink()">
+      <svg-icon name="copy-icon"></svg-icon>
+    </button>
+  </div>
 </ng-container>
 <app-link-simple-list></app-link-simple-list>
 <!---->

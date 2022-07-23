@@ -44,7 +44,6 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) response: Response
   ): Promise<{ user: User; token: string }> {
-    console.log(req.cookies);
     const refreshToken = req.cookies['refreshToken'];
     if (!refreshToken) throw new Error('Not Authorized');
     const result = await this.authService.refreshAccessToken(refreshToken);
@@ -59,7 +58,6 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) response: Response
   ): Promise<boolean> {
-    console.log(req.cookies['refreshToken']);
     await this.authService.logout(req.cookies['refreshToken']);
     response.clearCookie('refreshToken', refreshCookieOptions);
     return true;

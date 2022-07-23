@@ -1,27 +1,39 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { DOCUMENT, Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
+import {
+  DOCUMENT,
+  Location,
+  LocationStrategy,
+  PathLocationStrategy,
+} from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
 import { LinkService } from '../../services/link.service';
+import { Clipboard } from '@angular/cdk/clipboard';
 
 @Component({
   selector: 'app-link-list-index',
   templateUrl: './links-index.page.html',
   styleUrls: ['./links-index.page.scss'],
-  providers: [LinkService]
+  providers: [LinkService],
 })
 export class LinksIndexPage implements OnInit {
   private sub: Subscription;
   private canEditSub: Subscription;
+
   public code?: string;
   public canEdit: boolean;
 
-  constructor(public listService: LinkService, readonly location: Location, readonly locationStrategy: LocationStrategy, @Inject(DOCUMENT) readonly document: Document) {
+  constructor(
+    public listService: LinkService,
+    private clipboard: Clipboard,
+    readonly location: Location,
+    readonly locationStrategy: LocationStrategy,
+    @Inject(DOCUMENT) readonly document: Document
+  ) {
     this.sub = listService.subscribeToCodeChange((code?: string) => {
       this.code = code;
     });
     this.canEditSub = listService.subscribeToCanEditChange((can: boolean) => {
-      console.log('here', can);
       this.canEdit = can;
     });
   }
@@ -31,6 +43,19 @@ export class LinksIndexPage implements OnInit {
   ngOnInit(): void {
     // this.listService.openFolder();
     // this.onDragDrop$.subscribe(this.onDragDrop);
+  }
+
+  copyLink() {
+    const link = this.getLink();
+    if (!link) return;
+    this.clipboard.copy(link);
+  }
+
+  getLink() {
+    if (!this.code) return null;
+    return `${document.location.origin}${this.location.prepareExternalUrl(
+      this.code
+    )}`;
   }
 
   // public drop = (event: any) => {

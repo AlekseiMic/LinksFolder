@@ -10,8 +10,14 @@
   align-items: center;
   padding: 0 25px;
   font-size: 20px;
+  position: relative;
   a {
     text-decoration: none;
     color: #444;
+  }
+
+  .delete {
+    position: absolute;
+    right: 0;
   }
 }

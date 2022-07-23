@@ -29,7 +29,7 @@ export class LinkController {
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request
   ): Promise<{ result: Link; code?: string; }> {
-    const token = req.cookies['token'];
+    const token = req.cookies['tokenzy'];
     const data: { text?: string, url: string }  = { url };
     if (text) data.text = text;
     const { link, code, authToken } = await this.service.create(
@@ -39,7 +39,7 @@ export class LinkController {
       token
     );
 
-    res.cookie('token', authToken, {
+    res.cookie('tokenzy', authToken, {
       secure: false,
       httpOnly: true,
       maxAge: 1000 * 3600 * 60,
@@ -53,7 +53,7 @@ export class LinkController {
     @Body() { url, name }: { name: string, url?: string },
     @Req() req: Request
   ): Promise<boolean> {
-    const token = req.cookies['token'];
+    const token = req.cookies['tokenzy'];
     const data: { name: string, link?: string } = { name };
     if (url) data.link = url;
     return this.service.rename(id, { url, name }, undefined, token);
@@ -64,14 +64,14 @@ export class LinkController {
     @Req() req: Request,
     @Param('code') code?: string,
   ): Promise<undefined | { canEdit?: boolean, list: Link[], code?: string}> {
-    const token = req.cookies['token'];
+    const token = req.cookies['tokenzy'];
     const result = this.service.find(code, undefined, undefined, token);
     return result;
   }
 
   @Delete(':id')
   async delete(@Param('id') id: string, @Req() req: Request): Promise<number> {
-    const token = req.cookies['token'];
+    const token = req.cookies['tokenzy'];
     const ids = id.split(',').map(Number);
     return this.service.delete(ids, false, undefined, token);
   }

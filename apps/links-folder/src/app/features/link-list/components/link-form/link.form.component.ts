@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { UntypedFormBuilder } from '@angular/forms';
 import { LinkService } from '../../services/link.service';
 
 @Component({
@@ -12,10 +12,12 @@ export class LinkFormComponent implements OnInit {
 
   @Input() create?: (url: string) => void;
 
+  @Input() showDescription?: boolean;
+
   @Input() createFolder?: (name: string) => void;
 
   constructor(
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     private linkService: LinkService
   ) {}
 

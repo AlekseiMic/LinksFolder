@@ -6,6 +6,8 @@ import { CoreModule } from './core/core.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule, Routes } from '@angular/router';
+import { AngularSvgIconModule } from 'angular-svg-icon';
+import { AngularSvgIconPreloaderModule } from 'angular-svg-icon-preloader';
 
 const routes: Routes = [
   {
@@ -20,6 +22,10 @@ const routes: Routes = [
 @NgModule({
   declarations: [AppComponent],
   imports: [
+    AngularSvgIconModule.forRoot(),
+    AngularSvgIconPreloaderModule.forRoot({
+      configUrl: 'http://localhost:4200/assets/icons.json',
+    }),
     CoreModule,
     BrowserModule,
     HttpClientModule,

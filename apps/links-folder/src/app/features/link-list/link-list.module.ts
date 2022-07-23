@@ -17,6 +17,7 @@ import { DragNDropManagerService } from './services/drag-n-drop-manager.service'
 import { MatCardModule } from '@angular/material/card';
 import { LinkService } from './services/link.service';
 import { LinkSimpleList } from './components/link-simple-list/link.simple.list.component';
+import { AngularSvgIconModule } from 'angular-svg-icon';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { LinkSimpleList } from './components/link-simple-list/link.simple.list.c
     DragNDropManagerRootDirective,
   ],
   imports: [
+    AngularSvgIconModule,
     CommonModule,
     LinkRoutingModule,
     DragDropModule,

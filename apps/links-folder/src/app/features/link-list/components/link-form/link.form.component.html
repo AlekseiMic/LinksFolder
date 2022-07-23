@@ -1,5 +1,5 @@
 <form [formGroup]="newLinkForm">
-  <p>Paste link in the input field and press enter</p>
+  <p [ngClass]="{'small': !showDescription }">Paste link in the input field and press enter</p>
   <input
     autocomplete=off
     type="text"

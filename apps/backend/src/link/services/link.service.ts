@@ -19,7 +19,7 @@ export class LinkService {
   ) {}
 
   async create(
-    data: { url: string, name?: string},
+    data: { url: string; name?: string },
     directory?: string,
     user?: User,
     token?: string
@@ -89,7 +89,7 @@ export class LinkService {
       const dir = await this.dirToUser.findOne({
         where: { code },
       });
-      if (!dir) return { list: [] };
+      if (!dir || !dir.directoryId) return { list: [] };
       const result = await this.linkModel.findAll({
         where: { directory: dir.directoryId },
       });
@@ -97,16 +97,19 @@ export class LinkService {
     }
 
     if (token) {
-      const dir = await this.dirToUser.findOne({ where: { authToken: token }});
+      const dir = await this.dirToUser.findOne({ where: { authToken: token } });
+      if (!dir || !dir.directoryId) return { list: [] };
       const result = await this.linkModel.findAll({
-        where: { directory: dir?.directoryId }
+        where: { directory: dir.directoryId },
       });
       return { canEdit: true, list: result, code: dir?.code };
     }
 
-    if (!user) return { list: []};
+    if (!user) return { list: [] };
 
-    return { list: await this.linkModel.findAll({ where: { userId: user.id }})};
+    return {
+      list: await this.linkModel.findAll({ where: { userId: user.id } }),
+    };
   }
 
   async delete(
@@ -117,7 +120,7 @@ export class LinkService {
   ) {
     if (!user && !token) throw new ForbiddenException('No rights');
     if (token) {
-      const dir = await this.dirToUser.findOne({ where: { authToken: token }, });
+      const dir = await this.dirToUser.findOne({ where: { authToken: token } });
       if (!dir) throw new NotFoundException('Id not found');
       const result = await this.linkModel.destroy({
         where: {

@@ -1,5 +1,6 @@
 <div class="list">
   <div class="item" *ngFor="let link of links">
     <a href="{{ link.url }}">{{link.text ?? link.url}}</a>
+    <button class="delete" btn>delete</button>
   </div>
 </div>

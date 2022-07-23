@@ -4,8 +4,66 @@
 }
 
 .link {
-  text-align: center;
+  border-radius: 5px;
+  width: 480px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 5px 10px 5px 10px;
+  box-sizing: border-box;
+  color: #ccc;
+  margin: 20px auto 30px auto;
+  box-shadow: 0 0 10px 2px #999;
+  height: 50px;
   font-size: 20px;
-  margin-top: 20px;
-  margin-bottom: 30px;
+  position: relative;
+  background: #5227cc;
+  span {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -o-user-select: none;
+    position: absolute;
+    top: 2px;
+    font-size: 14px;
+    font-weight: bold;
+    left: 10px;
+    font-style: italic;
+  }
+  a {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: calc(100% - 50px);
+    line-height: 22px;
+    font-size: 22px;
+    text-decoration: none;
+    font-weight: bold;
+    color: #fff;
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+}
+button {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: #5227cc;
+  cursor: pointer;
+  transition: all ease-in-out 0.15s;
+  height: 100%;
+  margin-left: 5px;
+  svg {
+    height: 100%;
+  }
+  &:hover {
+    color: rgba(#fff, 0.6);
+    background: rgba(#5227cc, 0.5);
+  }
 }

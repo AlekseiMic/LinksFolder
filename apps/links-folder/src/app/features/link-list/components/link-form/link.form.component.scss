@@ -4,13 +4,18 @@ form {
   width: 60vw;
   text-align: center;
   margin: auto;
-  margin-top: 50px;
   p {
+    margin-top: 50px;
     font-size: 55px;
     line-height: 70px;
     color: #444;
     font-weight: 700;
     margin-bottom: 40px;
+    &.small {
+      margin: 30px 0 15px 0;
+      font-size: 20px;
+      line-height: 20px;
+    }
   }
   input {
     box-sizing: border-box;
