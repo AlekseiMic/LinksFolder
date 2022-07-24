@@ -25,13 +25,11 @@ export class LinkController {
 
   @Post()
   async create(
-    @Body() { text, url }: { text?: string, url: string },
+    @Body() data: { text?: string; url: string },
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request
-  ): Promise<{ result: Link; code?: string; }> {
+  ): Promise<{ result: Link; code?: string }> {
     const token = req.cookies['tokenzy'];
-    const data: { text?: string, url: string }  = { url };
-    if (text) data.text = text;
     const { link, code, authToken } = await this.service.create(
       data,
       undefined,
@@ -50,20 +48,20 @@ export class LinkController {
   @Patch(':id')
   async edit(
     @Param('id') id: number,
-    @Body() { url, name }: { name: string, url?: string },
+    @Body() { url, text }: { text: string; url?: string },
     @Req() req: Request
   ): Promise<boolean> {
     const token = req.cookies['tokenzy'];
-    const data: { name: string, link?: string } = { name };
+    const data: { text: string; link?: string } = { text };
     if (url) data.link = url;
-    return this.service.rename(id, { url, name }, undefined, token);
+    return this.service.rename(id, data, undefined, token);
   }
 
   @Get(':code?')
   async find(
     @Req() req: Request,
-    @Param('code') code?: string,
-  ): Promise<undefined | { canEdit?: boolean, list: Link[], code?: string}> {
+    @Param('code') code?: string
+  ): Promise<undefined | { canEdit?: boolean; list: Link[]; code?: string }> {
     const token = req.cookies['tokenzy'];
     const result = this.service.find(code, undefined, undefined, token);
     return result;

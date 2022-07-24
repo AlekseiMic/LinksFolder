@@ -14,7 +14,6 @@ import { Clipboard } from '@angular/cdk/clipboard';
   selector: 'app-link-list-index',
   templateUrl: './links-index.page.html',
   styleUrls: ['./links-index.page.scss'],
-  providers: [LinkService],
 })
 export class LinksIndexPage implements OnInit {
   private sub: Subscription;

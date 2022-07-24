@@ -5,16 +5,16 @@
 
 .link {
   border-radius: 5px;
-  width: 480px;
+  width: 340px;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   padding: 5px 10px 5px 10px;
   box-sizing: border-box;
   color: #ccc;
-  margin: 20px auto 30px auto;
+  margin: 25px auto 10px auto;
   box-shadow: 0 0 10px 2px #999;
-  height: 50px;
+  height: 45px;
   font-size: 20px;
   position: relative;
   background: #5227cc;
@@ -32,12 +32,13 @@
     font-style: italic;
   }
   a {
+    display: block;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    width: calc(100% - 50px);
-    line-height: 22px;
-    font-size: 22px;
+    max-width: 100%;
+    line-height: 20px;
+    font-size: 20px;
     text-decoration: none;
     font-weight: bold;
     color: #fff;
@@ -66,4 +67,9 @@ button {
     color: rgba(#fff, 0.6);
     background: rgba(#5227cc, 0.5);
   }
+}
+h2 {
+  padding: 0 385px;
+  margin-top: 30px;
+  margin-bottom: 0;
 }

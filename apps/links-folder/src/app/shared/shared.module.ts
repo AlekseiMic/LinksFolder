@@ -13,6 +13,8 @@ import { DynamicDialogComponent } from './dialogs/DynamicDialog/dynamic.dialog.c
 import { DefaultLayoutComponent } from './components/defaultLayout/default.layout.component';
 import { HeaderComponent } from './components/header/header.component';
 import { AppButton } from './components/button/button.component';
+import { DefaultDialogComponent } from './components/default-dialog/default-dialog.component';
+import { AngularSvgIconModule } from 'angular-svg-icon';
 
 @NgModule({
   declarations: [
@@ -22,13 +24,21 @@ import { AppButton } from './components/button/button.component';
     DefaultLayoutComponent,
     HeaderComponent,
     AppButton,
+    DefaultDialogComponent,
   ],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatDialogModule, MatMenuModule],
+  imports: [
+    AngularSvgIconModule,
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatMenuModule,
+  ],
   providers: [
     AuthService,
     JwtService,
     { provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true },
   ],
-  exports: [SigninComponent, DefaultLayoutComponent],
+  exports: [SigninComponent, DefaultLayoutComponent, DefaultDialogComponent],
 })
 export class SharedModule {}

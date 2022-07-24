@@ -1,17 +1,19 @@
-<ng-container *ngIf="canEdit">
-  <app-link-form [showDescription]="!code"></app-link-form>
-  <div *ngIf="code" class="link">
-    <span>Your link: </span>
-    <div class="link-wrapper">
-      <a href="{{location.prepareExternalUrl(code)}}"
-        >{{getLink()}}</a>
+<section>
+  <ng-container *ngIf="canEdit">
+    <app-link-form [showDescription]="!code"></app-link-form>
+    <div *ngIf="code" class="link">
+      <span>Your link: </span>
+      <a href="{{location.prepareExternalUrl(code)}}">{{getLink()}}</a>
+      <button (click)="copyLink()">
+        <svg-icon name="copy-icon"></svg-icon>
+      </button>
     </div>
-    <button (click)="copyLink()">
-      <svg-icon name="copy-icon"></svg-icon>
-    </button>
-  </div>
-</ng-container>
-<app-link-simple-list></app-link-simple-list>
+  </ng-container>
+</section>
+<section>
+  <h2>Links list</h2>
+  <app-link-simple-list [canEdit]="canEdit"></app-link-simple-list>
+</section>
 <!---->
 <!-- <div app-link-list -->
 <!--   appDragNDropManagerRoot -->

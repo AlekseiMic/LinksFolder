@@ -1,0 +1,5 @@
+<form [formGroup]="editLinkForm" (ngSubmit)='submit()' class="form">
+  <input autocomplete="off" type="text" formControlName="link" id="link" />
+  <input autocomplete="off" type="text" formControlName="name" id="name" />
+  <button type="submit">Save</button>
+</form>

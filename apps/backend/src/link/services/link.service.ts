@@ -19,7 +19,7 @@ export class LinkService {
   ) {}
 
   async create(
-    data: { url: string; name?: string },
+    data: { url: string; text?: string },
     directory?: string,
     user?: User,
     token?: string
@@ -63,7 +63,7 @@ export class LinkService {
 
   async rename(
     id: number,
-    data: { name: string; url?: string },
+    data: { text: string; url?: string },
     user?: User,
     token?: string
   ) {

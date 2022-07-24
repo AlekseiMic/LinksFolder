@@ -1,0 +1,17 @@
+.dialog-wrapper {
+  position: relative;
+  width: 320px;
+
+}
+.close {
+  background-color: transparent;
+  border: none;
+  border-radius:0px;
+  padding: 2px;
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}

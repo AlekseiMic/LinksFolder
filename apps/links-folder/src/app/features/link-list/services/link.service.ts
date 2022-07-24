@@ -7,34 +7,43 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 export class LinkService {
   private listSubject: Subject<any[]> = new BehaviorSubject<any[]>([]);
 
-  private codeSubject: Subject<string | undefined> = new BehaviorSubject<string | undefined>(undefined);
+  private codeSubject: Subject<string | undefined> = new BehaviorSubject<
+    string | undefined
+  >(undefined);
 
-  private list: {url: string, text?:string, id: number}[] = [];
+  private list: { url: string; text?: string; id: number }[] = [];
 
   private code?: string;
 
-  private canEditSubject: Subject<boolean> = new BehaviorSubject<boolean>(false);
+  private canEditSubject: Subject<boolean> = new BehaviorSubject<boolean>(
+    false
+  );
 
   private canEdit = false;
 
-  constructor(private readonly http: HttpClient, routingParam: ActivatedRoute ) {
+  constructor(private readonly http: HttpClient, routingParam: ActivatedRoute) {
     const code = routingParam.snapshot.paramMap.get('id') ?? '';
     if (!code) {
       this.canEdit = true;
       this.canEditSubject.next(true);
     }
-    this.http.get<{ canEdit?: boolean; list: any[]; code?: string}>('http://localhost:3333/v1/link/'+code, { withCredentials: true }).subscribe((value) => {
-      this.list = value.list;
-      this.listSubject.next(this.list);
-      if (value.code && value.code !== this.code) {
-        this.code = value.code;
-        this.codeSubject.next(this.code);
-      }
+    this.http
+      .get<{ canEdit?: boolean; list: any[]; code?: string }>(
+        'http://localhost:3333/v1/link/' + code,
+        { withCredentials: true }
+      )
+      .subscribe((value) => {
+        this.list = value.list;
+        this.listSubject.next(this.list);
+        if (value.code && value.code !== this.code) {
+          this.code = value.code;
+          this.codeSubject.next(this.code);
+        }
         if (value.canEdit) {
           this.canEdit = true;
           this.canEditSubject.next(this.canEdit);
         }
-    });
+      });
   }
 
   subscribeToListChanges(callback: (value: any[]) => void): Subscription {
@@ -42,7 +51,9 @@ export class LinkService {
     return sub;
   }
 
-  subscribeToCodeChange(callback: (code: string | undefined) => void): Subscription {
+  subscribeToCodeChange(
+    callback: (code: string | undefined) => void
+  ): Subscription {
     const sub = this.codeSubject.subscribe(callback);
     return sub;
   }
@@ -54,7 +65,10 @@ export class LinkService {
 
   addLink(url: string) {
     this.http
-      .post<{ result: { url: string, text?: string, id: number}; code: string }>(
+      .post<{
+        result: { url: string; text?: string; id: number };
+        code: string;
+      }>(
         'http://localhost:3333/v1/link',
         { url, text: url },
         { withCredentials: true }
@@ -73,5 +87,45 @@ export class LinkService {
 
   getLinks(): typeof this.list {
     return this.list;
+  }
+
+  delete(id: number) {
+    this.http
+      .delete<number>('http://localhost:3333/v1/link/' + id, {
+        withCredentials: true,
+      })
+      .subscribe((value) => {
+        if (value) {
+          this.list = this.list.filter((el) => el.id !== id);
+          this.listSubject.next(this.list);
+        }
+      });
+  }
+
+  edit(id: number, formData: { link: string; name: string }) {
+    return new Promise((resolve, reject) => {
+      this.http
+        .patch<number>(
+          'http://localhost:3333/v1/link/' + id,
+          { text: formData.name, url: formData.link },
+          {
+            withCredentials: true,
+          }
+        )
+        .subscribe((value) => {
+          if (value) {
+            this.list = this.list.map((el) => {
+              if (el.id === id) {
+                el = { ...el };
+                el.url = formData.link;
+                el.text = formData.name;
+              }
+              return el;
+            });
+            this.listSubject.next(this.list);
+            resolve(true);
+          }
+        });
+    });
   }
 }

@@ -1,6 +1,9 @@
 <div class="list">
   <div class="item" *ngFor="let link of links">
-    <a href="{{ link.url }}">{{link.text ?? link.url}}</a>
-    <button class="delete" btn>delete</button>
+    <a href="{{ link.url }}">{{ link.text ?? link.url }}</a>
+    <div class="actions">
+      <button *ngIf="canEdit" class="edit" btn (click)="edit(link.id)">edit</button>
+      <button *ngIf="canEdit" class="delete" btn (click)="delete(link.id)">delete</button>
+    </div>
   </div>
 </div>
