@@ -1,5 +1,5 @@
 <header>
-  <span class="logo">LinkFolder</span>
+  <a [routerLink]="['/']"><span class="logo">LinkFolder</span></a>
   <div *ngIf="!isLogged; else logout" class="actions">
     <button btn (click)="openSigninDialog()">Signin</button>
     <button btn (click)="openSignupDialog()">Signup</button>

@@ -90,10 +90,11 @@ export class LinkService {
         where: { code },
       });
       if (!dir || !dir.directoryId) return { list: [] };
+      if (token !== dir.authToken && dir.expiresIn < new Date()) return { list: [] };
       const result = await this.linkModel.findAll({
         where: { directory: dir.directoryId },
       });
-      return { list: result, code };
+      return { list: result, code, canEdit: token === dir.authToken };
     }
 
     if (token) {

@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject, Subscription, switchMap } from 'rxjs';
-import { ActivatedRoute, ParamMap } from '@angular/router';
+import { BehaviorSubject, Subject, Subscription } from 'rxjs';
 
 @Injectable()
 export class LinkService {
@@ -12,28 +11,31 @@ export class LinkService {
   >(undefined);
 
   private list: { url: string; text?: string; id: number }[] = [];
-
   private code?: string;
-
-  private canEditSubject: Subject<boolean> = new BehaviorSubject<boolean>(
-    false
-  );
-
+  private lastFetch: Date;
+  private canEditSubject = new BehaviorSubject<boolean>(false);
   private canEdit = false;
 
-  constructor(private readonly http: HttpClient, routingParam: ActivatedRoute) {
-    const code = routingParam.snapshot.paramMap.get('id') ?? '';
+  constructor(private readonly http: HttpClient) {}
+
+  fetchList(code?: string) {
+    if (
+      code === this.code &&
+      this.lastFetch.getTime() >= new Date().getTime() + 60000
+    )
+      return;
     if (!code) {
       this.canEdit = true;
       this.canEditSubject.next(true);
     }
     this.http
       .get<{ canEdit?: boolean; list: any[]; code?: string }>(
-        'http://localhost:3333/v1/link/' + code,
+        'http://localhost:3333/v1/link/' + (code ?? ''),
         { withCredentials: true }
       )
       .subscribe((value) => {
-        this.list = value.list;
+        this.lastFetch = new Date();
+        this.list = value?.list ?? [];
         this.listSubject.next(this.list);
         if (value.code && value.code !== this.code) {
           this.code = value.code;

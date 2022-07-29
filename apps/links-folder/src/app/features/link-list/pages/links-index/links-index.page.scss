@@ -1,3 +1,5 @@
+$linkHeight: 45px;
+
 .folders {
   display: flex;
   justify-content: space-between;
@@ -14,7 +16,7 @@
   color: #ccc;
   margin: 25px auto 10px auto;
   box-shadow: 0 0 10px 2px #999;
-  height: 45px;
+  height: $linkHeight;
   font-size: 20px;
   position: relative;
   background: #5227cc;
@@ -47,25 +49,29 @@
     }
   }
 }
-button {
+.actions {
   position: absolute;
   left: 100%;
   top: 0;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  padding: 10px;
-  background-color: #5227cc;
-  cursor: pointer;
-  transition: all ease-in-out 0.15s;
-  height: 100%;
-  margin-left: 5px;
-  svg {
-    height: 100%;
-  }
-  &:hover {
-    color: rgba(#fff, 0.6);
-    background: rgba(#5227cc, 0.5);
+  display: flex;
+  > button {
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #5227cc;
+    cursor: pointer;
+    transition: all ease-in-out 0.15s;
+    height: $linkHeight;
+    margin-left: 5px;
+    width: $linkHeight;
+    svg {
+      height: 100%;
+    }
+    &:hover {
+      color: rgba(#fff, 0.6);
+      background: rgba(#5227cc, 0.5);
+    }
   }
 }
 h2 {

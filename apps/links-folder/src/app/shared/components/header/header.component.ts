@@ -30,14 +30,12 @@ export class HeaderComponent implements OnInit {
 
   openSigninDialog() {
     this.dialog.open(DynamicDialogComponent, {
-      width: '400px',
       data: { component: SigninComponent },
     });
   }
 
   openSignupDialog() {
     this.dialog.open(DynamicDialogComponent, {
-      width: '400px',
       data: { component: SignupComponent },
     });
   }

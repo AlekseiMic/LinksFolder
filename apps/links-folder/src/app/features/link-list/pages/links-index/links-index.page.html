@@ -3,26 +3,22 @@
     <app-link-form [showDescription]="!code"></app-link-form>
     <div *ngIf="code" class="link">
       <span>Your link: </span>
-      <a href="{{location.prepareExternalUrl(code)}}">{{getLink()}}</a>
+      <a href="{{getLink()}}">{{getLink()}}</a>
+      <div class="actions">
       <button (click)="copyLink()">
         <svg-icon name="copy-icon"></svg-icon>
       </button>
+      <button (click)="copyLink()">
+        <svg-icon name="pen-icon"></svg-icon>
+      </button>
+      <button (click)="copyLink()">
+        <svg-icon name="clock-icon"></svg-icon>
+      </button>
+      </div>
     </div>
   </ng-container>
 </section>
-<section>
+<section *ngIf="!!code">
   <h2>Links list</h2>
   <app-link-simple-list [canEdit]="canEdit"></app-link-simple-list>
 </section>
-<!---->
-<!-- <div app-link-list -->
-<!--   appDragNDropManagerRoot -->
-<!--   *ngFor="let item of listService.activeLists" -->
-<!--   [goToParentFolder]='listService.openParentFolder' -->
-<!--   [isHome]='listService.isHome(item.folder)' -->
-<!--   [openFolder]='listService.openFolder' -->
-<!--   [delete]='listService.deleteFromList' -->
-<!--   [edit]='listService.editInList' -->
-<!--   [items]='item.folder' -->
-<!--   [drop]='drop'> -->
-<!-- </div> -->

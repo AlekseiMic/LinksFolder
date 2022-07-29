@@ -1,16 +1,30 @@
+$paddingY: 10px;
+$paddingX: 15px;
+
 .dialog-wrapper {
   position: relative;
   width: 320px;
+  padding: $paddingY $paddingX;
+  box-sizing: border-box;
+  border-radius:5px;
 
 }
+
+h2 {
+  height: 20px;
+  line-height: 20px;
+  font-size: 20px;
+
+}
+
 .close {
   background-color: transparent;
   border: none;
   border-radius:0px;
   padding: 2px;
   position: absolute;
-  right: -10px;
-  top: -10px;
+  right: $paddingX;
+  top: $paddingY;
   width: 20px;
   height: 20px;
   cursor: pointer;

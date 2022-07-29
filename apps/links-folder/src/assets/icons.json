@@ -1,4 +1,29 @@
 {
-  "iconImageFiles": [{ "iconName": "copy-icon", "iconPath": "http://localhost:4200/assets/svg/copy.svg" }],
+  "iconImageFiles": [
+    {
+      "iconName": "copy-icon",
+      "iconPath": "http://localhost:4200/assets/svg/copy.svg"
+    },
+    {
+      "iconName": "trash-icon",
+      "iconPath": "http://localhost:4200/assets/svg/trash.svg"
+    },
+    {
+      "iconName": "gear-icon",
+      "iconPath": "http://localhost:4200/assets/svg/gear.svg"
+    },
+    {
+      "iconName": "close-icon",
+      "iconPath": "http://localhost:4200/assets/svg/close.svg"
+    },
+    {
+      "iconName": "clock-icon",
+      "iconPath": "http://localhost:4200/assets/svg/clock.svg"
+    },
+    {
+      "iconName": "pen-icon",
+      "iconPath": "http://localhost:4200/assets/svg/pen.svg"
+    }
+  ],
   "customIcons": []
 }

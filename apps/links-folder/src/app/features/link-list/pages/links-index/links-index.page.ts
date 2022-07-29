@@ -1,14 +1,9 @@
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import {
-  DOCUMENT,
-  Location,
-  LocationStrategy,
-  PathLocationStrategy,
-} from '@angular/common';
+import { DOCUMENT, Location, LocationStrategy } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
-import { Subject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { LinkService } from '../../services/link.service';
 import { Clipboard } from '@angular/cdk/clipboard';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-link-list-index',
@@ -16,32 +11,45 @@ import { Clipboard } from '@angular/cdk/clipboard';
   styleUrls: ['./links-index.page.scss'],
 })
 export class LinksIndexPage implements OnInit {
-  private sub: Subscription;
+  private codeSub: Subscription;
   private canEditSub: Subscription;
+  private routeSub: Subscription;
 
   public code?: string;
   public canEdit: boolean;
 
   constructor(
-    public listService: LinkService,
+    private listService: LinkService,
     private clipboard: Clipboard,
     readonly location: Location,
+    private routingParam: ActivatedRoute,
     readonly locationStrategy: LocationStrategy,
+    private router: Router,
     @Inject(DOCUMENT) readonly document: Document
-  ) {
-    this.sub = listService.subscribeToCodeChange((code?: string) => {
-      this.code = code;
-    });
-    this.canEditSub = listService.subscribeToCanEditChange((can: boolean) => {
-      this.canEdit = can;
-    });
-  }
-
-  public onDragDrop$ = new Subject<CdkDragDrop<Array<any>>>();
+  ) {}
 
   ngOnInit(): void {
-    // this.listService.openFolder();
-    // this.onDragDrop$.subscribe(this.onDragDrop);
+    this.routeSub = this.routingParam.params.subscribe((params) => {
+      this.listService.fetchList(params['id']);
+    });
+    this.codeSub = this.listService.subscribeToCodeChange((code?: string) => {
+      if (this.code !== code) {
+        const url = this.router.createUrlTree([code ?? '']).toString();
+        this.location.go(url);
+      }
+      this.code = code;
+    });
+    this.canEditSub = this.listService.subscribeToCanEditChange(
+      (can: boolean) => {
+        this.canEdit = can;
+      }
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.routeSub.unsubscribe();
+    this.codeSub.unsubscribe();
+    this.canEditSub.unsubscribe();
   }
 
   copyLink() {
@@ -56,21 +64,4 @@ export class LinksIndexPage implements OnInit {
       this.code
     )}`;
   }
-
-  // public drop = (event: any) => {
-  //   this.onDragDrop$.next(event);
-  // }
-  //
-  // public onDragDrop = (event: CdkDragDrop<any>) => {
-  //   if (event.container === event.previousContainer) {
-  //     moveItemInArray(event.container.data.children, event.previousIndex, event.currentIndex)
-  //   }
-  //   else {
-  //     transferArrayItem(
-  //       event.previousContainer.data.children,
-  //       event.container.data.children,
-  //       event.previousIndex,
-  //       event.currentIndex);
-  //   }
-  // }
 }
