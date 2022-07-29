@@ -18,16 +18,42 @@ export class LinkService {
 
   constructor(private readonly http: HttpClient) {}
 
+  extendLifetime() {
+    if (!this.code) return;
+    this.editAccess({});
+  }
+
+  editAccess(data: { code?: string }) {
+    return new Promise((resolve, reject) => {
+      this.http
+        .patch<boolean>(
+          'http://localhost:3333/v1/directory/' + (this.code ?? ''),
+          data,
+          { withCredentials: true }
+        )
+        .subscribe((value) => {
+          if (data.code && value) {
+            this.code=data.code;
+            this.codeSubject.next(this.code);
+          }
+          resolve(value);
+        });
+    });
+  }
+
   fetchList(code?: string) {
     if (
       code === this.code &&
+      this.lastFetch &&
       this.lastFetch.getTime() >= new Date().getTime() + 60000
     )
       return;
+
     if (!code) {
       this.canEdit = true;
       this.canEditSubject.next(true);
     }
+
     this.http
       .get<{ canEdit?: boolean; list: any[]; code?: string }>(
         'http://localhost:3333/v1/link/' + (code ?? ''),

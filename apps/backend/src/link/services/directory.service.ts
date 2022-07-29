@@ -1,11 +1,16 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Directory } from 'link/models/directory.model';
+import { DirectoryToUser } from 'link/models/directory.to.user.model';
+import { User } from 'user/user.model';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class DirectoryService {
   constructor(
-    @InjectModel(Directory) private readonly dirModel: typeof Directory
+    @InjectModel(Directory) private readonly dirModel: typeof Directory,
+    @InjectModel(DirectoryToUser)
+    private readonly dirToUser: typeof DirectoryToUser
   ) {}
 
   create(name: string): Promise<Directory> {
@@ -16,7 +21,19 @@ export class DirectoryService {
     return dir.save();
   }
 
-  async rename(id: number, name: string) {
+  async edit(
+    id: string | number,
+    { name, code }: { code?: string; name: string },
+    user?: User,
+    authToken?: string
+  ) {
+    if (authToken) {
+      const result = await this.dirToUser.update(
+        { expiresIn: dayjs().add(25, 'minutes'), ...(code ? { code } : {}) },
+        { where: { authToken } }
+      );
+      return result[0] === 1;
+    }
     const result = await this.dirModel.update({ name }, { where: { id } });
     return result[0] === 1;
   }
@@ -27,7 +44,7 @@ export class DirectoryService {
   }
 
   async delete(id: number | number[]) {
-    const result = await this.dirModel.destroy({ where: { id }});
+    const result = await this.dirModel.destroy({ where: { id } });
     return result;
   }
 }

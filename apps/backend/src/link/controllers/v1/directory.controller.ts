@@ -6,13 +6,15 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { Request } from 'express';
 import { Directory } from '../../models/directory.model';
 import { DirectoryService } from '../../services/directory.service';
+import { OptionalJwtAuthGuard } from 'auth/guards/optional-jwt-auth.guard';
 
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(OptionalJwtAuthGuard)
 @Controller({
   path: 'directory',
   version: '1',
@@ -27,10 +29,12 @@ export class DirectoryController {
 
   @Patch(':id')
   async edit(
-    @Param('id') id: number,
-    @Body() { name }: { name: string }
+    @Param('id') id: string | number,
+    @Body() { name, code }: { code?: string, name: string },
+    @Req() req: Request
   ): Promise<boolean> {
-    return this.service.rename(id, name);
+    const token = req.cookies['tokenzy'];
+    return this.service.edit(id, { name, code }, undefined, token);
   }
 
   @Get(':id?')

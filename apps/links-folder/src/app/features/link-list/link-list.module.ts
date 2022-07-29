@@ -22,10 +22,13 @@ import { EditLinkFormComponent } from './components/edit-link-form/edit-link-for
 import { ChangeLinkDialog } from './dialogs/change-link.dialog';
 import { MatDialogModule } from '@angular/material/dialog';
 import { SharedModule } from '../../shared/shared.module';
+import { ChangeAccessCodeDialog } from './dialogs/change-access-code.dialog';
+import { EditAccessCodeFormComponent } from './components/edit-access-code-form/edit-access-code-form.component';
 
 @NgModule({
   declarations: [
     EditLinkFormComponent,
+    EditAccessCodeFormComponent,
     LinksIndexPage,
     LinkFormComponent,
     LinkItemComponent,
@@ -34,6 +37,7 @@ import { SharedModule } from '../../shared/shared.module';
     DragNDropManagerDirective,
     DragNDropManagerRootDirective,
     ChangeLinkDialog,
+    ChangeAccessCodeDialog
   ],
   imports: [
     AngularSvgIconModule,

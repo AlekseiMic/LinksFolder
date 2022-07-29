@@ -4,6 +4,8 @@ import { Subscription } from 'rxjs';
 import { LinkService } from '../../services/link.service';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { ChangeAccessCodeDialog } from '../../dialogs/change-access-code.dialog';
 
 @Component({
   selector: 'app-link-list-index',
@@ -19,6 +21,7 @@ export class LinksIndexPage implements OnInit {
   public canEdit: boolean;
 
   constructor(
+    private dialog: MatDialog,
     private listService: LinkService,
     private clipboard: Clipboard,
     readonly location: Location,
@@ -58,10 +61,20 @@ export class LinksIndexPage implements OnInit {
     this.clipboard.copy(link);
   }
 
+  extendLinkLifetime() {
+    this.listService.extendLifetime();
+  }
+
   getLink() {
     if (!this.code) return null;
     return `${document.location.origin}${this.location.prepareExternalUrl(
       this.code
     )}`;
+  }
+
+  edit() {
+    const dialogRef = this.dialog.open(ChangeAccessCodeDialog, {
+      data: { defaultValues: { code: this.code } },
+    });
   }
 }

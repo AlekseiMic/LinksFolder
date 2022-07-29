@@ -54,7 +54,7 @@ export class LinkController {
     const token = req.cookies['tokenzy'];
     const data: { text: string; link?: string } = { text };
     if (url) data.link = url;
-    return this.service.rename(id, data, undefined, token);
+    return this.service.edit(id, data, undefined, token);
   }
 
   @Get(':code?')

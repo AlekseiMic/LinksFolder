@@ -9,6 +9,7 @@ import { DirectoryToUser } from 'link/models/directory.to.user.model';
 import { Link } from 'link/models/link.model';
 import { User } from 'user/user.model';
 import { nanoid } from 'nanoid';
+import * as dayjs from 'dayjs';
 
 @Injectable()
 export class LinkService {
@@ -53,7 +54,7 @@ export class LinkService {
         directoryId: folder,
         code,
         authToken,
-        expiresIn: new Date(),
+        expiresIn: dayjs().add(25, 'minutes'),
       });
       await guestDirAccess.save();
     }
@@ -61,7 +62,7 @@ export class LinkService {
     return { link, code, authToken };
   }
 
-  async rename(
+  async edit(
     id: number,
     data: { text: string; url?: string },
     user?: User,
