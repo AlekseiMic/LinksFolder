@@ -12,7 +12,7 @@ export class LinkService {
 
   private list: { url: string; text?: string; id: number }[] = [];
   private code?: string;
-  private lastFetch: Date;
+  private lastFetch: number;
   private canEditSubject = new BehaviorSubject<boolean>(false);
   private canEdit = false;
 
@@ -33,7 +33,7 @@ export class LinkService {
         )
         .subscribe((value) => {
           if (data.code && value) {
-            this.code=data.code;
+            this.code = data.code;
             this.codeSubject.next(this.code);
           }
           resolve(value);
@@ -45,9 +45,8 @@ export class LinkService {
     if (
       code === this.code &&
       this.lastFetch &&
-      this.lastFetch.getTime() >= new Date().getTime() + 60000
-    )
-      return;
+      this.lastFetch >= Date.now() + 60000
+    ) return;
 
     if (!code) {
       this.canEdit = true;
@@ -60,7 +59,7 @@ export class LinkService {
         { withCredentials: true }
       )
       .subscribe((value) => {
-        this.lastFetch = new Date();
+        this.lastFetch = Date.now();
         this.list = value?.list ?? [];
         this.listSubject.next(this.list);
         if (value.code && value.code !== this.code) {

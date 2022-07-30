@@ -7,4 +7,9 @@
     (keyup.enter)="onCreateLink()"
     id="link"
   />
+  <div *ngIf="lino && lino.invalid && (lino.dirty || lino.touched)">
+  <div *ngIf="lino?.errors?.['required']">
+    Link is required
+  </div>
+  </div>
 </form>

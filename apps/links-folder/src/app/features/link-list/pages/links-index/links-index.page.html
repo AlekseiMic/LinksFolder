@@ -5,20 +5,20 @@
       <span>Your link: </span>
       <a href="{{getLink()}}">{{getLink()}}</a>
       <div class="actions">
-      <button (click)="copyLink()">
-        <svg-icon name="copy-icon"></svg-icon>
-      </button>
-      <button (click)="edit()">
-        <svg-icon name="pen-icon"></svg-icon>
-      </button>
-      <button (click)="extendLinkLifetime()">
-        <svg-icon name="clock-icon"></svg-icon>
-      </button>
+        <button (click)="copyLink()">
+          <svg-icon name="copy-icon"></svg-icon>
+        </button>
+        <button (click)="edit()">
+          <svg-icon name="pen-icon"></svg-icon>
+        </button>
+        <button (click)="extendLinkLifetime()">
+          <svg-icon name="clock-icon"></svg-icon>
+        </button>
       </div>
     </div>
   </ng-container>
 </section>
+<br />
 <section *ngIf="!!code">
-  <h2>Links list</h2>
   <app-link-simple-list [canEdit]="canEdit"></app-link-simple-list>
 </section>

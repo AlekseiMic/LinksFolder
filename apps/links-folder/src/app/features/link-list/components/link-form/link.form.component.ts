@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { UntypedFormBuilder } from '@angular/forms';
+import { FormControl, UntypedFormBuilder, Validators } from '@angular/forms';
 import { LinkService } from '../../services/link.service';
 
 @Component({
@@ -22,7 +22,7 @@ export class LinkFormComponent implements OnInit {
   ) {}
 
   newLinkForm = this.formBuilder.group({
-    link: '',
+    link: new FormControl('', [Validators.required, Validators.minLength(10), Validators.pattern(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/)]),
   });
 
   onCreateLink(): void {
@@ -33,5 +33,11 @@ export class LinkFormComponent implements OnInit {
 
   onSubmit(): void {
     // this.items.push(this.newLinkForm.value.link);
+  }
+
+  get lino() {
+    const lin =  this.newLinkForm.get('link');
+    console.log(lin);
+    return lin;
   }
 }
