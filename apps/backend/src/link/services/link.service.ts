@@ -20,11 +20,11 @@ export class LinkService {
   ) {}
 
   async create(
-    data: { url: string; text?: string },
+    data: { url: string; text?: string } | { url: string; text?: string }[],
     directory?: string,
     user?: User,
     token?: string
-  ): Promise<{ link: Link; code?: string; authToken?: string }> {
+  ): Promise<{ link: Link | Link[]; code?: string; authToken?: string }> {
     let folder: null | number = null;
     let authToken = token;
     let code = nanoid(5);
@@ -43,9 +43,16 @@ export class LinkService {
       folder = newDirectory.id;
       authToken = undefined;
     }
-
-    const link = new Link({ directory: folder, ...data });
-    await link.save();
+    const saveLink = async (linkData: { url: string; text?: string }) => {
+      const link = new Link({ directory: folder, ...linkData });
+      return link.save();
+    };
+    let result: Link | Link[];
+    if (Array.isArray(data)) {
+      result = await Promise.all(data.map(saveLink));
+    } else {
+      result = await saveLink({ url: data.url, text: data.text });
+    }
 
     if (!user && !authToken) {
       authToken = nanoid(16);
@@ -59,7 +66,7 @@ export class LinkService {
       await guestDirAccess.save();
     }
 
-    return { link, code, authToken };
+    return { link: result, code, authToken };
   }
 
   async edit(
@@ -91,7 +98,8 @@ export class LinkService {
         where: { code },
       });
       if (!dir || !dir.directoryId) return { list: [] };
-      if (token !== dir.authToken && dir.expiresIn < new Date()) return { list: [] };
+      if (token !== dir.authToken && dir.expiresIn < new Date())
+        return { list: [] };
       const result = await this.linkModel.findAll({
         where: { directory: dir.directoryId },
       });

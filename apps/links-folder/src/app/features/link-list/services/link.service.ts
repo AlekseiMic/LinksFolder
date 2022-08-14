@@ -46,7 +46,8 @@ export class LinkService {
       code === this.code &&
       this.lastFetch &&
       this.lastFetch >= Date.now() + 60000
-    ) return;
+    )
+      return;
 
     if (!code) {
       this.canEdit = true;
@@ -103,6 +104,28 @@ export class LinkService {
       .subscribe((value) => {
         if (value.result) {
           this.list.push(value.result);
+          this.listSubject.next(this.list);
+        }
+        if (value.code && value.code !== this.code) {
+          this.code = value.code;
+          this.codeSubject.next(this.code);
+        }
+      });
+  }
+
+  addLinks(clearLinks: { url: string; text: string }[]) {
+    this.http
+      .post<{
+        result: { url: string; text?: string; id: number }[];
+        code: string;
+      }>(
+        'http://localhost:3333/v1/link',
+        { links: clearLinks },
+        { withCredentials: true }
+      )
+      .subscribe((value) => {
+        if (value.result) {
+          value.result.map((el) => this.list.push(el));
           this.listSubject.next(this.list);
         }
         if (value.code && value.code !== this.code) {

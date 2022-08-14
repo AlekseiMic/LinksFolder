@@ -11,5 +11,8 @@
   <div *ngIf="lino?.errors?.['required']">
     Link is required
   </div>
+  <div *ngIf="lino?.errors?.['pattern']">
+    Not a valid url
+  </div>
   </div>
 </form>

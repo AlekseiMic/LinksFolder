@@ -25,13 +25,22 @@ export class LinkController {
 
   @Post()
   async create(
-    @Body() data: { text?: string; url: string },
+    @Body()
+    data:
+      | {
+          links: { text?: string; url: string }[];
+        }
+      | {
+          text?: string;
+          url: string;
+          links: undefined;
+        },
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request
-  ): Promise<{ result: Link; code?: string }> {
+  ): Promise<{ result: Link | Link[]; code?: string }> {
     const token = req.cookies['tokenzy'];
     const { link, code, authToken } = await this.service.create(
-      data,
+      data?.links ?? data,
       undefined,
       undefined,
       token

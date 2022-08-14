@@ -22,13 +22,35 @@ export class LinkFormComponent implements OnInit {
   ) {}
 
   newLinkForm = this.formBuilder.group({
-    link: new FormControl('', [Validators.required, Validators.minLength(10), Validators.pattern(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/)]),
+    link: new FormControl('', [
+      Validators.required,
+      Validators.minLength(10),
+      Validators.pattern(
+        /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
+      ),
+    ]),
   });
 
   onCreateLink(): void {
-    const link = this.newLinkForm.value.link;
-    this.linkService.addLink(link);
-    this.newLinkForm.controls['link'].reset();
+    const link: string = this.newLinkForm.value.link;
+    let links = link.split(';');
+    let prefix = '';
+
+    if (links.length === 1) {
+      prefix = 'http';
+      links = link.split('http');
+    }
+    const clearLinks = links
+      .filter((el) => el !== '')
+      .map((el) => {
+        let str = (prefix + el).trim();
+        console.log(str);
+        let [url, ...name] = str.split(' ');
+        return { url, text: name.map((el) => el.trim()).join(' ') };
+      });
+
+    this.linkService.addLinks(clearLinks);
+    this.newLinkForm.controls['link'].reset('');
   }
 
   onSubmit(): void {
@@ -36,8 +58,7 @@ export class LinkFormComponent implements OnInit {
   }
 
   get lino() {
-    const lin =  this.newLinkForm.get('link');
-    console.log(lin);
+    const lin = this.newLinkForm.get('link');
     return lin;
   }
 }
