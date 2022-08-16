@@ -10,13 +10,24 @@ export class LinkService {
     string | undefined
   >(undefined);
 
-  private list: { url: string; text?: string; id: number }[] = [];
+  private lists: {
+    guest: { url: string; text?: string; id: number }[];
+    [key: string]: { url: string; text?: string; id: number }[];
+  } = {
+    guest: [],
+  };
+
   private code?: string;
   private lastFetch: number;
   private canEditSubject = new BehaviorSubject<boolean>(false);
   private canEdit = false;
 
   constructor(private readonly http: HttpClient) {}
+
+  clear() {
+    this.lists = { guest: [] };
+    this.listSubject.next(this.lists.guest);
+  }
 
   extendLifetime() {
     if (!this.code) return;
@@ -55,19 +66,19 @@ export class LinkService {
     }
 
     this.http
-      .get<{ canEdit?: boolean; list: any[]; code?: string }>(
+      .get<{ list: any; guestList: any }>(
         'http://localhost:3333/v1/link/' + (code ?? ''),
         { withCredentials: true }
       )
       .subscribe((value) => {
         this.lastFetch = Date.now();
-        this.list = value?.list ?? [];
-        this.listSubject.next(this.list);
-        if (value.code && value.code !== this.code) {
-          this.code = value.code;
+        this.lists.guest = value?.guestList.list ?? [];
+        this.listSubject.next(this.lists.guest);
+        if (value.guestList.code && value.guestList.code !== this.code) {
+          this.code = value.guestList.code;
           this.codeSubject.next(this.code);
         }
-        if (value.canEdit) {
+        if (value.guestList.canEdit) {
           this.canEdit = true;
           this.canEditSubject.next(this.canEdit);
         }
@@ -103,8 +114,8 @@ export class LinkService {
       )
       .subscribe((value) => {
         if (value.result) {
-          this.list.push(value.result);
-          this.listSubject.next(this.list);
+          this.lists.guest.push(value.result);
+          this.listSubject.next(this.lists.guest);
         }
         if (value.code && value.code !== this.code) {
           this.code = value.code;
@@ -125,8 +136,8 @@ export class LinkService {
       )
       .subscribe((value) => {
         if (value.result) {
-          value.result.map((el) => this.list.push(el));
-          this.listSubject.next(this.list);
+          value.result.map((el) => this.lists.guest.push(el));
+          this.listSubject.next(this.lists.guest);
         }
         if (value.code && value.code !== this.code) {
           this.code = value.code;
@@ -135,8 +146,8 @@ export class LinkService {
       });
   }
 
-  getLinks(): typeof this.list {
-    return this.list;
+  getLinks(): typeof this.lists.guest {
+    return this.lists.guest;
   }
 
   delete(id: number) {
@@ -146,8 +157,8 @@ export class LinkService {
       })
       .subscribe((value) => {
         if (value) {
-          this.list = this.list.filter((el) => el.id !== id);
-          this.listSubject.next(this.list);
+          this.lists.guest = this.lists.guest.filter((el) => el.id !== id);
+          this.listSubject.next(this.lists.guest);
         }
       });
   }
@@ -164,7 +175,7 @@ export class LinkService {
         )
         .subscribe((value) => {
           if (value) {
-            this.list = this.list.map((el) => {
+            this.lists.guest = this.lists.guest.map((el) => {
               if (el.id === id) {
                 el = { ...el };
                 el.url = formData.link;
@@ -172,7 +183,7 @@ export class LinkService {
               }
               return el;
             });
-            this.listSubject.next(this.list);
+            this.listSubject.next(this.lists.guest);
             resolve(true);
           }
         });

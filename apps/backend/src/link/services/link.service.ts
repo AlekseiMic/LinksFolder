@@ -11,6 +11,12 @@ import { User } from 'user/user.model';
 import { nanoid } from 'nanoid';
 import * as dayjs from 'dayjs';
 
+type LinkList = {
+  list: Link[];
+  canEdit: boolean;
+  code?: string;
+};
+
 @Injectable()
 export class LinkService {
   constructor(
@@ -29,9 +35,9 @@ export class LinkService {
     let authToken = token;
     let code = nanoid(5);
 
-    if (authToken) {
+    if (token) {
       const guestDir = await this.dirToUser.findOne({
-        where: { authToken },
+        where: { authToken: token },
       });
       folder = guestDir?.directoryId ?? null;
       code = guestDir?.code ?? code;
@@ -43,11 +49,14 @@ export class LinkService {
       folder = newDirectory.id;
       authToken = undefined;
     }
+
     const saveLink = async (linkData: { url: string; text?: string }) => {
       const link = new Link({ directory: folder, ...linkData });
       return link.save();
     };
+
     let result: Link | Link[];
+
     if (Array.isArray(data)) {
       result = await Promise.all(data.map(saveLink));
     } else {
@@ -93,33 +102,37 @@ export class LinkService {
   }
 
   async find(code?: string, dir?: number, user?: User, token?: string) {
-    if (code) {
-      const dir = await this.dirToUser.findOne({
-        where: { code },
-      });
-      if (!dir || !dir.directoryId) return { list: [] };
-      if (token !== dir.authToken && dir.expiresIn < new Date())
-        return { list: [] };
-      const result = await this.linkModel.findAll({
-        where: { directory: dir.directoryId },
-      });
-      return { list: result, code, canEdit: token === dir.authToken };
-    }
+    const queries: Promise<null | LinkList>[] = [this.getUserLinks(user)];
+    if (code) queries.push(this.getLinksByCode(code, token));
+    else if (token) queries.push(this.getLinksByToken(token));
+    const [list, guestList] = await Promise.all(queries);
+    return { list, guestList };
+  }
 
-    if (token) {
-      const dir = await this.dirToUser.findOne({ where: { authToken: token } });
-      if (!dir || !dir.directoryId) return { list: [] };
-      const result = await this.linkModel.findAll({
-        where: { directory: dir.directoryId },
-      });
-      return { canEdit: true, list: result, code: dir?.code };
-    }
+  async getLinksByCode(code: string, token?: string) {
+    const dir = await this.dirToUser.findOne({ where: { code } });
+    if (!dir) return null;
+    const isExpired = dir.expiresIn.getTime() < Date.now();
+    if (isExpired && token !== dir.authToken) return null;
+    const result = await this.linkModel.findAll({
+      where: { directory: dir.directoryId },
+    });
+    return { list: result, canEdit: token === dir.authToken, code };
+  }
 
-    if (!user) return { list: [] };
+  async getLinksByToken(token: string) {
+    const dir = await this.dirToUser.findOne({ where: { authToken: token } });
+    if (!dir) return null;
+    const result = await this.linkModel.findAll({
+      where: { directory: dir.directoryId },
+    });
+    return { canEdit: true, list: result, code: dir?.code };
+  }
 
-    return {
-      list: await this.linkModel.findAll({ where: { userId: user.id } }),
-    };
+  async getUserLinks(user?: User) {
+    if (!user) return null;
+    const result = await this.linkModel.findAll({ where: { userId: user.id } });
+    return { list: result, canEdit: true };
   }
 
   async delete(

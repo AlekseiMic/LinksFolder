@@ -19,6 +19,6 @@
   </ng-container>
 </section>
 <br />
-<section *ngIf="!!code">
+<section *ngIf="!canEdit || (code && isAuthorized !== true)">
   <app-link-simple-list [canEdit]="canEdit"></app-link-simple-list>
 </section>

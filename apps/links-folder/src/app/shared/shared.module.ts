@@ -38,7 +38,6 @@ import { RouterModule } from '@angular/router';
     RouterModule,
   ],
   providers: [
-    AuthService,
     JwtService,
     { provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true },
     { provide: MatDialog, useClass: CustomMatDialog },

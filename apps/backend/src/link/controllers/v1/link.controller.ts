@@ -15,6 +15,20 @@ import { LinkService } from '../../services/link.service';
 import { Response, Request } from 'express';
 import { OptionalJwtAuthGuard } from 'auth/guards/optional-jwt-auth.guard';
 
+type CreatePayload =
+  | {
+      links: { text?: string; url: string }[];
+    }
+  | {
+      text?: string;
+      url: string;
+      links: undefined;
+    };
+const cookieSettings = {
+  secure: false,
+  httpOnly: true,
+  maxAge: 1000 * 3600 * 60,
+};
 @UseGuards(OptionalJwtAuthGuard)
 @Controller({
   path: 'link',
@@ -25,32 +39,18 @@ export class LinkController {
 
   @Post()
   async create(
-    @Body()
-    data:
-      | {
-          links: { text?: string; url: string }[];
-        }
-      | {
-          text?: string;
-          url: string;
-          links: undefined;
-        },
+    @Body() data: CreatePayload,
     @Res({ passthrough: true }) res: Response,
     @Req() req: Request
   ): Promise<{ result: Link | Link[]; code?: string }> {
-    const token = req.cookies['tokenzy'];
     const { link, code, authToken } = await this.service.create(
       data?.links ?? data,
       undefined,
       undefined,
-      token
+      req.cookies['tokenzy']
     );
 
-    res.cookie('tokenzy', authToken, {
-      secure: false,
-      httpOnly: true,
-      maxAge: 1000 * 3600 * 60,
-    });
+    res.cookie('tokenzy', authToken, cookieSettings);
     return { result: link, code };
   }
 
@@ -60,20 +60,25 @@ export class LinkController {
     @Body() { url, text }: { text: string; url?: string },
     @Req() req: Request
   ): Promise<boolean> {
-    const token = req.cookies['tokenzy'];
     const data: { text: string; link?: string } = { text };
     if (url) data.link = url;
-    return this.service.edit(id, data, undefined, token);
+    return this.service.edit(id, data, undefined, req.cookies['tokenzy']);
   }
 
   @Get(':code?')
   async find(
     @Req() req: Request,
     @Param('code') code?: string
-  ): Promise<undefined | { canEdit?: boolean; list: Link[]; code?: string }> {
-    const token = req.cookies['tokenzy'];
-    const result = this.service.find(code, undefined, undefined, token);
-    return result;
+  ): Promise<{
+    list: null | { canEdit: boolean; list: Link[] };
+    guestList: null | { code?: string; canEdit: boolean; list: Link[] };
+  }> {
+    return this.service.find(
+      code,
+      undefined,
+      undefined,
+      req.cookies['tokenzy']
+    );
   }
 
   @Delete(':id')

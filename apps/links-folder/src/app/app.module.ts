@@ -8,6 +8,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { RouterModule, Routes } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { AngularSvgIconPreloaderModule } from 'angular-svg-icon-preloader';
+import { AuthService } from './shared/services/auth.service';
 
 const routes: Routes = [
   {
@@ -33,6 +34,7 @@ const routes: Routes = [
     BrowserAnimationsModule,
     SharedModule,
   ],
+  providers: [AuthService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

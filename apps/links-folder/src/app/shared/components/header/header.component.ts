@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
 import { DynamicDialogComponent } from '../../dialogs/DynamicDialog/dynamic.dialog.component';
 import { User } from '../../models/user.model';
 import { AuthService } from '../../services/auth.service';
@@ -12,17 +13,22 @@ import { SignupComponent } from '../signup/signup.component';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit {
-  isLogged = false;
-  user: null | User = null;
+  isLogged: boolean | undefined;
+  user: undefined | null | User = null;
+  private authSub: Subscription;
 
   constructor(private auth: AuthService, public dialog: MatDialog) {
-    this.auth.isLoggedSubject.subscribe((v) => {
+    this.auth.subscribeToAuthChange((v) => {
       this.isLogged = v;
       this.user = this.auth.user;
     });
   }
 
   ngOnInit(): void {}
+
+  ngOnDestroy(): void {
+    this.authSub.unsubscribe();
+  }
 
   onLogout() {
     this.auth.logout();

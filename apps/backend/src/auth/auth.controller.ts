@@ -1,4 +1,4 @@
-import { Controller, Post, Req, Res } from '@nestjs/common';
+import { Controller, HttpException, Post, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Request, Response, CookieOptions } from 'express';
 import { User } from '../user/user.model';
@@ -45,9 +45,9 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response
   ): Promise<{ user: User; token: string }> {
     const refreshToken = req.cookies['refreshToken'];
-    if (!refreshToken) throw new Error('Not Authorized');
+    if (!refreshToken) throw new HttpException('Unauthorized', 401);
     const result = await this.authService.refreshAccessToken(refreshToken);
-    if (!result) throw new Error('Not Authorized');
+    if (!result) throw new HttpException('Unauthorized', 401);
     const { user, token, session } = result;
     response.cookie('refreshToken', session.token, refreshCookieOptions);
     return { user, token };

@@ -5,16 +5,21 @@ import pDebounce from 'p-debounce';
 import { BehaviorSubject, lastValueFrom, Subject } from 'rxjs';
 import { JwtService } from './jwt.service';
 
-let user: null | User = null;
-let accessToken: null | string = null;
+let user: undefined | null | User;
+let accessToken: undefined | null | string;
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  isLoggedSubject: Subject<boolean> = new BehaviorSubject<boolean>(false);
+  isLoggedSubject = new BehaviorSubject<boolean | undefined>(undefined);
 
   constructor(private http: HttpClient, private jwtService: JwtService) {}
+
+  subscribeToAuthChange(callback: (v: boolean | undefined) => void) {
+    const sub = this.isLoggedSubject.subscribe(callback);
+    return sub;
+  }
 
   async login(username: string, password: string): Promise<boolean> {
     const req = this.http.post<{ token: string }>(
@@ -94,19 +99,15 @@ export class AuthService {
       {},
       { withCredentials: true }
     );
-    const result = await lastValueFrom(req);
-    if (result.token) {
-      const { data, isValid } = this.jwtService.parse(result.token);
-      if (!isValid || !data) {
-        this.user = null;
-        this.accessToken = null;
-        return false;
-      }
-      this.user = new User(data.id, data.name);
-      this.accessToken = result.token;
-      return true;
-    }
-    return false;
+    const result = await lastValueFrom(req).catch((err) => {
+      return { token: '' };
+    });
+    const { data, isValid } = result.token
+      ? this.jwtService.parse(result.token)
+      : { data: null, isValid: false };
+    const ok = isValid && data;
+    this.user = ok ? new User(data.id, data.name) : null;
+    this.accessToken = ok ? result.token : null;
   }
 
   get bearer() {
@@ -123,8 +124,12 @@ export class AuthService {
     accessToken = token;
   }
 
-  set user(data: null | User) {
-    const shouldNotifySubscribers = data !== user && (!user || !data);
+  set user(data: undefined | null | User) {
+    if (data === undefined) throw new Error('Undefined is reserved');
+    const shouldNotifySubscribers =
+      (user === undefined && data !== user) ||
+      (data !== user && (!user || !data));
+    console.log(shouldNotifySubscribers);
     user = data;
     if (shouldNotifySubscribers) this.isLoggedSubject.next(!!data);
   }

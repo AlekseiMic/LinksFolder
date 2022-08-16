@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
 import { AuthService } from './shared/services/auth.service';
 
 @Component({
@@ -9,12 +10,17 @@ import { AuthService } from './shared/services/auth.service';
 })
 export class AppComponent implements OnInit {
   title = 'links-folder';
-  isLogged = false;
+  isLogged: boolean | undefined = false;
+  private authSub: Subscription;
 
   constructor(private auth: AuthService, public dialog: MatDialog) {
-    this.auth.isLoggedSubject.subscribe((v) => {
+    this.authSub = this.auth.subscribeToAuthChange((v) => {
       this.isLogged = v;
     });
+  }
+
+  ngOnDestroy() {
+    this.authSub.unsubscribe();
   }
 
   ngOnInit(): void {
