@@ -103,6 +103,7 @@ export class LinkService {
 
   async find(code?: string, dir?: number, user?: User, token?: string) {
     const queries: Promise<null | LinkList>[] = [this.getUserLinks(user)];
+    console.log(token);
     if (code) queries.push(this.getLinksByCode(code, token));
     else if (token) queries.push(this.getLinksByToken(token));
     const [list, guestList] = await Promise.all(queries);

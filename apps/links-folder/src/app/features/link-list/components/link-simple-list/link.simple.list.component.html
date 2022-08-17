@@ -1,6 +1,6 @@
 <div class="list">
   <div class="item" *ngFor="let link of links">
-    <a href="{{ link.url }}" blank>{{ link.text ?? link.url }}</a>
+    <a href="{{ link.url }}" target="_blank">{{ link.text ?? link.url }}</a>
     <div class="actions">
       <button *ngIf="canEdit" class="edit" btn (click)="edit(link.id)">
         <svg-icon name="gear-icon"></svg-icon>

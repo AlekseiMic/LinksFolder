@@ -14,7 +14,10 @@ export class ApiInterceptor implements HttpInterceptor {
     let requestUrl = req.url;
     if (requestUrl.startsWith('http')) return next.handle(req);
     return next.handle(
-      req.clone({ url: `http://localhost:3333${requestUrl}` })
+      req.clone({
+        url: `http://localhost:3333${requestUrl}`,
+        withCredentials: true,
+      })
     );
   }
 }

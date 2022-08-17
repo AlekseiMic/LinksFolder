@@ -3,10 +3,7 @@ import { CommonModule } from '@angular/common';
 import { SigninComponent } from './components/signin/signin.component';
 import { MatMenuModule } from '@angular/material/menu';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AuthService } from './services/auth.service';
 import { JwtService } from './services/jwt.service';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { ApiInterceptor } from './interceptors/api.interceptor';
 import { SignupComponent } from './components/signup/signup.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DynamicDialogComponent } from './dialogs/DynamicDialog/dynamic.dialog.component';
@@ -37,11 +34,7 @@ import { RouterModule } from '@angular/router';
     MatMenuModule,
     RouterModule,
   ],
-  providers: [
-    JwtService,
-    { provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true },
-    { provide: MatDialog, useClass: CustomMatDialog },
-  ],
+  providers: [JwtService, { provide: MatDialog, useClass: CustomMatDialog }],
   exports: [SigninComponent, DefaultLayoutComponent, DefaultDialogComponent],
 })
 export class SharedModule {}

@@ -3,7 +3,7 @@
     <app-link-form [showDescription]="!code"></app-link-form>
     <div *ngIf="code" class="link">
       <span>Your link: </span>
-      <a href="{{getLink()}}">{{getLink()}}</a>
+      <a target="_blank" href="{{getLink()}}">{{getLink()}}</a>
       <div class="actions">
         <button (click)="copyLink()">
           <svg-icon name="copy-icon"></svg-icon>

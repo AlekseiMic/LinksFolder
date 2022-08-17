@@ -17,7 +17,8 @@ export class ChangeAccessCodeDialog {
   ) {}
 
   async onSubmit(values: { code: string }): Promise<void> {
-    const result = await this.linkService.editAccess(values);
-    if (result) this.dialogRef.close();
+    this.linkService.editAccess(values).subscribe((result) => {
+      if (result) this.dialogRef.close();
+    });
   }
 }

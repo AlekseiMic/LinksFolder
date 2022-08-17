@@ -30,11 +30,12 @@ export class DirectoryController {
   @Patch(':id')
   async edit(
     @Param('id') id: string | number,
-    @Body() { name, code }: { code?: string, name: string },
+    @Body()
+    { name, code, extend }: { extend?: number; code?: string; name: string },
     @Req() req: Request
-  ): Promise<boolean> {
+  ): Promise<{ result: boolean; code?: string }> {
     const token = req.cookies['tokenzy'];
-    return this.service.edit(id, { name, code }, undefined, token);
+    return this.service.edit(id, { name, code, extend }, undefined, token);
   }
 
   @Get(':id?')

@@ -23,19 +23,19 @@ export class DirectoryService {
 
   async edit(
     id: string | number,
-    { name, code }: { code?: string; name: string },
+    { name, code, extend }: { code?: string; name?: string; extend?: number },
     user?: User,
     authToken?: string
   ) {
-    if (authToken) {
-      const result = await this.dirToUser.update(
-        { expiresIn: dayjs().add(25, 'minutes'), ...(code ? { code } : {}) },
-        { where: { authToken } }
-      );
-      return result[0] === 1;
-    }
-    const result = await this.dirModel.update({ name }, { where: { id } });
-    return result[0] === 1;
+    if (!authToken) return { result: false };
+    const result = await this.dirToUser.update(
+      {
+        expiresIn: dayjs().add(extend ?? 25, 'minutes'),
+        ...(code ? { code } : {}),
+      },
+      { where: { authToken } }
+    );
+    return { result: result[0] === 1, code };
   }
 
   async find(id?: number[]) {

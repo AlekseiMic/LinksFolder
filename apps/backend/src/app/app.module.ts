@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from '../auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { resolve} from 'path';
-import { LinkModule } from './link/link.module';
+import { LinkModule } from '../link/link.module';
 
 const envFilePath = resolve(__dirname + '/common/env/.env');
 

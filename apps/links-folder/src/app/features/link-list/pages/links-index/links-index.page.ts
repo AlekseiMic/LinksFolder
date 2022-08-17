@@ -39,18 +39,15 @@ export class LinksIndexPage implements OnInit {
   ngOnInit(): void {
     this.routeSub = this.routingParam.params.subscribe((params) => {
       this.routeCode = params['id'];
-      if (this.isAuthorized === undefined) {
-        this.listService.clear();
-        return;
-      }
+      this.listService.clear();
+      if (this.isAuthorized === undefined) return;
       this.listService.fetchList(params['id']);
     });
 
     this.codeSub = this.listService.subscribeToCodeChange((code?: string) => {
-      if (!this.routeCode && this.code !== code) {
-        const url = this.router.createUrlTree([code ?? '']).toString();
-        this.location.go(url);
-      }
+      if (this.code === code) return;
+      const url = this.router.createUrlTree([code ?? '']).toString();
+      this.location.go(url);
       this.code = code;
     });
 
@@ -62,12 +59,8 @@ export class LinksIndexPage implements OnInit {
 
     this.authorizationSub = this.auth.isLoggedSubject.subscribe(
       (flag: boolean | undefined) => {
-        console.log('here', flag);
+        if (flag === undefined) return;
         this.isAuthorized = flag;
-        if (this.isAuthorized === undefined) {
-          this.listService.clear();
-          return;
-        }
         this.listService.fetchList(this.routeCode);
       }
     );
@@ -82,8 +75,7 @@ export class LinksIndexPage implements OnInit {
 
   copyLink() {
     const link = this.getLink();
-    if (!link) return;
-    this.clipboard.copy(link);
+    if (link) this.clipboard.copy(link);
   }
 
   extendLinkLifetime() {
