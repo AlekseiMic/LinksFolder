@@ -1,8 +1,8 @@
 <app-default-dialog>
     <app-edit-link-form
       (onSubmit)="onSubmit($event)"
-      [link]="data.defaultValues?.link"
-      [name]="data.defaultValues?.name"
+      [url]="data?.url"
+      [text]="data?.text"
       [id]="data.id"
     ></app-edit-link-form>
 </app-default-dialog>

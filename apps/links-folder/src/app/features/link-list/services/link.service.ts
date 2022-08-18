@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, of, first } from 'rxjs';
 
-type Link = { url: string; text?: string; id: number };
+export type Link = { url: string; text?: string; id: number };
 
 type AddLinkResult = {
   result: Link;
@@ -34,11 +34,11 @@ export class LinkService {
   }
 
   extendLifetime() {
-    if (this.canEdit && this.code) this.editAccess({ extend: 60 });
+    this.editAccess({ extend: 60 });
   }
 
   editAccess(data: { code?: string; extend?: number }) {
-    if (!this.code) return of(false).pipe(first());
+    if (!this.code || !this.canEdit) return of(false).pipe(first());
     return this.http
       .patch<{ result: boolean; code?: string }>(
         `/v1/directory/${this.code}`,
@@ -111,12 +111,9 @@ export class LinkService {
     this.codeSubject.next(this.code);
   }
 
-  addLinks(clearLinks: { url: string; text: string }[]) {
+  addLinks(clearLinks: Omit<Link, 'id'>[]) {
     this.http
-      .post<{
-        result: { url: string; text?: string; id: number }[];
-        code: string;
-      }>('/v1/link', { links: clearLinks })
+      .post<{ result: Link[]; code: string }>('/v1/link', { links: clearLinks })
       .subscribe((value) => {
         if (value.result) {
           value.result.map((el) => this.lists.guest.push(el));
@@ -141,26 +138,26 @@ export class LinkService {
     });
   }
 
-  edit(id: number, formData: { link: string; name: string }) {
-    return new Promise((resolve, reject) => {
-      this.http
-        .patch<number>(`/v1/link/${id}`, {
-          text: formData.name,
-          url: formData.link,
-        })
-        .subscribe((value) => {
-          if (!value) return;
+  edit(id: number, formData: Omit<Link, 'id'>) {
+    if (!this.code || !this.canEdit) return of(false).pipe(first());
+    return this.http
+      .patch<number>(`/v1/link/${id}`, {
+        text: formData.text,
+        url: formData.url,
+      })
+      .pipe(
+        map((value) => {
+          if (!value) return false;
           this.lists.guest = this.lists.guest.map((el) => {
-            if (el.id === id) {
-              el = { ...el };
-              el.url = formData.link;
-              el.text = formData.name;
-            }
+            if (el.id !== id) return el;
+            el = { ...el };
+            el.url = formData.url;
+            el.text = formData.text;
             return el;
           });
           this.listSubject.next(this.lists.guest);
-          resolve(true);
-        });
-    });
+          return true;
+        })
+      );
   }
 }

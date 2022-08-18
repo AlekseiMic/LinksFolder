@@ -9,18 +9,18 @@ import { UntypedFormBuilder } from '@angular/forms';
 export class EditLinkFormComponent implements OnInit {
   @Input() id: number;
 
-  @Input() link?: string;
+  @Input() url?: string;
 
-  @Input() name?: string;
+  @Input() text?: string;
 
-  @Output() onSubmit: EventEmitter<{ link: string; name: string }> =
+  @Output() onSubmit: EventEmitter<{ url: string; text: string }> =
     new EventEmitter();
 
   constructor(private formBuilder: UntypedFormBuilder) {}
 
   editLinkForm = this.formBuilder.group({
-    link: '',
-    name: '',
+    url: '',
+    text: '',
   });
 
   submit(): void {
@@ -28,7 +28,7 @@ export class EditLinkFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.editLinkForm.controls['link'].reset(this.link);
-    this.editLinkForm.controls['name'].reset(this.name);
+    this.editLinkForm.controls['url'].reset(this.url);
+    this.editLinkForm.controls['text'].reset(this.text);
   }
 }
