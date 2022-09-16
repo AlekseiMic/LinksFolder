@@ -18,10 +18,12 @@ type Lists = {
 
 @Injectable()
 export class LinkService {
-  private code?: string;
+  private _code?: string;
   private lastFetch: number;
-  private canEdit = false;
+  private _canEdit = false;
+  private _isOwner = false;
   private canEditSubject = new BehaviorSubject<boolean>(false);
+  private isOwnerSubject = new BehaviorSubject<boolean>(false);
   private listSubject = new BehaviorSubject<any[]>([]);
   private codeSubject = new BehaviorSubject<string | undefined>(undefined);
   private lists: Lists = { guest: [] };
@@ -33,57 +35,12 @@ export class LinkService {
     this.listSubject.next(this.lists.guest);
   }
 
-  extendLifetime() {
-    this.editAccess({ extend: 60 });
-  }
-
-  editAccess(data: { code?: string; extend?: number }) {
-    if (!this.code || !this.canEdit) return of(false).pipe(first());
-    return this.http
-      .patch<{ result: boolean; code?: string }>(
-        `/v1/directory/${this.code}`,
-        data
-      )
-      .pipe(
-        map((value) => {
-          if (value.result) this.setCode(value.code ?? '');
-          return value?.result ?? false;
-        })
-      );
-  }
-
-  fetchList(code?: string) {
-    if (
-      code === this.code &&
-      this.lastFetch &&
-      this.lastFetch >= Date.now() + 60000
-    )
-      return;
-
-    if (!code) {
-      this.canEdit = true;
-      this.canEditSubject.next(true);
-    }
-
-    this.http
-      .get<{ list: any; guestList: any }>(`/v1/link/${code ?? ''}`)
-      .subscribe((value) => {
-        this.lastFetch = Date.now();
-        this.lists.guest = value?.guestList.list ?? [];
-        this.listSubject.next(this.lists.guest);
-        if (value.guestList.code && value.guestList.code !== this.code) {
-          this.code = value.guestList.code;
-          this.codeSubject.next(this.code);
-        }
-        if (value.guestList.canEdit) {
-          this.canEdit = true;
-          this.canEditSubject.next(this.canEdit);
-        }
-      });
-  }
-
   subscribeToListChanges(callback: (value: any[]) => void) {
     return this.listSubject.subscribe(callback);
+  }
+
+  subscribeToIsOwnerChanges(callback: (value: boolean) => void) {
+    return this.isOwnerSubject.subscribe(callback);
   }
 
   subscribeToCodeChange(callback: (code: string | undefined) => void) {
@@ -94,35 +51,99 @@ export class LinkService {
     return this.canEditSubject.subscribe(callback);
   }
 
+  private set code(code: undefined | string) {
+    if (!code || code === this._code) return;
+    this._code = code;
+    this.codeSubject.next(this._code);
+  }
+
+  get code() {
+    return this._code;
+  }
+
+  private set canEdit(canEdit: boolean | undefined) {
+    if ((canEdit ?? false) === this._canEdit) return;
+    this._canEdit = canEdit ?? false;
+    this.canEditSubject.next(this._canEdit);
+  }
+
+  get canEdit() {
+    return this._canEdit;
+  }
+
+  private set isOwner(isOwner: undefined | boolean) {
+    if ((isOwner ?? false) === this._isOwner) return;
+    this._isOwner = isOwner ?? false;
+    this.isOwnerSubject.next(this._isOwner);
+  }
+
+  public get isOwner() {
+    return this._isOwner;
+  }
+
+  extendLifetime() {
+    return this.editAccess({ extend: 60 });
+  }
+
+  editAccess(data: { code?: string; extend?: number }) {
+    if (!this.code || !this._canEdit) return of(false).pipe(first());
+    return this.http
+      .patch<{ result: boolean; code?: string }>(
+        `/v1/directory/${this.code}`,
+        data
+      )
+      .pipe(
+        map((value) => {
+          if (value.code) this.code = value.code;
+          if (!value.result) return false;
+          return value.result;
+        })
+      );
+  }
+
+  fetchList(code?: string) {
+    if (
+      code === this.code &&
+      this.lastFetch &&
+      this.lastFetch >= Date.now() + 60000
+    ) {
+      return;
+    }
+
+    this.canEdit = !code;
+    this.isOwner = !code;
+
+    this.http
+      .get<{ list: any; guestList: any }>(`/v1/link/${code ?? ''}`)
+      .subscribe((value) => {
+        this.lastFetch = Date.now();
+        this.lists.guest = value?.guestList.list ?? [];
+        this.listSubject.next(this.lists.guest);
+        this.code = value.guestList.code;
+        this.canEdit = value.guestList.canEdit;
+        this.isOwner = value.guestList.isOwner;
+      });
+  }
+
   addLink(url: string) {
     this.http
       .post<AddLinkResult>('/v1/link', { url, text: url })
       .subscribe((value) => {
-        this.setCode(value.code ?? '');
+        this.code = value.code;
         if (!value.result) return;
         this.lists.guest.push(value.result);
         this.listSubject.next(this.lists.guest);
       });
   }
 
-  setCode(code: string) {
-    if (!code || code === this.code) return;
-    this.code = code;
-    this.codeSubject.next(this.code);
-  }
-
   addLinks(clearLinks: Omit<Link, 'id'>[]) {
     this.http
       .post<{ result: Link[]; code: string }>('/v1/link', { links: clearLinks })
       .subscribe((value) => {
-        if (value.result) {
-          value.result.map((el) => this.lists.guest.push(el));
-          this.listSubject.next(this.lists.guest);
-        }
-        if (value.code && value.code !== this.code) {
-          this.code = value.code;
-          this.codeSubject.next(this.code);
-        }
+        this.code = value.code;
+        if (!value.result) return;
+        value.result.map((el) => this.lists.guest.push(el));
+        this.listSubject.next(this.lists.guest);
       });
   }
 
@@ -159,5 +180,27 @@ export class LinkService {
           return true;
         })
       );
+  }
+
+  mergeLists(src?: number, target?: number) {
+    return this.http
+      .patch<boolean>(
+        `/v1/directory/merge/${src ?? ''}?target=${target ?? ''}`,
+        {}
+      )
+      .pipe(
+        map((value) => {
+          return value;
+        })
+      );
+  }
+
+  removeList(id?: number) {
+    return this.http.delete<boolean>(`/v1/directory/${id ?? ''}`, {}).pipe(
+      map((value) => {
+        if (value) this.lists = { guest: [] };
+        return value;
+      })
+    );
   }
 }

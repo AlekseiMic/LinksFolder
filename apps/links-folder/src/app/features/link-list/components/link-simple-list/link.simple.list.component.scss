@@ -4,33 +4,55 @@
 
 .item {
   margin-top: 7px;
-  box-shadow: 0 0 3px 1px #aaa;
-  height: 40px;
+  box-shadow: 0 0 1px 1px #ddd;
+  height: 32px;
   display: flex;
-  align-items: center;
-  padding: 0 25px;
-  font-size: 20px;
+  border-radius: 5px;
+  font-size: 18px;
   position: relative;
+  transition: box-shadow ease-in-out 0.1s, background ease-in-out 0.1s;
+  padding-right: 10px;
+  column-gap: 10px;
+  &:hover,
+  &:focus-within {
+    background: lighten(#5227cc, 40%);
+    box-shadow: 0 0 3px 1px lighten(#5227cc, 20%);
+  }
   a {
+    padding-left: 15px;
+    flex-grow: 1;
+    height: 100%;
+    line-height: 34px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     text-decoration: none;
-    color: #444;
+    color: #252525;
   }
 
   .actions {
-    position: absolute;
-    right: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
     button {
       padding: 0;
-      width: 20px;
-      height: 20px;
+      width: 17px;
+      height: 17px;
       border: 0;
       background: transparent;
-      margin-right: 10px;
-    }
-    svg {
-      color: #ccc;
-      width: 20px;
-      height: 20px;
+      color: lighten(#5227cc, 15%);
+      & > svg-icon {
+        display: block;
+        height: 100%;
+      }
+      svg {
+        height: 100%;
+      }
+      &:hover,
+      &:focus {
+        color: #5227cc;
+      }
     }
   }
 }

@@ -24,7 +24,7 @@ export class LinkFormComponent implements OnInit {
   newLinkForm = this.formBuilder.group({
     link: new FormControl('', [
       Validators.required,
-      Validators.minLength(10),
+      Validators.minLength(5),
       Validators.pattern(
         /^ *([-\w/]*?\/?https?:\/\/(www\.)?[-\w@:%._\+~#=]{1,256}\.[\w()]{1,6}\b([-\w()@:%_\+.~#?&/=]*)([-_@$!%^&*() \w]*?)\b( #[-\w_]*)* *)+$/
       ),
@@ -32,6 +32,7 @@ export class LinkFormComponent implements OnInit {
   });
 
   onCreateLink(): void {
+    if (!this.newLinkForm.valid) return;
     const link: string = this.newLinkForm.value.link;
     let links = link.split(';');
     let prefix = '';
@@ -44,9 +45,9 @@ export class LinkFormComponent implements OnInit {
       .filter((el) => el !== '')
       .map((el) => {
         let str = (prefix + el).trim();
-        console.log(str);
         let [url, ...name] = str.split(' ');
-        return { url, text: name.map((el) => el.trim()).join(' ') };
+        const text = name.map((el) => el.trim()).join(' ');
+        return { url, text: text || url };
       });
 
     this.linkService.addLinks(clearLinks);

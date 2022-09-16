@@ -4,6 +4,7 @@ import { Directory } from 'link/models/directory.model';
 import { DirectoryToUser } from 'link/models/directory.to.user.model';
 import { User } from 'user/user.model';
 import * as dayjs from 'dayjs';
+import { DestroyOptions } from 'sequelize/types';
 
 @Injectable()
 export class DirectoryService {
@@ -43,8 +44,15 @@ export class DirectoryService {
     return this.dirModel.findAll();
   }
 
-  async delete(id: number | number[]) {
-    const result = await this.dirModel.destroy({ where: { id } });
+  async delete(id?: number | number[], authToken?: string) {
+    const condition: DestroyOptions = { where: { id } };
+    if (!id && !authToken) return 0;
+    if (!id && authToken) {
+      const directory = await this.dirToUser.findOne({ where: { authToken } });
+      if (!directory) return 0;
+      condition.where = { id: directory.directoryId };
+    }
+    const result = await this.dirModel.destroy(condition);
     return result;
   }
 }

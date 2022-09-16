@@ -7,6 +7,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ChangeAccessCodeDialog } from '../../dialogs/change-access-code.dialog';
 import { AuthService } from 'apps/links-folder/src/app/shared/services/auth.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MergeGuestListDialog } from '../../dialogs/merge-guest-list.dialog';
 
 @Component({
   selector: 'app-link-list-index',
@@ -18,8 +20,10 @@ export class LinksIndexPage implements OnInit {
   private canEditSub: Subscription;
   private routeSub: Subscription;
   private authorizationSub: Subscription;
+  private isOwnerSub: Subscription;
 
   public routeCode?: string;
+  public isOwner: boolean;
   public code?: string;
   public canEdit: boolean;
   public isAuthorized: boolean | undefined;
@@ -33,6 +37,7 @@ export class LinksIndexPage implements OnInit {
     private routingParam: ActivatedRoute,
     readonly locationStrategy: LocationStrategy,
     private router: Router,
+    private snackBar: MatSnackBar,
     @Inject(DOCUMENT) readonly document: Document
   ) {}
 
@@ -57,11 +62,19 @@ export class LinksIndexPage implements OnInit {
       }
     );
 
+    this.isOwnerSub = this.listService.subscribeToIsOwnerChanges(
+      (isOwner: boolean) => {
+        this.isOwner = isOwner;
+        this.checkCanMergeGuestList();
+      }
+    );
+
     this.authorizationSub = this.auth.isLoggedSubject.subscribe(
       (flag: boolean | undefined) => {
         if (flag === undefined) return;
         this.isAuthorized = flag;
         this.listService.fetchList(this.routeCode);
+        this.checkCanMergeGuestList();
       }
     );
   }
@@ -70,16 +83,38 @@ export class LinksIndexPage implements OnInit {
     this.routeSub.unsubscribe();
     this.codeSub.unsubscribe();
     this.canEditSub.unsubscribe();
+    this.isOwnerSub.unsubscribe();
     this.authorizationSub.unsubscribe();
+  }
+
+  checkCanMergeGuestList() {
+    if (this.isOwner && this.isAuthorized) {
+      console.log('Do you want to add guest list to your account?');
+
+      this.dialog.open(MergeGuestListDialog, {});
+    }
   }
 
   copyLink() {
     const link = this.getLink();
-    if (link) this.clipboard.copy(link);
+    if (link) {
+      this.clipboard.copy(link);
+      this.snackBar.open('Link copied!', undefined, {
+        panelClass: 'success',
+        duration: 5000,
+        verticalPosition: 'top',
+      });
+    }
   }
 
   extendLinkLifetime() {
-    this.listService.extendLifetime();
+    this.listService.extendLifetime().subscribe((value) => {
+      this.snackBar.open(value ? 'Success!' : 'Error!', undefined, {
+        panelClass: value ? 'success' : 'error',
+        duration: 5000,
+        verticalPosition: 'top',
+      });
+    });
   }
 
   getLink() {

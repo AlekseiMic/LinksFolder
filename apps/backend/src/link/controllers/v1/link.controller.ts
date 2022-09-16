@@ -6,14 +6,14 @@ import {
   Param,
   Patch,
   Post,
-  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { Link } from '../../models/link.model';
 import { LinkService } from '../../services/link.service';
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import { OptionalJwtAuthGuard } from 'auth/guards/optional-jwt-auth.guard';
+import { GuestToken } from 'auth/decorators/guest-token.decorator';
+import { GuestService } from 'link/services/guest.service';
 
 type CreatePayload =
   | {
@@ -24,33 +24,35 @@ type CreatePayload =
       url: string;
       links: undefined;
     };
-const cookieSettings = {
-  secure: false,
-  httpOnly: true,
-  maxAge: 1000 * 3600 * 60,
-};
+
 @UseGuards(OptionalJwtAuthGuard)
 @Controller({
   path: 'link',
   version: '1',
 })
 export class LinkController {
-  constructor(private service: LinkService) {}
+  constructor(
+    private service: LinkService,
+    private guestService: GuestService
+  ) {}
 
   @Post()
   async create(
     @Body() data: CreatePayload,
     @Res({ passthrough: true }) res: Response,
-    @Req() req: Request
-  ): Promise<{ result: Link | Link[]; code?: string }> {
+    @GuestToken() token: string | undefined
+  ) {
     const { link, code, authToken } = await this.service.create(
       data?.links ?? data,
       undefined,
       undefined,
-      req.cookies['tokenzy']
+      token
     );
 
-    res.cookie('tokenzy', authToken, cookieSettings);
+    if (authToken) {
+      this.guestService.setCookie(res.cookie, authToken);
+    }
+
     return { result: link, code };
   }
 
@@ -58,32 +60,26 @@ export class LinkController {
   async edit(
     @Param('id') id: number,
     @Body() { url, text }: { text: string; url?: string },
-    @Req() req: Request
-  ): Promise<boolean> {
+    @GuestToken() token: string | undefined
+  ) {
     const data: { text: string; link?: string } = { text };
     if (url) data.link = url;
-    return this.service.edit(id, data, undefined, req.cookies['tokenzy']);
+    return this.service.edit(id, data, undefined, token);
   }
 
   @Get(':code?')
   async find(
-    @Req() req: Request,
+    @GuestToken() token: string | undefined,
     @Param('code') code?: string
-  ): Promise<{
-    list: null | { canEdit: boolean; list: Link[] };
-    guestList: null | { code?: string; canEdit: boolean; list: Link[] };
-  }> {
-    return this.service.find(
-      code,
-      undefined,
-      undefined,
-      req.cookies['tokenzy']
-    );
+  ) {
+    return this.service.find(code, undefined, undefined, token);
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string, @Req() req: Request): Promise<number> {
-    const token = req.cookies['tokenzy'];
+  async delete(
+    @Param('id') id: string,
+    @GuestToken() token: string | undefined
+  ): Promise<number> {
     const ids = id.split(',').map(Number);
     return this.service.delete(ids, false, undefined, token);
   }

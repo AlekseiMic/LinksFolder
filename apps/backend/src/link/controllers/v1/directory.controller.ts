@@ -13,6 +13,7 @@ import { Request } from 'express';
 import { Directory } from '../../models/directory.model';
 import { DirectoryService } from '../../services/directory.service';
 import { OptionalJwtAuthGuard } from 'auth/guards/optional-jwt-auth.guard';
+import { GuestToken } from 'auth/decorators/guest-token.decorator';
 
 @UseGuards(OptionalJwtAuthGuard)
 @Controller({
@@ -32,9 +33,8 @@ export class DirectoryController {
     @Param('id') id: string | number,
     @Body()
     { name, code, extend }: { extend?: number; code?: string; name: string },
-    @Req() req: Request
+    @GuestToken() token: string | undefined
   ): Promise<{ result: boolean; code?: string }> {
-    const token = req.cookies['tokenzy'];
     return this.service.edit(id, { name, code, extend }, undefined, token);
   }
 
@@ -44,9 +44,12 @@ export class DirectoryController {
     return this.service.find(ids);
   }
 
-  @Delete(':id')
-  async delete(@Param('id') id: string): Promise<number> {
-    const ids = id.split(',').map(Number);
-    return this.service.delete(ids);
+  @Delete(':id?')
+  async delete(
+    @GuestToken() token: string | undefined,
+    @Param('id') id?: string
+  ): Promise<number> {
+    const ids = id?.split(',').map(Number);
+    return this.service.delete(ids, token);
   }
 }

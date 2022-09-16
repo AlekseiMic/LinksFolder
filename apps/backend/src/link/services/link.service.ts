@@ -103,7 +103,6 @@ export class LinkService {
 
   async find(code?: string, dir?: number, user?: User, token?: string) {
     const queries: Promise<null | LinkList>[] = [this.getUserLinks(user)];
-    console.log(token);
     if (code) queries.push(this.getLinksByCode(code, token));
     else if (token) queries.push(this.getLinksByToken(token));
     const [list, guestList] = await Promise.all(queries);
@@ -118,7 +117,12 @@ export class LinkService {
     const result = await this.linkModel.findAll({
       where: { directory: dir.directoryId },
     });
-    return { list: result, canEdit: token === dir.authToken, code };
+    return {
+      list: result,
+      canEdit: token === dir.authToken,
+      isOwner: token === dir.authToken,
+      code,
+    };
   }
 
   async getLinksByToken(token: string) {
@@ -127,7 +131,7 @@ export class LinkService {
     const result = await this.linkModel.findAll({
       where: { directory: dir.directoryId },
     });
-    return { canEdit: true, list: result, code: dir?.code };
+    return { canEdit: true, list: result, isOwner: true, code: dir?.code };
   }
 
   async getUserLinks(user?: User) {

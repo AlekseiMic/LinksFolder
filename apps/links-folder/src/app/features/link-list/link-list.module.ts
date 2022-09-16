@@ -15,6 +15,7 @@ import {
 } from './directives/drag-n-drop-manager.directive';
 import { DragNDropManagerService } from './services/drag-n-drop-manager.service';
 import { MatCardModule } from '@angular/material/card';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { LinkService } from './services/link.service';
 import { LinkSimpleList } from './components/link-simple-list/link.simple.list.component';
 import { AngularSvgIconModule } from 'angular-svg-icon';
@@ -24,6 +25,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { SharedModule } from '../../shared/shared.module';
 import { ChangeAccessCodeDialog } from './dialogs/change-access-code.dialog';
 import { EditAccessCodeFormComponent } from './components/edit-access-code-form/edit-access-code-form.component';
+import { MergeGuestListDialog } from './dialogs/merge-guest-list.dialog';
 
 @NgModule({
   declarations: [
@@ -37,6 +39,7 @@ import { EditAccessCodeFormComponent } from './components/edit-access-code-form/
     DragNDropManagerDirective,
     DragNDropManagerRootDirective,
     ChangeLinkDialog,
+    MergeGuestListDialog,
     ChangeAccessCodeDialog
   ],
   imports: [
@@ -49,6 +52,7 @@ import { EditAccessCodeFormComponent } from './components/edit-access-code-form/
     MatCardModule,
     MatDialogModule,
     SharedModule,
+    MatSnackBarModule
   ],
   providers: [LinkListService, LinkService, DragNDropManagerService],
 })

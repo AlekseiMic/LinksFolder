@@ -10,6 +10,10 @@ body {
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
+.success {
+  background: #20c997;
+  color: #fff;
+}
 .custom-dialog-component {
   .mat-dialog-container {
     padding: 0;
