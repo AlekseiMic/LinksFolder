@@ -1,22 +1,31 @@
-import { BelongsTo, Column, ForeignKey, Model, Table } from "sequelize-typescript";
-import { User } from "user/user.model";
+import {
+  BelongsTo,
+  Column,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript';
+import { User } from 'user/user.model';
+import { Directory } from './directory.model';
 
 @Table
 export class Link extends Model {
   @ForeignKey(() => User)
   @Column
-  userId: number
+  userId: number;
 
-  @BelongsTo(() => User)
-  user: User
-
-  @Column
-  url: string
+  @BelongsTo(() => User, 'userId')
+  user: User;
 
   @Column
-  directory: number
+  url: string;
 
   @Column
-  text: string
+  directory: number;
 
+  @BelongsTo(() => User, 'directory')
+  dir: Directory;
+
+  @Column
+  text: string;
 }

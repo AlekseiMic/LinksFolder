@@ -6,14 +6,17 @@ import {
   Param,
   Patch,
   Post,
-  Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { Directory } from '../../models/directory.model';
 import { DirectoryService } from '../../services/directory.service';
 import { OptionalJwtAuthGuard } from 'auth/guards/optional-jwt-auth.guard';
 import { GuestToken } from 'auth/decorators/guest-token.decorator';
+import { Response } from 'express';
+import { LinkDto } from 'link/dto/LinkDto';
+import { ReqUser } from 'auth/decorators/user.decorator';
+import { AuthUser } from 'user/user.model';
 
 @UseGuards(OptionalJwtAuthGuard)
 @Controller({
@@ -23,9 +26,22 @@ import { GuestToken } from 'auth/decorators/guest-token.decorator';
 export class DirectoryController {
   constructor(private service: DirectoryService) {}
 
+  @Post('/:id/link')
+  async createLink(
+    @Param('id') dir: number,
+    @Body() links: LinkDto[],
+    @GuestToken() token: string | undefined,
+    @ReqUser() user?: AuthUser
+  ) {
+    return this.service.createLinks(dir, links, user, token);
+  }
+
   @Post()
-  async create(@Body() { name }: { name: string }): Promise<Directory | null> {
-    return this.service.create(name);
+  async create(
+    @Body() { name, parent }: { name: string; parent: number },
+    @ReqUser() user?: AuthUser
+  ): Promise<Directory | null> {
+    return this.service.create(name, parent, user);
   }
 
   @Patch(':id')
@@ -47,9 +63,10 @@ export class DirectoryController {
   @Delete(':id?')
   async delete(
     @GuestToken() token: string | undefined,
+    @Res({ passthrough: true }) res: Response,
     @Param('id') id?: string
   ): Promise<number> {
     const ids = id?.split(',').map(Number);
-    return this.service.delete(ids, token);
+    return this.service.delete(res, ids, token);
   }
 }

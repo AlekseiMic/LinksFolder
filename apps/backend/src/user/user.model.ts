@@ -3,6 +3,7 @@ import { hash, compare } from 'bcrypt';
 
 export class AuthUser {
   id: number;
+  name?: string;
 }
 
 @Table

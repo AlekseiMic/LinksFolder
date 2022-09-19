@@ -1,5 +1,5 @@
 <header>
-  <a [routerLink]="['/']"><span class="logo">LinkFolder</span></a>
+  <a [routerLink]="['/']" class="logo">LinkFolder</a>
   <div *ngIf="!isLogged; else logout" class="actions">
     <button btn (click)="openSigninDialog()">Signin</button>
     <button btn (click)="openSignupDialog()">Signup</button>
@@ -13,7 +13,7 @@
           class="profile-btn"
         >
           <span class="avatar"></span>
-          <span class="username">{{ user?.name ?? 'Unknown' }}</span>
+          <span class="username">{{ user?.name ?? 'Noname' }}</span>
         </button>
         <mat-menu #profileMenu="matMenu">
           <button mat-menu-item (click)="onLogout()">Logout</button>

@@ -5,17 +5,24 @@ form {
   text-align: center;
   margin: auto;
   p {
-    margin-top: 50px;
-    font-size: 55px;
-    line-height: 70px;
     color: #444;
     font-weight: 700;
-    margin-bottom: 40px;
-    &.small {
-      margin: 30px 0 15px 0;
-      font-size: 20px;
-      line-height: 20px;
+    span {
+      color: #5527cc;
     }
+  }
+  &:not(.small) {
+    height: calc(100vh - 112px);
+    justify-content: center;
+    p {
+      font-size: 40px;
+      line-height: 40px;
+    }
+  }
+  &.small p {
+    margin: 30px 0 15px 0;
+    font-size: 20px;
+    line-height: 20px;
   }
   input {
     box-sizing: border-box;

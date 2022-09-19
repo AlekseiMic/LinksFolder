@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '../user/user.model';
+import { AuthUser, User } from '../user/user.model';
 import { UserService } from '../user/user.service';
 import { SessionService } from './session.service';
 import { JwtService } from './jwt.service';
 import { Session } from './session.model';
+import { DirectoryService } from 'link/services/directory.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private sessionService: SessionService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private dirService: DirectoryService
   ) {}
 
   async signup(
@@ -19,7 +21,9 @@ export class AuthService {
   ): Promise<{ user: User; session: Session; token: string }> {
     const user = await this.userService.create(username, password);
     const session = await this.sessionService.create(user);
-    const token = this.jwtService.create({ name: user.username, id: user.id });
+    const authUser: AuthUser = { name: user.username, id: user.id };
+    const token = this.jwtService.create(authUser);
+    await this.dirService.create('Base', null, authUser);
     return { user, session, token };
   }
 

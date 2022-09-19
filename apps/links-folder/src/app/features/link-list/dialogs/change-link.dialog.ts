@@ -11,18 +11,26 @@ export class ChangeLinkDialog {
     public dialogRef: MatDialogRef<ChangeLinkDialog>,
     private linkService: LinkService,
     @Inject(MAT_DIALOG_DATA)
-    public data: Link
+    public data: { directory: number | undefined; id: number; link: Link }
   ) {
-    const link = this.linkService
-      .getLinks()
-      .find((el) => el.id == this.data.id);
-    if (!link) return;
-    this.data = { ...link };
+    const list = this.linkService.getListById(data.directory);
+    if (!list) {
+      this.dialogRef.close();
+      return;
+    }
+    const link = list.links.find((el) => el.id == this.data.id);
+    if (!link) {
+      this.dialogRef.close();
+      return;
+    }
+    this.data.link = { ...link };
   }
 
   async onSubmit(values: { url: string; text: string }): Promise<void> {
-    this.linkService.edit(this.data.id, values).subscribe((result) => {
-      if (result) this.dialogRef.close();
-    });
+    this.linkService
+      .editLinks(this.data.directory, { ...this.data.link, ...values })
+      .subscribe((result) => {
+        if (result) this.dialogRef.close();
+      });
   }
 }

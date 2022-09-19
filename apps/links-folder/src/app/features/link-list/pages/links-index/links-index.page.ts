@@ -1,9 +1,9 @@
 import { DOCUMENT, Location, LocationStrategy } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { LinkService } from '../../services/link.service';
+import { LinkService, List } from '../../services/link.service';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ChangeAccessCodeDialog } from '../../dialogs/change-access-code.dialog';
 import { AuthService } from 'apps/links-folder/src/app/shared/services/auth.service';
@@ -16,17 +16,18 @@ import { MergeGuestListDialog } from '../../dialogs/merge-guest-list.dialog';
   styleUrls: ['./links-index.page.scss'],
 })
 export class LinksIndexPage implements OnInit {
-  private codeSub: Subscription;
-  private canEditSub: Subscription;
   private routeSub: Subscription;
   private authorizationSub: Subscription;
-  private isOwnerSub: Subscription;
+  private listSub: Subscription;
+  private guestSub: Subscription;
 
   public routeCode?: string;
-  public isOwner: boolean;
   public code?: string;
-  public canEdit: boolean;
+  public canEdit: boolean = false;
+  public isOwner: boolean = false;
   public isAuthorized: boolean | undefined;
+  public list: List['links'] = [];
+  public dir: number | null = null;
 
   constructor(
     private auth: AuthService,
@@ -36,7 +37,6 @@ export class LinksIndexPage implements OnInit {
     readonly location: Location,
     private routingParam: ActivatedRoute,
     readonly locationStrategy: LocationStrategy,
-    private router: Router,
     private snackBar: MatSnackBar,
     @Inject(DOCUMENT) readonly document: Document
   ) {}
@@ -44,55 +44,43 @@ export class LinksIndexPage implements OnInit {
   ngOnInit(): void {
     this.routeSub = this.routingParam.params.subscribe((params) => {
       this.routeCode = params['id'];
-      this.listService.clear();
       if (this.isAuthorized === undefined) return;
-      this.listService.fetchList(params['id']);
+      this.fetchList();
     });
-
-    this.codeSub = this.listService.subscribeToCodeChange((code?: string) => {
-      if (this.code === code) return;
-      const url = this.router.createUrlTree([code ?? '']).toString();
-      this.location.go(url);
-      this.code = code;
-    });
-
-    this.canEditSub = this.listService.subscribeToCanEditChange(
-      (can: boolean) => {
-        this.canEdit = can;
-      }
-    );
-
-    this.isOwnerSub = this.listService.subscribeToIsOwnerChanges(
-      (isOwner: boolean) => {
-        this.isOwner = isOwner;
-        this.checkCanMergeGuestList();
-      }
-    );
 
     this.authorizationSub = this.auth.isLoggedSubject.subscribe(
       (flag: boolean | undefined) => {
-        if (flag === undefined) return;
+        if (this.isAuthorized === flag && flag === undefined) return;
         this.isAuthorized = flag;
-        this.listService.fetchList(this.routeCode);
-        this.checkCanMergeGuestList();
+        this.fetchList();
       }
     );
+
+    this.guestSub = this.listService.guestList$.subscribe((list) => {
+      if (!list) {
+        return;
+      }
+      this.code = list.codes[0].code;
+      this.isOwner = list.owned;
+      this.canEdit = list.editable;
+      this.list = list.links ?? [];
+      this.dir = list.id;
+      console.log(list);
+      console.log(this.list);
+    });
+  }
+
+  fetchList() {
+    this.listService.fetchList(this.routeCode);
   }
 
   ngOnDestroy(): void {
     this.routeSub.unsubscribe();
-    this.codeSub.unsubscribe();
-    this.canEditSub.unsubscribe();
-    this.isOwnerSub.unsubscribe();
     this.authorizationSub.unsubscribe();
   }
 
   checkCanMergeGuestList() {
-    if (this.isOwner && this.isAuthorized) {
-      console.log('Do you want to add guest list to your account?');
-
-      this.dialog.open(MergeGuestListDialog, {});
-    }
+    this.dialog.open(MergeGuestListDialog, {});
   }
 
   copyLink() {
@@ -108,13 +96,13 @@ export class LinksIndexPage implements OnInit {
   }
 
   extendLinkLifetime() {
-    this.listService.extendLifetime().subscribe((value) => {
-      this.snackBar.open(value ? 'Success!' : 'Error!', undefined, {
-        panelClass: value ? 'success' : 'error',
-        duration: 5000,
-        verticalPosition: 'top',
-      });
-    });
+    // this.listService.extendLifetime().subscribe((value) => {
+    // this.snackBar.open(value ? 'Success!' : 'Error!', undefined, {
+    //   panelClass: value ? 'success' : 'error',
+    //   duration: 5000,
+    //   verticalPosition: 'top',
+    // });
+    // });
   }
 
   getLink() {

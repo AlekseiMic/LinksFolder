@@ -1,24 +1,25 @@
-<section>
-  <ng-container *ngIf="canEdit">
-    <app-link-form [showDescription]="!code"></app-link-form>
-    <div *ngIf="code" class="link">
-      <span>Your link: </span>
-      <a target="_blank" href="{{getLink()}}">{{getLink()}}</a>
-      <div class="actions">
-        <button (click)="copyLink()">
-          <svg-icon name="copy-icon"></svg-icon>
-        </button>
-        <button (click)="edit()">
-          <svg-icon name="pen-icon"></svg-icon>
-        </button>
-        <button (click)="extendLinkLifetime()">
-          <svg-icon name="clock-icon"></svg-icon>
-        </button>
-      </div>
+<section *ngIf="canEdit">
+  <app-link-form [directory]="dir" [showDescription]="!code"></app-link-form>
+  <div *ngIf="code && !isAuthorized" class="link">
+    <span>Your link: </span>
+    <a target="_blank" href="{{getLink()}}">{{getLink()}}</a>
+    <div class="actions">
+      <button (click)="copyLink()">
+        <svg-icon name="copy-icon"></svg-icon>
+      </button>
+      <button (click)="edit()">
+        <svg-icon name="pen-icon"></svg-icon>
+      </button>
+      <button (click)="extendLinkLifetime()">
+        <svg-icon name="clock-icon"></svg-icon>
+      </button>
     </div>
-  </ng-container>
+  </div>
 </section>
-<br />
-<section *ngIf="!canEdit || (code && isAuthorized !== true)">
-  <app-link-simple-list [canEdit]="canEdit"></app-link-simple-list>
+<section *ngIf="!canEdit || (code && !isAuthorized)">
+  <app-link-simple-list
+    [links]="list"
+    [canEdit]="canEdit"
+    [directory]="dir"
+  ></app-link-simple-list>
 </section>

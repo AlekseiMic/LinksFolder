@@ -10,11 +10,9 @@ import { LinkService } from '../../services/link.service';
 export class LinkFormComponent implements OnInit {
   ngOnInit(): void {}
 
-  @Input() create?: (url: string) => void;
-
   @Input() showDescription?: boolean;
 
-  @Input() createFolder?: (name: string) => void;
+  @Input() directory: number | null = null;
 
   constructor(
     private formBuilder: UntypedFormBuilder,
@@ -32,7 +30,7 @@ export class LinkFormComponent implements OnInit {
   });
 
   onCreateLink(): void {
-    if (!this.newLinkForm.valid) return;
+    if (!this.newLinkForm.valid || this.directory === null) return;
     const link: string = this.newLinkForm.value.link;
     let links = link.split(';');
     let prefix = '';
@@ -50,8 +48,11 @@ export class LinkFormComponent implements OnInit {
         return { url, text: text || url };
       });
 
-    this.linkService.addLinks(clearLinks);
-    this.newLinkForm.controls['link'].reset('');
+    this.linkService.addLinks(this.directory, clearLinks).subscribe((res) => {
+      if (res) {
+        this.newLinkForm.controls['link'].reset('');
+      }
+    });
   }
 
   onSubmit(): void {

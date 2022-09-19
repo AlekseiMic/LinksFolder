@@ -13,10 +13,27 @@ import { Tag } from './models/tag.model';
 import { TagService } from './services/tag.service';
 import { TagToLink } from './models/tag.to.link.model';
 import { GuestService } from './services/guest.service';
+import { NestedSetsSequelizeHelper } from 'common/services/nested-sets-sequelize.service';
+import { SqlDirectoryRepository } from './repositories/sql-directory.repository';
+import { GeneralController } from './controllers/v1/general.controller';
+import { GeneralService } from './services/general.service';
 
 @Module({
-  controllers: [LinkController, TagController, DirectoryController],
-  providers: [LinkService, TagService, DirectoryService, GuestService],
+  controllers: [
+    GeneralController,
+    LinkController,
+    TagController,
+    DirectoryController,
+  ],
+  providers: [
+    NestedSetsSequelizeHelper,
+    LinkService,
+    TagService,
+    DirectoryService,
+    GuestService,
+    GeneralService,
+    { provide: 'IDirectoryRepository', useClass: SqlDirectoryRepository },
+  ],
   imports: [
     SequelizeModule.forFeature([
       User,
@@ -26,6 +43,16 @@ import { GuestService } from './services/guest.service';
       Tag,
       TagToLink,
     ]),
+  ],
+  exports: [
+    SequelizeModule,
+    NestedSetsSequelizeHelper,
+    LinkService,
+    TagService,
+    DirectoryService,
+    GuestService,
+    GeneralService,
+    { provide: 'IDirectoryRepository', useClass: SqlDirectoryRepository },
   ],
 })
 export class LinkModule {}

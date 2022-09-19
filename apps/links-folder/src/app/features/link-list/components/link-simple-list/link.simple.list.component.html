@@ -1,4 +1,4 @@
-<div class="list">
+<div *ngIf="hasLinks() || canEdit" class="list">
   <div class="item" *ngFor="let link of links">
     <a href="{{ link.url }}" target="_blank">{{ link.text ?? link.url }}</a>
     <div *ngIf="canEdit" class="actions">
@@ -10,4 +10,8 @@
       </button>
     </div>
   </div>
+</div>
+<div *ngIf="!hasLinks() && !canEdit" class="no-data">
+  <h2>OOPS! nothing found</h2>
+  <a [routerLink]="['/']"> Go Home </a>
 </div>

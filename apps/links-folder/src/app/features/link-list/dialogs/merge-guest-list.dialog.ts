@@ -1,6 +1,6 @@
-import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Link, LinkService } from '../services/link.service';
+import { Component } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
+import { LinkService } from '../services/link.service';
 
 @Component({
   selector: 'merge-guest-list-dialog',
@@ -10,9 +10,7 @@ export class MergeGuestListDialog {
   constructor(
     public dialogRef: MatDialogRef<MergeGuestListDialog>,
     private linkService: LinkService
-  ) {
-    console.log(this.linkService.getLinks());
-  }
+  ) {}
 
   async accept(): Promise<void> {
     this.linkService.mergeLists().subscribe((v) => {
@@ -22,7 +20,7 @@ export class MergeGuestListDialog {
 
   async decline(): Promise<void> {
     this.linkService.removeList().subscribe((v) => {
-      console.log('Declined');
+      if (v) this.dialogRef.close();
     });
   }
 }

@@ -1,18 +1,14 @@
-<form [formGroup]="newLinkForm">
-  <p [ngClass]="{'small': !showDescription }">Paste link in the input field and press enter</p>
+<form [formGroup]="newLinkForm" [ngClass]="{ small: !showDescription }">
+  <p>Insert link and press <span>Enter</span></p>
   <input
-    autocomplete=off
+    autocomplete="off"
     type="text"
     formControlName="link"
     (keyup.enter)="onCreateLink()"
     id="link"
   />
   <div *ngIf="lino && lino.invalid && (lino.dirty || lino.touched)">
-  <div *ngIf="lino?.errors?.['required']">
-    Link is required
-  </div>
-  <div *ngIf="lino?.errors?.['pattern']">
-    Not a valid url
-  </div>
+    <div *ngIf="lino?.errors?.['required']">Link is required</div>
+    <div *ngIf="lino?.errors?.['pattern']">Not a valid url</div>
   </div>
 </form>
