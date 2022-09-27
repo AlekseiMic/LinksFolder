@@ -2,6 +2,9 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, UntypedFormBuilder, Validators } from '@angular/forms';
 import { LinkService } from '../../services/link.service';
 
+const linkRegex =
+  /^ *(?:(https?:\/\/(?:www\.)?[-\w@:%._\+~#=]{1,256}\.[\w()]{1,6}(?:[-\w()@:%_\+.~#?&/=]*)) *([-_@$!%^&*() \w]*)((?: *#[-\w_]+)*) *)+$/;
+
 @Component({
   selector: 'app-link-form',
   styleUrls: ['./link.form.component.scss'],
@@ -23,32 +26,34 @@ export class LinkFormComponent implements OnInit {
     link: new FormControl('', [
       Validators.required,
       Validators.minLength(5),
-      Validators.pattern(
-        /^ *([-\w/]*?\/?https?:\/\/(www\.)?[-\w@:%._\+~#=]{1,256}\.[\w()]{1,6}\b([-\w()@:%_\+.~#?&/=]*)([-_@$!%^&*() \w]*?)\b( #[-\w_]*)* *)+$/
-      ),
+      Validators.pattern(linkRegex),
     ]),
   });
 
   onCreateLink(): void {
     if (!this.newLinkForm.valid || this.directory === null) return;
     const link: string = this.newLinkForm.value.link;
-    let links = link.split(';');
-    let prefix = '';
+    const reg = new RegExp(linkRegex);
 
-    if (links.length === 1) {
-      prefix = 'http';
-      links = link.split('http');
-    }
-    const clearLinks = links
-      .filter((el) => el !== '')
-      .map((el) => {
-        let str = (prefix + el).trim();
-        let [url, ...name] = str.split(' ');
-        const text = name.map((el) => el.trim()).join(' ');
-        return { url, text: text || url };
+    const links: { url: string; text: string; tags?: string[] }[] = [];
+    link
+      .split('http')
+      .filter((el) => el.trim() !== '')
+      .forEach((el) => {
+        const str = 'http' + el;
+        const match = reg.exec(str);
+        if (!match) return;
+        const url = match[1];
+        const text = match[2]?.trim();
+        const tags = match[3]
+          ?.trim()
+          .split('#')
+          .filter((el) => el !== '')
+          .map((el) => el.trim());
+        links.push({ url, text: text || url, tags });
       });
 
-    this.linkService.addLinks(this.directory, clearLinks).subscribe((res) => {
+    this.linkService.addLinks(this.directory, links).subscribe((res) => {
       if (res) {
         this.newLinkForm.controls['link'].reset('');
       }
