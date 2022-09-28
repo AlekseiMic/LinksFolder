@@ -19,11 +19,11 @@ export class LinksIndexPage implements OnInit {
   private routeSub: Subscription;
   private authorizationSub: Subscription;
   private listSub: Subscription;
-  private guestSub: Subscription;
 
   public routeCode?: string;
-  public code?: string;
+  public codes?: List['codes'];
   public canEdit: boolean = false;
+  public isGuest: boolean = false;
   public isOwner: boolean = false;
   public isAuthorized: boolean | undefined;
   public list: List['links'] = [];
@@ -56,17 +56,27 @@ export class LinksIndexPage implements OnInit {
       }
     );
 
-    this.guestSub = this.listService.guestList$.subscribe((list) => {
+    this.listSub = this.listService.list$.subscribe((listObj) => {
+      if (!this.listService.rootDir) return;
+      if (!listObj) {
+        this.codes = [];
+        this.isOwner = false;
+        this.canEdit = false;
+        this.isGuest = false;
+        this.list = [];
+        this.dir = null;
+        return;
+      }
+      const list = listObj[this.listService.rootDir];
       if (!list) {
         return;
       }
-      this.code = list.codes[0].code;
+      this.codes = list.codes;
+      this.isGuest = !!list.isGuest;
       this.isOwner = list.owned;
       this.canEdit = list.editable;
       this.list = list.links ?? [];
       this.dir = list.id;
-      console.log(list);
-      console.log(this.list);
     });
   }
 
@@ -77,14 +87,15 @@ export class LinksIndexPage implements OnInit {
   ngOnDestroy(): void {
     this.routeSub.unsubscribe();
     this.authorizationSub.unsubscribe();
+    this.listSub.unsubscribe();
   }
 
   checkCanMergeGuestList() {
     this.dialog.open(MergeGuestListDialog, {});
   }
 
-  copyLink() {
-    const link = this.getLink();
+  copyLink(code: string) {
+    const link = this.getLink(code);
     if (link) {
       this.clipboard.copy(link);
       this.snackBar.open('Link copied!', undefined, {
@@ -95,26 +106,26 @@ export class LinksIndexPage implements OnInit {
     }
   }
 
-  extendLinkLifetime() {
-    // this.listService.extendLifetime().subscribe((value) => {
-    // this.snackBar.open(value ? 'Success!' : 'Error!', undefined, {
-    //   panelClass: value ? 'success' : 'error',
-    //   duration: 5000,
-    //   verticalPosition: 'top',
-    // });
-    // });
+  extendLinkLifetime(dirId: number, accessId: number) {
+    this.listService.extendLifetime(dirId, accessId).subscribe((value) => {
+      this.snackBar.open(value ? 'Success!' : 'Error!', undefined, {
+        panelClass: value ? 'success' : 'error',
+        duration: 5000,
+        verticalPosition: 'top',
+      });
+    });
   }
 
-  getLink() {
-    if (!this.code) return null;
+  getLink(code: string) {
+    if (!code) return null;
     return `${document.location.origin}${this.location.prepareExternalUrl(
-      this.code
+      code
     )}`;
   }
 
-  edit() {
+  edit(dirId: number, accessId: number) {
     this.dialog.open(ChangeAccessCodeDialog, {
-      data: { defaultValues: { code: this.code } },
+      data: { dirId, accessId },
     });
   }
 }

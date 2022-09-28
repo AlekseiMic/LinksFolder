@@ -44,14 +44,16 @@ export class DirectoryController {
     return this.service.create(name, parent, user);
   }
 
-  @Patch(':id')
-  async edit(
+  @Patch('/:id/access/:accessId')
+  async editAccess(
     @Param('id') id: string | number,
+    @Param('accessId') accessId: string | number,
     @Body()
     { name, code, extend }: { extend?: number; code?: string; name: string },
-    @GuestToken() token: string | undefined
+    @GuestToken() token: string | undefined,
+    @ReqUser() user?: AuthUser
   ): Promise<{ result: boolean; code?: string }> {
-    return this.service.edit(id, { name, code, extend }, undefined, token);
+    return this.service.edit(id, accessId, { name, code, extend }, user, token);
   }
 
   @Get(':id?')

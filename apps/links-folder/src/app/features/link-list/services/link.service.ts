@@ -4,16 +4,12 @@ import { BehaviorSubject, map, of, throwError } from 'rxjs';
 
 export type Link = { url: string; text?: string; id: number };
 
-type AddLinkResult = {
-  result: Link;
-  code: string;
-};
-
 export type List = {
   id: number;
   parent?: number;
   editable: boolean;
   author?: number;
+  isGuest: boolean | undefined;
   owned: boolean;
   name?: string;
   codes: { id: number; code: string; expires: Date }[];
@@ -29,32 +25,25 @@ export class LinkService {
 
   public list$ = new BehaviorSubject<null | Record<number, List>>(null);
 
-  public guestList$ = new BehaviorSubject<null | List>(null);
+  public rootDir: number | undefined;
 
   constructor(private readonly http: HttpClient) {}
 
   clear() {
     this.list$.next(null);
-    this.guestList$.next(null);
   }
 
-  extendLifetime(
-    id: number | undefined,
-    accessId: number | undefined,
-    minutes: number = 60
-  ) {
+  extendLifetime(id: number, accessId: number, minutes: number = 60) {
     return this.editAccess(id, accessId, { extend: minutes });
   }
 
-  public getListById(id: number | undefined) {
-    return id === undefined || this.guestList$.getValue()?.id === id
-      ? this.guestList$.getValue()
-      : this.list$.getValue()?.[id];
+  public getListById(id: number) {
+    return this.list$.getValue()?.[id];
   }
 
   editAccess(
-    id: number | undefined,
-    accessId: undefined | number,
+    id: number,
+    accessId: number,
     data: { code?: string; extend?: number }
   ) {
     const list = this.getListById(id);
@@ -65,10 +54,24 @@ export class LinkService {
       });
     }
 
-    const url = `/v1/directory/${list.id}/${accessId ?? ''}`;
+    const url = `/v1/directory/${list.id}/access/${accessId}`;
     return this.http
-      .patch<{ success: boolean; code?: string; expires?: Date }>(url, data)
-      .pipe(map((value) => {}));
+      .patch<{ result: boolean; code: string; expiresIn: Date }>(url, data)
+      .pipe(
+        map((value) => {
+          if (!value.result) return false;
+          list.codes.map((code) => {
+            if (code.id === accessId) {
+              code.code = value.code ?? code.code;
+              code.expires = value.expiresIn ?? code.expires;
+            }
+            return code;
+          });
+
+          this.list$.next(this.list$.getValue());
+          return true;
+        })
+      );
   }
 
   private canFetch(code?: string) {
@@ -82,7 +85,7 @@ export class LinkService {
   init() {
     this.http.post<List>(`/v1/init`, {}).subscribe({
       next: (value) => {
-        if (!value) this.guestList$.next(value);
+        if (!value) this.list$.next(value);
       },
     });
   }
@@ -91,14 +94,24 @@ export class LinkService {
     if (!this.canFetch(code)) return;
     this.lastCode = code;
     this.http
-      .get<{ user: null | Record<number, List>; guest: null | List }>(
-        `/v1/link/${code ?? ''}`
-      )
+      .get<{
+        user: null | { rootDir: number; data: Record<number, List> };
+        guest: null | List;
+      }>(`/v1/link/${code ?? ''}`)
       .subscribe({
         next: (value) => {
           this.lastFetch = Date.now();
-          this.list$.next(value.user);
-          this.guestList$.next(value.guest);
+          let { rootDir, data } = value.user ?? {
+            rootDir: undefined,
+            data: {},
+          };
+
+          if (value.guest) {
+            data[value.guest.id] = value.guest;
+            rootDir = value.guest.id;
+          }
+          this.rootDir = rootDir;
+          this.list$.next(data);
         },
         error: (error) => {
           if (error.status === 401) this.init();
@@ -106,8 +119,8 @@ export class LinkService {
       });
   }
 
-  addLinks(id: number | undefined, links: Omit<Link, 'id'>[]) {
-    const list = this.getListById(id);
+  addLinks(dirId: number, links: Omit<Link, 'id'>[]) {
+    const list = this.getListById(dirId);
     const url = list ? `/v1/directory/${list.id}/link/` : '/v1/link/';
     if (!list) return of(false);
     return this.http
@@ -115,39 +128,26 @@ export class LinkService {
       .pipe(
         map((res) => {
           list.links = [...(list?.links ?? []), ...res];
-
-          if (id === this.guestList$.getValue()?.id) {
-            this.guestList$.next(list);
-            return true;
-          }
-
-          this.list$.next(list);
+          this.list$.next(this.list$.getValue());
           return true;
         })
       );
   }
 
-  deleteLinks(directory: number | undefined, id: number[]) {
-    const list = this.getListById(directory);
+  deleteLinks(dirId: number, id: number[]) {
+    const list = this.getListById(dirId);
     if (!list) return of(false);
     return this.http.delete<number[]>(`/v1/link/${id.join(',')}`).pipe(
       map((res) => {
         if (!res) return false;
-
         list.links = list.links.filter((l) => !res.includes(l.id));
-
-        if (directory === this.guestList$.getValue()?.id) {
-          this.guestList$.next(list);
-          return true;
-        }
-
-        this.list$.next(list);
+        this.list$.next(this.list$.getValue());
         return true;
       })
     );
   }
 
-  editLinks(directory: number | undefined, link: Link) {
+  editLinks(directory: number, link: Link) {
     const list = this.getListById(directory);
     if (!list) return of(false);
     return this.http.patch<number>(`/v1/link/${link.id}`, link).pipe(
@@ -159,12 +159,7 @@ export class LinkService {
           return link;
         });
 
-        if (directory === this.guestList$.getValue()?.id) {
-          this.guestList$.next(list);
-          return true;
-        }
-
-        this.list$.next(list);
+        this.list$.next(this.list$.getValue());
         return true;
       })
     );

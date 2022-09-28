@@ -9,23 +9,19 @@ import { Directory } from 'link/models/directory.model';
 import { DirectoryToUser } from 'link/models/directory.to.user.model';
 import { Link } from 'link/models/link.model';
 import { Op } from 'sequelize';
-import { AuthUser, User } from 'user/user.model';
+import { AuthUser } from 'user/user.model';
 
 type List = {
   id: number;
   parent?: number;
   editable: boolean;
   author?: number;
+  isGuest?: boolean;
   owned: boolean;
   name?: string;
   codes: { id: number; code: string; expires: Date }[];
   sublists?: number[];
   links: { userId: null | number; id: number; url: string; text?: string }[];
-};
-
-type AllLists = {
-  user: Record<number, List> | null;
-  guest: List | null;
 };
 
 @Injectable()
@@ -96,6 +92,7 @@ export class LinkService {
       id: access.directoryId, // dir.id
       codes: [{ id: access.id, code: access.code, expires: access.expiresIn }],
       editable: token === access.authToken,
+      isGuest: true,
       owned: token === access.authToken,
       name: 'GuestDir', //dir.name
       links: result,
@@ -120,6 +117,7 @@ export class LinkService {
       codes: [{ id: access.id, code: access.code, expires: access.expiresIn }],
       editable: true,
       owned: true,
+      isGuest: true,
       name: 'GuestDir', //dir.name
       links: result,
     };
@@ -127,17 +125,17 @@ export class LinkService {
 
   async getUserLinks(user?: AuthUser) {
     if (!user) return null;
-    const baseDir = await this.directory.findOne({
+    const rootDir = await this.directory.findOne({
       where: { author: user.id },
       order: [['lft', 'asc']],
     });
+    if (!rootDir) return null;
     const dirConditions = [];
-    if (baseDir) {
-      dirConditions.push({
-        lft: { [Op.gte]: baseDir.lft },
-        rht: { [Op.lte]: baseDir.rht },
-      });
-    }
+
+    dirConditions.push({
+      lft: { [Op.gte]: rootDir.lft },
+      rht: { [Op.lte]: rootDir.rht },
+    });
 
     const received = await this.directory.findAll({
       include: [
@@ -166,7 +164,8 @@ export class LinkService {
           })
         : [];
     const result: Record<number, List> = {};
-    const prev: Directory[] = [];
+    const prevOwn: Directory[] = [];
+    const prevReceived: Directory[] = [];
 
     dirs?.forEach((dir) => {
       const list: List = {
@@ -177,7 +176,12 @@ export class LinkService {
         name: dir.name,
         sublists: [],
         codes: dir.directoryToUsers.reduce((acc: List['codes'], dtu) => {
-          if (dtu.userId !== user.id && dtu.createdBy !== user.id) return acc;
+          if (
+            dir.author !== user.id &&
+            dtu.userId !== user.id &&
+            dtu.createdBy !== user.id
+          )
+            return acc;
           acc.push({
             id: dtu.id,
             code: dtu.code,
@@ -186,6 +190,9 @@ export class LinkService {
           return acc;
         }, []),
       };
+
+      let parentId = rootDir.id;
+      const prev = dir.author === user.id ? prevOwn : prevReceived;
 
       if (dir.depth > 0 && prev.length > 0) {
         while (
@@ -196,17 +203,15 @@ export class LinkService {
           )
         )
           prev.pop();
-        const parent = prev[prev.length - 1];
-        if (parent) {
-          list.parent = parent.id;
-          result[parent.id].sublists?.push(dir.id);
-        } else {
-          console.log(dir);
+
+        parentId = prev[prev.length - 1].id;
+        if (prev.length === 0 || dir.rht - dir.lft > 1) {
+          prev.push(dir);
         }
       }
-      if (prev.length === 0 || dir.rht - dir.lft > 1) {
-        prev.push(dir);
-      }
+
+      list.parent = parentId;
+      result[parentId].sublists?.push(dir.id);
       result[dir.id] = list;
     });
 
@@ -223,7 +228,7 @@ export class LinkService {
       });
     });
 
-    return result;
+    return { rootDir: rootDir.id, data: result };
   }
 
   async delete(linkId: number | number[], user?: AuthUser, token?: string) {

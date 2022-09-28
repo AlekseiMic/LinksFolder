@@ -145,19 +145,21 @@ export class DirectoryService {
 
   async edit(
     id: string | number,
+    accessId: string | number,
     { name, code, extend }: { code?: string; name?: string; extend?: number },
-    user?: User,
+    user?: AuthUser,
     authToken?: string
   ) {
-    if (!authToken) return { result: false };
-    const result = await this.dirToUser.update(
-      {
-        expiresIn: dayjs().add(extend ?? 25, 'minutes'),
-        ...(code ? { code } : {}),
-      },
-      { where: { authToken } }
-    );
-    return { result: result[0] === 1, code };
+    const access = await this.dirToUser.findOne({ where: { id: accessId } });
+    if (!access) throw new NotFoundException();
+    if (authToken !== access.authToken && user?.id !== access.createdBy)
+      throw new ForbiddenException();
+    access.expiresIn = dayjs()
+      .add(extend ?? 25, 'minutes')
+      .toDate();
+    if (code) access.code = code;
+    const result = await access.save();
+    return { result: !!result, code: access.code, expiresIn: access.expiresIn };
   }
 
   async find(id?: number[]) {

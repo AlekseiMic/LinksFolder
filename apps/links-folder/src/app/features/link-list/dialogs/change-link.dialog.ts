@@ -11,7 +11,7 @@ export class ChangeLinkDialog {
     public dialogRef: MatDialogRef<ChangeLinkDialog>,
     private linkService: LinkService,
     @Inject(MAT_DIALOG_DATA)
-    public data: { directory: number | undefined; id: number; link: Link }
+    public data: { directory: number; id: number; link: Link }
   ) {
     const list = this.linkService.getListById(data.directory);
     if (!list) {
