@@ -94,6 +94,50 @@ export class DirectoryService {
     private readonly nsHelper: NestedSetsSequelizeHelper
   ) {}
 
+  async merge(
+    res: Response,
+    dir: number,
+    id: number,
+    token: string,
+    user?: AuthUser
+  ): Promise<boolean> {
+    if (!user) throw new ForbiddenException();
+
+    const [item, target] = await Promise.all([
+      this.repo.findOne({
+        where: { id: dir },
+        include: [
+          {
+            model: DirectoryToUser,
+            required: false,
+            where: { authToken: token },
+          },
+        ],
+      }),
+      this.repo.findOne({ where: { id, author: user.id } }),
+    ]);
+
+    if (!item || !target) return false;
+    if (item.author === null && item.directoryToUsers.length > 0) {
+      item.author = user.id;
+      await this.repo.save(item);
+      await this.linkModel.update(
+        { userId: user.id },
+        { where: { directory: item.id } }
+      );
+      await this.dirToUser.update(
+        { userId: user.id },
+        { where: { directoryId: item.id } }
+      );
+    }
+    if (item.author !== user.id) throw new NotFoundException();
+    const result = await this.nsHelper.moveTo(this.repo, item, target);
+    if (result) {
+      this.guestService.removeCookie(res);
+    }
+    return result;
+  }
+
   async createGuestDir() {
     const directory = await this.create('GuestDir', null);
     const access = await this.createGuestAccess(
@@ -167,18 +211,24 @@ export class DirectoryService {
     return this.repo.findAll();
   }
 
-  async delete(res: Response, id?: number | number[], authToken?: string) {
-    this.guestService.removeCookie(res);
-    const condition: DestroyOptions = { where: { id } };
-    if (!id && !authToken) return 0;
-    if (!id && authToken) {
-      const directory = await this.dirToUser.findOne({ where: { authToken } });
-      if (!directory) return 0;
-      condition.where = { id: directory.directoryId };
-      this.guestService.removeCookie(res);
-      console.log('whut');
+  async delete(res: Response, id: number, authToken?: string, user?: AuthUser) {
+    console.log(id, user);
+    if (!id || !user) return 0;
+    const condition: DestroyOptions = { where: { id, author: user?.id || 0 } };
+    if (user && authToken) {
+      const directory = await this.dirToUser.findOne({
+        where: { directoryId: id, authToken },
+      });
+
+      if (directory) {
+        condition.where = { id: directory.directoryId };
+        this.guestService.removeCookie(res);
+      }
     }
-    const result = await this.repo.removeAll(condition);
-    return result;
+    try {
+      return await this.nsHelper.delete(this.repo, condition);
+    } catch (err) {
+      return false;
+    }
   }
 }

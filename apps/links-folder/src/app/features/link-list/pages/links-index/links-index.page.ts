@@ -58,7 +58,7 @@ export class LinksIndexPage implements OnInit {
 
     this.listSub = this.listService.list$.subscribe((listObj) => {
       if (!this.listService.rootDir) return;
-      if (!listObj) {
+      if (!listObj || Object.keys(listObj).length === 0) {
         this.codes = [];
         this.isOwner = false;
         this.canEdit = false;
@@ -77,6 +77,14 @@ export class LinksIndexPage implements OnInit {
       this.canEdit = list.editable;
       this.list = list.links ?? [];
       this.dir = list.id;
+      if (this.listService.guestDir) {
+        const guestDir = listObj[this.listService.guestDir];
+        if (guestDir.isGuest && guestDir.owned && guestDir.links.length > 0) {
+          this.openMergeDialog(guestDir.id);
+        } else if (guestDir.isGuest && guestDir.owned) {
+          this.listService.removeList(guestDir.id).subscribe(() => {});
+        }
+      }
     });
   }
 
@@ -90,8 +98,10 @@ export class LinksIndexPage implements OnInit {
     this.listSub.unsubscribe();
   }
 
-  checkCanMergeGuestList() {
-    this.dialog.open(MergeGuestListDialog, {});
+  openMergeDialog(dirId: number) {
+    this.dialog.open(MergeGuestListDialog, {
+      data: { dirId, baseDir: this.listService.rootDir },
+    });
   }
 
   copyLink(code: string) {

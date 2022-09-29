@@ -71,6 +71,10 @@ export class LinkService {
 
     const [userList, guest] = await Promise.all(queries);
 
+    if (!userList && !guest && !user) {
+      throw new HttpException('Not authorized', 401);
+    }
+
     return { user: userList, guest };
   }
 
@@ -209,9 +213,10 @@ export class LinkService {
           prev.push(dir);
         }
       }
-
-      list.parent = parentId;
-      result[parentId].sublists?.push(dir.id);
+      if (result[parentId]) {
+        list.parent = parentId;
+        result[parentId].sublists?.push(dir.id);
+      }
       result[dir.id] = list;
     });
 

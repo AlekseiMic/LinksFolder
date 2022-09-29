@@ -22,25 +22,21 @@ export class AuthService {
   }
 
   async login(username: string, password: string): Promise<boolean> {
-    const req = this.http.post<{ token: string }>(
-      '/auth/signin',
-      {
-        username,
-        password,
-      },
-      { withCredentials: true }
-    );
+    const req = this.http.post<{ token: string }>('/auth/signin', {
+      username,
+      password,
+    });
 
     const result = await lastValueFrom(req);
     if (result.token) {
       const { data, isValid } = this.jwtService.parse(result.token);
       if (!isValid || !data) {
-        this.user = null;
         this.accessToken = null;
+        this.user = null;
         return false;
       }
-      this.user = new User(data.id, data.name);
       this.accessToken = result.token;
+      this.user = new User(data.id, data.name);
       return true;
     }
 
@@ -48,14 +44,10 @@ export class AuthService {
   }
 
   async signup(username: string, password: string): Promise<boolean> {
-    const req = this.http.post<{ token: string }>(
-      '/auth/signup',
-      {
-        username,
-        password,
-      },
-      { withCredentials: true }
-    );
+    const req = this.http.post<{ token: string }>('/auth/signup', {
+      username,
+      password,
+    });
 
     const result = await lastValueFrom(req);
 
@@ -66,8 +58,8 @@ export class AuthService {
         this.accessToken = null;
         return false;
       }
-      this.user = new User(data.id, data.name);
       this.accessToken = result.token;
+      this.user = new User(data.id, data.name);
       return true;
     }
 
@@ -75,15 +67,11 @@ export class AuthService {
   }
 
   async logout(): Promise<boolean> {
-    const req = this.http.post<boolean>(
-      '/auth/logout',
-      {},
-      { withCredentials: true, headers: { Authorization: this.bearer } }
-    );
+    const req = this.http.post<boolean>('/auth/logout', {});
     const result = await lastValueFrom(req);
     if (result) {
-      this.user = null;
       this.accessToken = null;
+      this.user = null;
       return true;
     }
     return false;
@@ -94,11 +82,7 @@ export class AuthService {
   }
 
   public async refreshToken() {
-    const req = this.http.post<{ token: string }>(
-      '/auth/refresh',
-      {},
-      { withCredentials: true }
-    );
+    const req = this.http.post<{ token: string }>('/auth/refresh', {});
     const result = await lastValueFrom(req).catch((err) => {
       return { token: '' };
     });
@@ -106,11 +90,11 @@ export class AuthService {
       ? this.jwtService.parse(result.token)
       : { data: null, isValid: false };
     const ok = isValid && data;
-    this.user = ok ? new User(data.id, data.name) : null;
     this.accessToken = ok ? result.token : null;
+    this.user = ok ? new User(data.id, data.name) : null;
   }
 
-  get bearer() {
+  public get bearer() {
     return `Bearer ${accessToken}`;
   }
 
@@ -129,7 +113,6 @@ export class AuthService {
     const shouldNotifySubscribers =
       (user === undefined && data !== user) ||
       (data !== user && (!user || !data));
-    console.log(shouldNotifySubscribers);
     user = data;
     if (shouldNotifySubscribers) this.isLoggedSubject.next(!!data);
   }

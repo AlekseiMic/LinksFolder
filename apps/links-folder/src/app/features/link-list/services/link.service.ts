@@ -27,6 +27,8 @@ export class LinkService {
 
   public rootDir: number | undefined;
 
+  public guestDir: number | undefined;
+
   constructor(private readonly http: HttpClient) {}
 
   clear() {
@@ -85,7 +87,11 @@ export class LinkService {
   init() {
     this.http.post<List>(`/v1/init`, {}).subscribe({
       next: (value) => {
-        if (!value) this.list$.next(value);
+        if (value) {
+          this.rootDir = value.id;
+          value.isGuest = true;
+          this.list$.next({ [value.id]: value });
+        }
       },
     });
   }
@@ -101,16 +107,23 @@ export class LinkService {
       .subscribe({
         next: (value) => {
           this.lastFetch = Date.now();
+
+          let guestDir = undefined;
           let { rootDir, data } = value.user ?? {
             rootDir: undefined,
             data: {},
           };
 
-          if (value.guest) {
+          if (value.guest && !rootDir) {
             data[value.guest.id] = value.guest;
             rootDir = value.guest.id;
+          } else if (value.guest) {
+            data[value.guest.id] = value.guest;
+            guestDir = value.guest.id;
           }
+
           this.rootDir = rootDir;
+          this.guestDir = guestDir;
           this.list$.next(data);
         },
         error: (error) => {
@@ -165,12 +178,26 @@ export class LinkService {
     );
   }
 
-  mergeLists(src?: number, target?: number) {
-    const url = `/v1/directory/merge/${src ?? ''}?target=${target ?? ''}`;
+  mergeLists(src: number, target: number) {
+    const url = `/v1/directory/${target}/merge/${src}`;
     return this.http.patch<boolean>(url, {}).pipe();
   }
 
-  removeList(id?: number) {
-    return this.http.delete<boolean>(`/v1/directory/${id ?? ''}`, {}).pipe();
+  removeList(id: number) {
+    return this.http.delete<boolean>(`/v1/directory/${id}`, {}).pipe(
+      map((val) => {
+        if (val) {
+          const list = this.list$.getValue();
+          if (!list) return;
+
+          if (this.guestDir === id) {
+            this.guestDir = undefined;
+          }
+          delete list[id];
+          this.list$.next(list);
+        }
+        return val;
+      })
+    );
   }
 }

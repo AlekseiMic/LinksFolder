@@ -1,8 +1,11 @@
 <section *ngIf="canEdit">
-  <app-link-form [directory]="dir" [showDescription]="list.length <= 0"></app-link-form>
+  <app-link-form
+    [directory]="dir"
+    [showDescription]="list.length <= 0"
+  ></app-link-form>
 
-  <div *ngFor="let code of codes">
-    <div *ngIf="!isAuthorized && dir" class="link">
+  <div *ngIf="!isAuthorized && dir && list.length > 0">
+    <div *ngFor="let code of codes" class="link">
       <span>Your link: </span>
       <a target="_blank" href="{{getLink(code.code)}}">
         {{getLink(code.code)}}
@@ -21,7 +24,8 @@
     </div>
   </div>
 </section>
-<section *ngIf="!canEdit || !isAuthorized">
+
+<section *ngIf="list.length > 0 && (!canEdit || !isAuthorized)">
   <app-link-simple-list
     [links]="list"
     [canEdit]="canEdit"

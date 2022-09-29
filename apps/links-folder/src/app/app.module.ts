@@ -4,11 +4,12 @@ import { SharedModule } from './shared/shared.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule, Routes } from '@angular/router';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { AngularSvgIconPreloaderModule } from 'angular-svg-icon-preloader';
 import { AuthService } from './shared/services/auth.service';
+import { ApiInterceptor } from './core/interceptors/api.interceptor';
 
 const routes: Routes = [
   {
@@ -34,7 +35,10 @@ const routes: Routes = [
     BrowserAnimationsModule,
     SharedModule,
   ],
-  providers: [AuthService],
+  providers: [
+    AuthService,
+    { provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

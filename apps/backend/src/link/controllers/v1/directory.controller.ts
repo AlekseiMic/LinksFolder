@@ -56,19 +56,30 @@ export class DirectoryController {
     return this.service.edit(id, accessId, { name, code, extend }, user, token);
   }
 
+  @Patch('/:id/merge/:dir')
+  async mergeDirs(
+    @GuestToken() token: string,
+    @Param('id') id: string,
+    @Res({ passthrough: true }) res: Response,
+    @Param('dir') dir: string,
+    @ReqUser() user?: AuthUser
+  ): Promise<boolean> {
+    return this.service.merge(res,Number(dir), Number(id), token, user);
+  }
+
   @Get(':id?')
   async find(@Param('id') id?: string): Promise<Directory[]> {
     const ids = id ? id.split(',').map(Number) : undefined;
     return this.service.find(ids);
   }
 
-  @Delete(':id?')
+  @Delete(':id')
   async delete(
     @GuestToken() token: string | undefined,
     @Res({ passthrough: true }) res: Response,
-    @Param('id') id?: string
-  ): Promise<number> {
-    const ids = id?.split(',').map(Number);
-    return this.service.delete(res, ids, token);
+    @Param('id') id: string,
+    @ReqUser() user?: AuthUser
+  ): Promise<boolean | number> {
+    return this.service.delete(res, Number(id), token, user);
   }
 }

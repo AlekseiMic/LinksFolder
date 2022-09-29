@@ -36,6 +36,53 @@ export class NestedSetsSequelizeHelper {
     return repo.save(element);
   }
 
+  async moveTo<M extends NSModel>(
+    repo: IRepository<M>,
+    item: M,
+    target: M
+  ): Promise<boolean> {
+    const newLft = target.rht;
+    const width = item.rht - item.lft + 1;
+    let distance = newLft - item.lft;
+    let tmppos = item.lft;
+    if (distance < 0) {
+      distance -= width;
+      tmppos += width;
+    }
+
+    await repo.increment('depth', {
+      by: target.depth - item.depth + 1,
+      where: { lft: { [Op.gte]: item.lft }, rht: { [Op.lte]: item.rht } },
+    });
+
+    await repo.increment('lft', {
+      by: width,
+      where: { lft: { [Op.gte]: newLft } },
+    });
+
+    await repo.increment('rht', {
+      by: width,
+      where: { rht: { [Op.gte]: newLft } },
+    });
+
+    await repo.increment(['lft', 'rht'], {
+      by: distance,
+      where: { lft: { [Op.gte]: tmppos }, rht: { [Op.lt]: tmppos + width } },
+    });
+
+    await repo.decrement('lft', {
+      by: width,
+      where: { lft: { [Op.gt]: item.rht } },
+    });
+
+    await repo.decrement('rht', {
+      by: width,
+      where: { rht: { [Op.gt]: item.rht } },
+    });
+
+    return true;
+  }
+
   async append<M extends NSModel>(
     repo: IRepository<M>,
     element: M,
@@ -48,10 +95,12 @@ export class NestedSetsSequelizeHelper {
     element.depth = parentNode.depth + 1;
     element.lft = parentNode.rht;
     element.rht = parentNode.rht + 1;
+
     await repo.increment('rht', {
       by: 2,
       where: { rht: { [Op.gte]: parentNode.rht } },
     });
+
     await repo.increment('lft', {
       by: 2,
       where: {
@@ -93,8 +142,8 @@ export class NestedSetsSequelizeHelper {
     return repo.save(element);
   }
 
-  async delete<M extends NSModel>(repo: IRepository<M>, pk: any) {
-    const node = await repo.findByPk(pk);
+  async delete<M extends NSModel>(repo: IRepository<M>, condition: any) {
+    const node = await repo.findOne(condition);
     if (!node) {
       throw new NotFoundException('Node not found');
     }

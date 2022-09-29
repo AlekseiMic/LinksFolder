@@ -27,6 +27,7 @@ export class GeneralService {
       codes: [{ id: access.id, code: access.code, expires: access.expiresIn }],
       editable: true,
       owned: true,
+      isGuest: true,
       name: directory.name,
       links: [],
     };

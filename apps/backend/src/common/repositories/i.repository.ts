@@ -13,6 +13,6 @@ export interface IRepository<T extends Model> {
   ): Promise<number>;
   exists(conditions: any): Promise<boolean>;
   removeAll(conditions: any): Promise<number>;
-  increment(fields: string, options?: any): Promise<boolean>;
-  decrement(fields: string, options?: any): Promise<boolean>;
+  increment(fields: string | string[], options?: any): Promise<boolean>;
+  decrement(fields: string | string[], options?: any): Promise<boolean>;
 }
