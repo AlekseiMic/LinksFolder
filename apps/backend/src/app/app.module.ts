@@ -4,7 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from '../auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
-import { resolve} from 'path';
+import { resolve } from 'path';
 import { LinkModule } from '../link/link.module';
 
 const envFilePath = resolve(__dirname + '/common/env/.env');
@@ -19,11 +19,14 @@ const envFilePath = resolve(__dirname + '/common/env/.env');
       password: '123qwe123',
       database: 'linkfolder',
       autoLoadModels: true,
-      models: []
+      dialectOptions: {
+        multipleStatements: true,
+      },
+      models: [],
     }),
-    ConfigModule.forRoot({ envFilePath, isGlobal: true}),
+    ConfigModule.forRoot({ envFilePath, isGlobal: true }),
     AuthModule,
-    LinkModule
+    LinkModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,7 +1,7 @@
 import { DOCUMENT, Location, LocationStrategy } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { LinkService, List } from '../../services/link.service';
+import { AllLists, LinkService, List } from '../../services/link.service';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
@@ -21,13 +21,10 @@ export class LinksIndexPage implements OnInit {
   private listSub: Subscription;
 
   public routeCode?: string;
-  public codes?: List['codes'];
-  public canEdit: boolean = false;
-  public isGuest: boolean = false;
-  public isOwner: boolean = false;
   public isAuthorized: boolean | undefined;
-  public list: List['links'] = [];
-  public dir: number | null = null;
+  public list: AllLists = {};
+  public root: List | undefined;
+  public baseDir: number | undefined;
 
   constructor(
     private auth: AuthService,
@@ -57,26 +54,14 @@ export class LinksIndexPage implements OnInit {
     );
 
     this.listSub = this.listService.list$.subscribe((listObj) => {
-      if (!this.listService.rootDir) return;
-      if (!listObj || Object.keys(listObj).length === 0) {
-        this.codes = [];
-        this.isOwner = false;
-        this.canEdit = false;
-        this.isGuest = false;
-        this.list = [];
-        this.dir = null;
-        return;
-      }
-      const list = listObj[this.listService.rootDir];
-      if (!list) {
-        return;
-      }
-      this.codes = list.codes;
-      this.isGuest = !!list.isGuest;
-      this.isOwner = list.owned;
-      this.canEdit = list.editable;
-      this.list = list.links ?? [];
-      this.dir = list.id;
+      this.baseDir = this.listService.rootDir;
+      this.list = listObj ?? {};
+      this.root = undefined;
+
+      if (!this.baseDir || !listObj || !listObj[this.baseDir]) return;
+
+      this.root = this.list[this.baseDir];
+
       if (this.listService.guestDir) {
         const guestDir = listObj[this.listService.guestDir];
         if (guestDir.isGuest && guestDir.owned && guestDir.links.length > 0) {
@@ -86,6 +71,10 @@ export class LinksIndexPage implements OnInit {
         }
       }
     });
+  }
+
+  hasLinks() {
+    return (this.root?.links?.length ?? 0) > 0;
   }
 
   fetchList() {

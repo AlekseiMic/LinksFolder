@@ -4,11 +4,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
+import { InjectConnection, InjectModel } from '@nestjs/sequelize';
 import { Directory } from 'link/models/directory.model';
 import { DirectoryToUser } from 'link/models/directory.to.user.model';
 import { Link } from 'link/models/link.model';
 import { Op } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 import { AuthUser } from 'user/user.model';
 
 type List = {
@@ -27,6 +28,7 @@ type List = {
 @Injectable()
 export class LinkService {
   constructor(
+    @InjectConnection() private readonly connection: Sequelize,
     @InjectModel(Link) private readonly linkModel: typeof Link,
     @InjectModel(DirectoryToUser)
     private readonly dirToUser: typeof DirectoryToUser,
@@ -240,6 +242,7 @@ export class LinkService {
     const link = await this.linkModel.findAll({ where: { id: linkId } });
     const toDelete: number[] = [];
     const toCheck: number[] = [];
+    const dirs: number[] = [];
     const canDelete = (link: Link) => {
       if (link.userId === user?.id) toDelete.push(link.id);
       else toCheck.push(link.directory);
@@ -254,12 +257,24 @@ export class LinkService {
     if (toCheck.length > 0) {
       const checkResults = await this.hasAccess(toCheck, user, token);
       link.forEach(({ id, directory }) => {
-        if (checkResults[directory]) toDelete.push(id);
+        if (checkResults[directory]) {
+          dirs.push(directory);
+          toDelete.push(id);
+        }
       });
     }
 
     if (toDelete.length === 0) return 0;
     const result = await this.linkModel.destroy({ where: { id: toDelete } });
+    if (result) {
+      for (let i = 0; i < dirs.length; i++) {
+        await this.connection.query(
+          'SET @i=0; UPDATE Links SET `sort` = @i:=@i+1 WHERE directory = ' +
+            dirs[i] +
+            ' order by `sort` asc;'
+        );
+      }
+    }
     return result ? toDelete : 0;
   }
 

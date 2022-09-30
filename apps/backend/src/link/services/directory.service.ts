@@ -30,9 +30,22 @@ export class DirectoryService {
       throw new ForbiddenException();
     }
 
+    const maxOrderLink = await this.linkModel.findOne({
+      where: { directory: dirId },
+      order: [['sort', 'DESC']],
+    });
+
+    const maxOrder = maxOrderLink?.sort ?? 0;
+
     const result = await Promise.all(
-      links.map(({ url, text }) =>
-        this.linkModel.create({ url, text, directory: dirId })
+      links.map(({ url, text }, idx) =>
+        this.linkModel.create({
+          url,
+          text,
+          userId: user?.id,
+          directory: dirId,
+          sort: maxOrder + idx + 1,
+        })
       )
     );
 

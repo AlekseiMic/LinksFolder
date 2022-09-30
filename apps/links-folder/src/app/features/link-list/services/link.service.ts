@@ -17,13 +17,15 @@ export type List = {
   links: Link[];
 };
 
+export type AllLists = null | Record<number, List>;
+
 @Injectable()
 export class LinkService {
   private lastFetch: number;
 
   private lastCode: string | undefined;
 
-  public list$ = new BehaviorSubject<null | Record<number, List>>(null);
+  public list$ = new BehaviorSubject<AllLists>(null);
 
   public rootDir: number | undefined;
 

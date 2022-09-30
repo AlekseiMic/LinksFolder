@@ -25,7 +25,7 @@ export class MergeGuestListDialog {
     this.linkService
       .mergeLists(this.data.dirId, this.data.baseDir)
       .subscribe((v) => {
-        console.log('Accepted');
+        if (v) this.dialogRef.close();
       });
   }
 

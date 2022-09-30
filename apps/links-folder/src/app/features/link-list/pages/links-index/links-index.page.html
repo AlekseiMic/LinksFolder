@@ -1,11 +1,11 @@
-<section *ngIf="canEdit">
+<section *ngIf="root?.editable && baseDir">
   <app-link-form
-    [directory]="dir"
-    [showDescription]="list.length <= 0"
+    [directory]="baseDir"
+    [showDescription]="!hasLinks()"
   ></app-link-form>
 
-  <div *ngIf="!isAuthorized && dir && list.length > 0">
-    <div *ngFor="let code of codes" class="link">
+  <div *ngIf="!isAuthorized && baseDir && hasLinks()">
+    <div *ngFor="let code of root?.codes ?? []" class="link">
       <span>Your link: </span>
       <a target="_blank" href="{{getLink(code.code)}}">
         {{getLink(code.code)}}
@@ -14,10 +14,10 @@
         <button (click)="copyLink(code.code)">
           <svg-icon name="copy-icon"></svg-icon>
         </button>
-        <button (click)="edit(dir, code.id)">
+        <button (click)="edit(baseDir, code.id)">
           <svg-icon name="pen-icon"></svg-icon>
         </button>
-        <button (click)="extendLinkLifetime(dir, code.id)">
+        <button (click)="extendLinkLifetime(baseDir, code.id)">
           <svg-icon name="clock-icon"></svg-icon>
         </button>
       </div>
@@ -25,10 +25,17 @@
   </div>
 </section>
 
-<section *ngIf="list.length > 0 && (!canEdit || !isAuthorized)">
+<section *ngIf="baseDir && hasLinks() && (!root?.editable || !isAuthorized)">
   <app-link-simple-list
-    [links]="list"
-    [canEdit]="canEdit"
-    [directory]="dir"
+    [links]="root?.links ?? []"
+    [canEdit]="root?.editable"
+    [directory]="baseDir"
   ></app-link-simple-list>
+</section>
+
+<section *ngIf="hasLinks() && (!root?.isGuest && isAuthorized)">
+  <app-link-not-simple-list
+    [lists]="list"
+    [directory]="baseDir"
+  ></app-link-not-simple-list>
 </section>

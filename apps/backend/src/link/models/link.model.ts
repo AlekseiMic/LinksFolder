@@ -28,4 +28,7 @@ export class Link extends Model {
 
   @Column
   text: string;
+
+  @Column
+  sort: number;
 }
