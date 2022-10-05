@@ -1,3 +1,30 @@
+<app-link-form
+  [directory]="[directory]"
+  [showDescription]="!hasLinks()"
+></app-link-form>
+
+<section *ngIf="canEdit && directory">
+  <div *ngIf="hasLinks()">
+    <div *ngFor="let code of codes ?? []" class="link">
+      <span>Your link: </span>
+      <a target="_blank" href="{{ getLink(code.code) }}">
+        {{ getLink(code.code) }}
+      </a>
+      <div class="actions">
+        <button (click)="copyLink(code.code)">
+          <svg-icon name="copy-icon"></svg-icon>
+        </button>
+        <button (click)="editAccess(directory, code.id)">
+          <svg-icon name="pen-icon"></svg-icon>
+        </button>
+        <button (click)="extendLinkLifetime(directory, code.id)">
+          <svg-icon name="clock-icon"></svg-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <div *ngIf="hasLinks() || canEdit" class="list">
   <div class="item" *ngFor="let link of links">
     <a href="{{ link.url }}" target="_blank">{{ link.text ?? link.url }}</a>

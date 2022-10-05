@@ -6,7 +6,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CdkAccordionModule } from '@angular/cdk/accordion';
 import { ReactiveFormsModule } from '@angular/forms';
 import { LinkFormComponent } from './components/link-form/link.form.component';
-import { LinkItemComponent } from './components/link-item/link-item.component';
 import { LinkListService } from './services/link-list.service';
 import {
   DragNDropManagerDirective,
@@ -26,21 +25,24 @@ import { ChangeAccessCodeDialog } from './dialogs/change-access-code.dialog';
 import { EditAccessCodeFormComponent } from './components/edit-access-code-form/edit-access-code-form.component';
 import { MergeGuestListDialog } from './dialogs/merge-guest-list.dialog';
 import { LinkNotSimpleList } from './components/link-not-simple-list/link.not.simple.list.component';
+import { CreateSubdirFormComponent } from './components/create-subdir-form/create-subdir-form.component';
+import { CreateSubdirDialog } from './dialogs/create-subdir-dialog/create-subdir.dialog';
 
 @NgModule({
   declarations: [
+    CreateSubdirFormComponent,
     EditLinkFormComponent,
     EditAccessCodeFormComponent,
     LinksIndexPage,
     LinkFormComponent,
-    LinkItemComponent,
     LinkSimpleList,
     LinkNotSimpleList,
     DragNDropManagerDirective,
     DragNDropManagerRootDirective,
     ChangeLinkDialog,
     MergeGuestListDialog,
-    ChangeAccessCodeDialog
+    ChangeAccessCodeDialog,
+    CreateSubdirDialog,
   ],
   imports: [
     AngularSvgIconModule,
@@ -52,7 +54,7 @@ import { LinkNotSimpleList } from './components/link-not-simple-list/link.not.si
     MatCardModule,
     MatDialogModule,
     SharedModule,
-    MatSnackBarModule
+    MatSnackBarModule,
   ],
   providers: [LinkListService, LinkService, DragNDropManagerService],
 })

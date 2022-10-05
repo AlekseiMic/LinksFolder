@@ -28,12 +28,12 @@ export class DirectoryController {
 
   @Post('/:id/link')
   async createLink(
-    @Param('id') dir: number,
+    @Param('id') dir: string,
     @Body() links: LinkDto[],
     @GuestToken() token: string | undefined,
     @ReqUser() user?: AuthUser
   ) {
-    return this.service.createLinks(dir, links, user, token);
+    return this.service.createLinks(Number(dir), links, user, token);
   }
 
   @Post()
@@ -64,7 +64,7 @@ export class DirectoryController {
     @Param('dir') dir: string,
     @ReqUser() user?: AuthUser
   ): Promise<boolean> {
-    return this.service.merge(res,Number(dir), Number(id), token, user);
+    return this.service.merge(res, Number(dir), Number(id), token, user);
   }
 
   @Get(':id?')

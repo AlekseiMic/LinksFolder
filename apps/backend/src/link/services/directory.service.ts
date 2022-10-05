@@ -7,7 +7,7 @@ import {
 import { InjectModel } from '@nestjs/sequelize';
 import { Directory } from 'link/models/directory.model';
 import { DirectoryToUser } from 'link/models/directory.to.user.model';
-import { AuthUser, User } from 'user/user.model';
+import { AuthUser } from 'user/user.model';
 import * as dayjs from 'dayjs';
 import { DestroyOptions, Op } from 'sequelize';
 import { GuestService } from './guest.service';

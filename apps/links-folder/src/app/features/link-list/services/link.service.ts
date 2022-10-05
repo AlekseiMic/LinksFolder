@@ -2,7 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, of, throwError } from 'rxjs';
 
-export type Link = { url: string; text?: string; id: number };
+export type Link = {
+  directory: number;
+  url: string;
+  text?: string;
+  id: number;
+};
 
 export type List = {
   id: number;
@@ -98,6 +103,32 @@ export class LinkService {
     });
   }
 
+  createDir(dir: number, name: string) {
+    return this.http
+      .post<{ id: number; name: string }>(`/v1/directory`, {
+        name,
+        parent: dir,
+      })
+      .pipe(
+        map((value) => {
+          const nextList = this.list$.getValue();
+          if (!nextList) return false;
+          nextList[dir]?.sublists?.push(value.id);
+          nextList[value.id] = {
+            name: value.name,
+            id: value.id,
+            editable: true,
+            codes: [],
+            owned: true,
+            isGuest: false,
+            links: [],
+          };
+          this.list$.next(nextList);
+          return true;
+        })
+      );
+  }
+
   fetchList(code?: string) {
     if (!this.canFetch(code)) return;
     this.lastCode = code;
@@ -134,12 +165,15 @@ export class LinkService {
       });
   }
 
-  addLinks(dirId: number, links: Omit<Link, 'id'>[]) {
+  addLinks(dirId: number, links: Omit<Link, 'id' | 'directory'>[]) {
     const list = this.getListById(dirId);
     const url = list ? `/v1/directory/${list.id}/link/` : '/v1/link/';
     if (!list) return of(false);
     return this.http
-      .post<{ id: number; url: string; text?: string }[]>(url, links)
+      .post<{ id: number; url: string; directory: number; text?: string }[]>(
+        url,
+        links
+      )
       .pipe(
         map((res) => {
           list.links = [...(list?.links ?? []), ...res];

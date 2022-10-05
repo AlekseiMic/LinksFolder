@@ -22,7 +22,7 @@ type List = {
   name?: string;
   codes: { id: number; code: string; expires: Date }[];
   sublists?: number[];
-  links: { userId: null | number; id: number; url: string; text?: string }[];
+  links: { userId: null | number; directory: number; id: number; url: string; text?: string }[];
 };
 
 @Injectable()
@@ -211,9 +211,9 @@ export class LinkService {
           prev.pop();
 
         parentId = prev[prev.length - 1].id;
-        if (prev.length === 0 || dir.rht - dir.lft > 1) {
-          prev.push(dir);
-        }
+      }
+      if (prev.length === 0 || dir.rht - dir.lft > 1) {
+        prev.push(dir);
       }
       if (result[parentId]) {
         list.parent = parentId;
@@ -231,6 +231,7 @@ export class LinkService {
         id: link.id,
         text: link.text,
         url: link.url,
+        directory: link.directory,
         userId: link.userId,
       });
     });

@@ -1,5 +1,10 @@
-.list {
-  padding: 10px 385px;
+.layout {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+}
+.left-panel {
+  border: 1px solid red;
 }
 
 .item {

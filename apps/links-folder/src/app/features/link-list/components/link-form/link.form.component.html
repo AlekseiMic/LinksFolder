@@ -1,5 +1,12 @@
 <form [formGroup]="newLinkForm" [ngClass]="{ small: !showDescription }">
   <p>Insert link and press <span>Enter</span></p>
+  <select
+    *ngIf="directory && directory.length > 1"
+    id="directory"
+    formControlName="directory"
+  >
+    <option *ngFor="let dir of directory">{{ dir }}</option>
+  </select>
   <input
     autocomplete="off"
     type="text"

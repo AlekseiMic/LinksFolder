@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { FormControl, UntypedFormBuilder, Validators } from '@angular/forms';
 import { LinkService } from '../../services/link.service';
 
@@ -15,7 +15,7 @@ export class LinkFormComponent implements OnInit {
 
   @Input() showDescription?: boolean;
 
-  @Input() directory: number | null = null;
+  @Input() directory: number[] | null = null;
 
   constructor(
     private formBuilder: UntypedFormBuilder,
@@ -28,10 +28,25 @@ export class LinkFormComponent implements OnInit {
       Validators.minLength(5),
       Validators.pattern(linkRegex),
     ]),
+    directory: null,
   });
 
+  ngOnChanges(changes: SimpleChanges) {
+    let newValue = changes['directory'].currentValue;
+    if (newValue && newValue.length === 1) newValue = newValue[0];
+    if (this.directory === null && typeof newValue === 'number') {
+      this.newLinkForm.controls['directory'].reset(newValue);
+      console.log(newValue);
+    }
+  }
+
   onCreateLink(): void {
-    if (!this.newLinkForm.valid || this.directory === null) return;
+    if (!this.newLinkForm.valid) return;
+    const directory = this.newLinkForm.value.directory;
+
+    console.log(directory);
+    if (!directory) return;
+
     const link: string = this.newLinkForm.value.link;
     const reg = new RegExp(linkRegex);
 
@@ -53,7 +68,7 @@ export class LinkFormComponent implements OnInit {
         links.push({ url, text: text || url, tags });
       });
 
-    this.linkService.addLinks(this.directory, links).subscribe((res) => {
+    this.linkService.addLinks(directory, links).subscribe((res) => {
       if (res) {
         this.newLinkForm.controls['link'].reset('');
       }
