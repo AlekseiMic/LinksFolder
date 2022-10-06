@@ -1,6 +1,11 @@
 <ng-template #folderList let-dir>
   <div class="subdirectory">
-    <input type="checkbox" [name]="dir" [checked]="isOpen(dir)" (change)="onDirChecked($event, dir)" />
+    <input
+      type="checkbox"
+      [name]="dir"
+      [checked]="isOpen(dir)"
+      (change)="onDirChecked($event, dir)"
+    />
     <button (click)="isExpanded(dir) ? collapse(dir) : expand(dir)">
       {{ isExpanded(dir) ? '<' : '>' }}
     </button>
@@ -43,10 +48,16 @@
     </ng-template>
   </div>
   <div class="right-panel">
-    <app-link-form
-      [directory]="openned"
-      [showDescription]="false"
-    ></app-link-form>
+    <h4>
+      {{ title }}
+    </h4>
+    <div>
+      <app-link-form
+        class="test"
+        [directory]="opennedVariants"
+        [hide]="true"
+      ></app-link-form>
+    </div>
     <div *ngIf="lists" class="list">
       <ng-template
         [ngTemplateOutlet]="linkList"

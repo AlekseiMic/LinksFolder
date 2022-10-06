@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { ChangeLinkDialog } from '../../dialogs/change-link.dialog';
 import { CreateSubdirDialog } from '../../dialogs/create-subdir-dialog/create-subdir.dialog';
 import { AllLists, LinkService, List } from '../../services/link.service';
+import memoizee from 'memoizee';
 
 @Component({
   selector: 'app-link-not-simple-list',
@@ -22,7 +23,7 @@ export class LinkNotSimpleList implements OnInit {
 
   onDirChecked(event: any, dir: number) {
     if (event.currentTarget.checked) {
-      this.openned.push(dir);
+      this.openned = [...this.openned, dir];
     } else {
       this.openned = this.openned.filter((d) => d !== dir);
     }
@@ -49,8 +50,7 @@ export class LinkNotSimpleList implements OnInit {
   }
 
   open(dir: number) {
-    this.openned = [];
-    this.openned.push(dir);
+    this.openned = [dir];
   }
 
   toggle(dir: number) {
@@ -100,6 +100,28 @@ export class LinkNotSimpleList implements OnInit {
 
   isMultiDirs() {
     return this.openned.length > 1;
+  }
+
+  getOpennedVariants = memoizee(
+    (lists: typeof this.lists, openned: typeof this.openned) => {
+      return openned.reduce((acc: { value: number; label: string }[], v) => {
+        const dir = lists?.[v];
+        if (!dir) return acc;
+        acc.push({ value: v, label: `${dir?.name ?? v}` });
+        return acc;
+      }, []);
+    }
+  );
+
+  get opennedVariants() {
+    return this.getOpennedVariants(this.lists, this.openned);
+  }
+
+  get title() {
+    return this.openned
+      .map((v) => this.lists?.[v]?.name)
+      .filter((v) => v)
+      .join(', ');
   }
 
   get links() {

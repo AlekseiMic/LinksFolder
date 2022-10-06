@@ -3,7 +3,7 @@ import { FormControl, UntypedFormBuilder, Validators } from '@angular/forms';
 import { LinkService } from '../../services/link.service';
 
 const linkRegex =
-  /^ *(?:(https?:\/\/(?:www\.)?[-\w@:%._\+~#=]{1,256}\.[\w()]{1,6}(?:[-\w()@:%_\+.~#?&/=]*)) *([-_@$!%^&*() \w]*)((?: *#[-\w_]+)*) *)+$/;
+  /^ *(?:(https?:\/\/(?:www\.)?[-\w@:%._\+~#=]{1,256}\.[\w()]{1,6}(?:[-\w()@:%_\+.~#?&/=]*)) *([-_@$!%^&*() \w]*)((?: *#[-\w_]+)*) *)*$/;
 
 @Component({
   selector: 'app-link-form',
@@ -15,7 +15,9 @@ export class LinkFormComponent implements OnInit {
 
   @Input() showDescription?: boolean;
 
-  @Input() directory: number[] | null = null;
+  @Input() directory: { value: number; label: string }[] | null = null;
+
+  @Input() hide = false;
 
   constructor(
     private formBuilder: UntypedFormBuilder,
@@ -23,31 +25,26 @@ export class LinkFormComponent implements OnInit {
   ) {}
 
   newLinkForm = this.formBuilder.group({
-    link: new FormControl('', [
-      Validators.required,
-      Validators.minLength(5),
-      Validators.pattern(linkRegex),
-    ]),
+    link: new FormControl('', [Validators.pattern(linkRegex)]),
     directory: null,
   });
 
   ngOnChanges(changes: SimpleChanges) {
     let newValue = changes['directory'].currentValue;
-    if (newValue && newValue.length === 1) newValue = newValue[0];
-    if (this.directory === null && typeof newValue === 'number') {
+    if (newValue && newValue.length === 1) newValue = newValue[0].value;
+    if (typeof newValue === 'number') {
+      console.log('???');
       this.newLinkForm.controls['directory'].reset(newValue);
-      console.log(newValue);
     }
   }
 
   onCreateLink(): void {
     if (!this.newLinkForm.valid) return;
     const directory = this.newLinkForm.value.directory;
-
-    console.log(directory);
-    if (!directory) return;
-
     const link: string = this.newLinkForm.value.link;
+
+    if (!directory || !link) return;
+
     const reg = new RegExp(linkRegex);
 
     const links: { url: string; text: string; tags?: string[] }[] = [];
@@ -71,12 +68,9 @@ export class LinkFormComponent implements OnInit {
     this.linkService.addLinks(directory, links).subscribe((res) => {
       if (res) {
         this.newLinkForm.controls['link'].reset('');
+        this.newLinkForm.controls['link'].setErrors(null);
       }
     });
-  }
-
-  onSubmit(): void {
-    // this.items.push(this.newLinkForm.value.link);
   }
 
   get lino() {

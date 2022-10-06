@@ -1,19 +1,22 @@
-<form [formGroup]="newLinkForm" [ngClass]="{ small: !showDescription }">
+<form [formGroup]="newLinkForm" [ngClass]="{ small: !showDescription, hide }">
   <p>Insert link and press <span>Enter</span></p>
-  <select
-    *ngIf="directory && directory.length > 1"
-    id="directory"
-    formControlName="directory"
-  >
-    <option *ngFor="let dir of directory">{{ dir }}</option>
-  </select>
-  <input
-    autocomplete="off"
-    type="text"
-    formControlName="link"
-    (keyup.enter)="onCreateLink()"
-    id="link"
-  />
+  <div class="wrapper">
+    <select
+      *ngIf="directory && directory.length > 1"
+      id="directory"
+      formControlName="directory"
+    >
+      <option *ngFor="let dir of directory" [value]="dir.value">{{ dir.label }}</option>
+    </select>
+    <input
+      autocomplete="off"
+      type="text"
+      placeholder="https://..."
+      formControlName="link"
+      (keyup.enter)="onCreateLink()"
+      id="link"
+    />
+  </div>
   <div *ngIf="lino && lino.invalid && (lino.dirty || lino.touched)">
     <div *ngIf="lino?.errors?.['required']">Link is required</div>
     <div *ngIf="lino?.errors?.['pattern']">Not a valid url</div>
