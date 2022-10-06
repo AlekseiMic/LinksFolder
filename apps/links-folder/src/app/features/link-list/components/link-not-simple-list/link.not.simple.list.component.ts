@@ -93,16 +93,11 @@ export class LinkNotSimpleList implements OnInit {
     return this.lists?.[dir];
   }
 
-  getLinks(dir: number | undefined) {
-    if (!dir) return [];
-    return this.lists?.[dir]?.links ?? [];
-  }
-
   isMultiDirs() {
     return this.openned.length > 1;
   }
 
-  getOpennedVariants = memoizee(
+  private getOpennedVariants = memoizee(
     (lists: typeof this.lists, openned: typeof this.openned) => {
       return openned.reduce((acc: { value: number; label: string }[], v) => {
         const dir = lists?.[v];
@@ -117,20 +112,32 @@ export class LinkNotSimpleList implements OnInit {
     return this.getOpennedVariants(this.lists, this.openned);
   }
 
+  private getTitle = memoizee(
+    (lists: typeof this.lists, openned: typeof this.openned) => {
+      return openned
+        .map((v) => lists?.[v]?.name)
+        .filter((v) => v)
+        .join(', ');
+    }
+  );
+
   get title() {
-    return this.openned
-      .map((v) => this.lists?.[v]?.name)
-      .filter((v) => v)
-      .join(', ');
+    return this.getTitle(this.lists, this.openned);
   }
 
+  private getLinks = memoizee(
+    (lists: typeof this.lists, openned: typeof this.openned) => {
+      const result: List['links'] = [];
+      openned.forEach((v) => {
+        if (!lists?.[v]) return;
+        result.push(...lists[v].links);
+      });
+      return result;
+    }
+  );
+
   get links() {
-    const result: List['links'] = [];
-    this.openned.forEach((v) => {
-      if (!this.lists?.[v]) return;
-      result.push(...this.lists[v].links);
-    });
-    return result;
+    return this.getLinks(this.lists, this.openned);
   }
 
   ngOnInit(): void {}

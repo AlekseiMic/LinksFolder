@@ -177,7 +177,7 @@ export class LinkService {
       .pipe(
         map((res) => {
           list.links = [...(list?.links ?? []), ...res];
-          this.list$.next(this.list$.getValue());
+          this.list$.next({...this.list$.getValue()});
           return true;
         })
       );
