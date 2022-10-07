@@ -21,6 +21,14 @@
       "iconPath": "http://localhost:4200/assets/svg/clock.svg"
     },
     {
+      "iconName": "down-chevron-icon",
+      "iconPath": "http://localhost:4200/assets/svg/down-chevron.svg"
+    },
+    {
+      "iconName": "create-folder-icon",
+      "iconPath": "http://localhost:4200/assets/svg/create-folder.svg"
+    },
+    {
       "iconName": "pen-icon",
       "iconPath": "http://localhost:4200/assets/svg/pen.svg"
     }

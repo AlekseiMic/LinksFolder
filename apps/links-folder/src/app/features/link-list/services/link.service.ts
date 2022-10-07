@@ -118,12 +118,13 @@ export class LinkService {
             name: value.name,
             id: value.id,
             editable: true,
+            sublists: [],
             codes: [],
             owned: true,
             isGuest: false,
             links: [],
           };
-          this.list$.next(nextList);
+          this.list$.next({...nextList});
           return true;
         })
       );

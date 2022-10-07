@@ -83,6 +83,11 @@ export class LinkNotSimpleList implements OnInit {
     });
   }
 
+  hasSubfolders(dir: number | undefined) {
+    if (!dir) return false;
+    return (this.lists?.[dir]?.sublists?.length ?? 0) > 0;
+  }
+
   getSubfolders(dir: number | undefined) {
     if (!dir) return [];
     return this.lists?.[dir]?.sublists ?? [];

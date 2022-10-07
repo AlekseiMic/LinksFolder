@@ -1,28 +1,43 @@
-<ng-template #folderList let-dir>
-  <div class="subdirectory">
+<ng-template #folderList let-dir let-depth="depth">
+  <div class="folder" [style.padding-left.px]="depth * 8">
     <input
       type="checkbox"
+      class="folder__checkbox"
       [name]="dir"
       [checked]="isOpen(dir)"
       (change)="onDirChecked($event, dir)"
     />
-    <button (click)="isExpanded(dir) ? collapse(dir) : expand(dir)">
-      {{ isExpanded(dir) ? '<' : '>' }}
+    <button
+      *ngIf="hasSubfolders(dir)"
+      [ngClass]="{ 'expand-chevron': true, expanded: isExpanded(dir) }"
+      (click)="isExpanded(dir) ? collapse(dir) : expand(dir)"
+    >
+      <svg-icon name="down-chevron-icon"></svg-icon>
     </button>
-    <button (click)="toggle(dir)">
-      {{ dir }}
+    <button class="folder__name" (click)="toggle(dir)" [title]="getFolder(dir)?.name ?? 'unknown'">
       {{ getFolder(dir)?.name ?? 'unknown' }}
     </button>
-    <button (click)="createSubdir(dir)">Subdir</button>
-    <button>Edit</button>
+    <button class="folder__create" (click)="createSubdir(dir)">
+      <svg-icon name="create-folder-icon"></svg-icon>
+    </button>
+    <button class="folder__edit">
+      <svg-icon name="gear-icon"></svg-icon>
+    </button>
+    <button class="folder__delete">
+      <svg-icon name="trash-icon"></svg-icon>
+    </button>
+  </div>
+  <ng-container *ngIf="isExpanded(dir)">
     <ng-template
-      *ngIf="isExpanded(dir)"
-      ngFor
-      [ngForOf]="getSubfolders(dir)"
-      [ngForTemplate]="folderList"
+      *ngFor="let d of getSubfolders(dir)"
+      [ngTemplateOutlet]="folderList"
+      [ngTemplateOutletContext]="{
+        $implicit: d,
+        depth: depth + 1
+      }"
     >
     </ng-template>
-  </div>
+  </ng-container>
 </ng-template>
 
 <ng-template #linkList let-links>
@@ -43,7 +58,10 @@
   <div class="left-panel">
     <ng-template
       [ngTemplateOutlet]="folderList"
-      [ngTemplateOutletContext]="{ $implicit: directory }"
+      [ngTemplateOutletContext]="{
+        $implicit: directory,
+        depth: 0
+      }"
     >
     </ng-template>
   </div>
