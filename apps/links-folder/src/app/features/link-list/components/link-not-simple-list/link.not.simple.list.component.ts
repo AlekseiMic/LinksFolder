@@ -1,4 +1,11 @@
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnInit,
+  SimpleChanges,
+  ViewChild,
+} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ChangeLinkDialog } from '../../dialogs/change-link.dialog';
 import { CreateSubdirDialog } from '../../dialogs/create-subdir-dialog/create-subdir.dialog';
@@ -15,9 +22,13 @@ export class LinkNotSimpleList implements OnInit {
 
   @Input() directory: number | undefined;
 
+  @ViewChild('linksCheckbox') linkCheckbox: ElementRef<HTMLInputElement>;
+
   expanded: Record<number, boolean> = {};
 
   openned: number[] = [];
+
+  selectedLinks: Record<number, boolean> = {};
 
   constructor(private dialog: MatDialog, private linkService: LinkService) {}
 
@@ -66,6 +77,37 @@ export class LinkNotSimpleList implements OnInit {
   close(dir: number) {
     this.openned = [];
     this.openned.push(dir);
+  }
+
+  get selectedLinksCount() {
+    return Object.values(this.selectedLinks).filter((v) => v).length;
+  }
+
+  isLinkSelected(link: number) {
+    return this.selectedLinks[link] || false;
+  }
+
+  toggleAllLinks(event: any) {
+    const hasUnselectedLinks = this.hasUnselectedLinks();
+    this.links.forEach(({ id }) => {
+      this.selectedLinks[id] = hasUnselectedLinks;
+    });
+    event.currentTarget.checked = hasUnselectedLinks;
+  }
+
+  hasUnselectedLinks() {
+    return (
+      this.links.findIndex((l) => this.selectedLinks[l.id] !== true) !== -1
+    );
+  }
+
+  toggleLink(link: number) {
+    this.selectedLinks[link] = !(this.selectedLinks[link] ?? false);
+    if (!this.selectedLinks[link]) {
+      this.linkCheckbox.nativeElement.checked = false;
+    } else if (!this.hasUnselectedLinks()) {
+      this.linkCheckbox.nativeElement.checked = true;
+    }
   }
 
   isOpen(dir: number) {

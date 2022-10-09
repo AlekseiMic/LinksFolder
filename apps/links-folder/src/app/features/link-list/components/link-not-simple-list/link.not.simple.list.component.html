@@ -14,7 +14,11 @@
     >
       <svg-icon name="down-chevron-icon"></svg-icon>
     </button>
-    <button class="folder__name" (click)="toggle(dir)" [title]="getFolder(dir)?.name ?? 'unknown'">
+    <button
+      class="folder__name"
+      (click)="toggle(dir)"
+      [title]="getFolder(dir)?.name ?? 'unknown'"
+    >
       {{ getFolder(dir)?.name ?? 'unknown' }}
     </button>
     <button class="folder__create" (click)="createSubdir(dir)">
@@ -42,6 +46,11 @@
 
 <ng-template #linkList let-links>
   <div class="item" *ngFor="let link of links">
+    <input
+      type="checkbox"
+      [checked]="isLinkSelected(link.id)"
+      (change)="toggleLink(link.id)"
+    />
     <a href="{{ link.url }}" target="_blank">{{ link.text ?? link.url }}</a>
     <div class="actions">
       <button class="edit" btn (click)="edit(link.directory, link.id)">
@@ -71,12 +80,29 @@
     </h4>
     <div>
       <app-link-form
-        class="test"
+        class="link-form"
         [directory]="opennedVariants"
         [hide]="true"
       ></app-link-form>
     </div>
+
     <div *ngIf="lists" class="list">
+      <div class="action-bar">
+        <input
+          #linksCheckbox
+          type="checkbox"
+          (change)="toggleAllLinks($event)"
+        />
+        <span> {{ selectedLinksCount }} selected </span>
+        <button>
+          <svg-icon name="trash-icon"></svg-icon>
+          Delete
+        </button>
+        <button>
+          <svg-icon name="gear-icon"></svg-icon>
+          Move
+        </button>
+      </div>
       <ng-template
         [ngTemplateOutlet]="linkList"
         [ngTemplateOutletContext]="{ $implicit: links }"

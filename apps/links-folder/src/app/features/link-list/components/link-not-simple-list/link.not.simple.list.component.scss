@@ -1,12 +1,12 @@
 .layout {
   height: 100%;
   display: grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: 360px 1fr;
 }
 
 .left-panel {
-  padding: 5px 5px 5px 0px;
-  min-width: 220px;
+  padding: 20px 10px 10px 10px;
+  min-width: 360px;
   border-right: 1px grey solid;
   box-sizing: border-box;
 }
@@ -75,28 +75,85 @@
   margin-left: 4px;
 }
 
+.right-panel {
+  padding: 20px;
+  h4 {
+    font-size: 18px;
+  }
+  .link-form {
+    display: block;
+    max-width: 400px;
+    margin-bottom: 20px;
+  }
+}
+
+.list {
+  border: 1px solid #ccc;
+  background: #333;
+  width: 100%;
+}
+
+.action-bar {
+  display: flex;
+  font-size: 16px;
+  align-items: center;
+  background: #303030;
+  border-bottom: 1px solid #ccc;
+  padding: 0px;
+  height: 32px;
+  input {
+    margin-left: 10px;
+  }
+  span {
+    margin-left: 10px;
+    margin-right: 10px;
+    padding-left: 10px;
+    display: block;
+    height: 100%;
+    line-height: 32px;
+    border-left: 1px solid #ccc;
+  }
+  button {
+    padding: 0;
+    border: 0;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    column-gap: 5px;
+    background: transparent;
+    svg-icon,
+    svg {
+      width: 15px;
+      height: 15px;
+    }
+  }
+}
+
 .item {
-  margin-top: 7px;
-  box-shadow: 0 0 1px 1px #ddd;
   height: 32px;
   display: flex;
-  border-radius: 5px;
-  font-size: 18px;
+  font-size: 16px;
   position: relative;
-  transition: box-shadow ease-in-out 0.1s, background ease-in-out 0.1s;
   padding-right: 10px;
   column-gap: 10px;
+  &:not(:last-child) {
+    border-bottom: 1px solid #ccc;
+  }
+  input {
+    margin-left: 10px;
+  }
   &:hover,
   &:focus-within {
     background: lighten(#5227cc, 40%);
     box-shadow: 0 0 3px 1px lighten(#5227cc, 20%);
   }
   a {
+    border-left: 1px solid #ccc;
     padding-left: 15px;
     flex-grow: 1;
+    flex-shrink: 1;
     height: 100%;
     line-height: 34px;
-    white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     text-decoration: none;
@@ -127,25 +184,5 @@
         color: #5227cc;
       }
     }
-  }
-}
-
-.no-data {
-  height: calc(100vh - 52px);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-  a {
-    background: #5227cc;
-    width: 120px;
-    margin: 0 auto;
-    height: 35px;
-    line-height: 35px;
-    color: white;
-    text-decoration: none;
-    font-weight: 700;
-    border-radius: 20px;
-    display: block;
   }
 }
