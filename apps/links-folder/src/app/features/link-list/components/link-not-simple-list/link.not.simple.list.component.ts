@@ -34,14 +34,23 @@ export class LinkNotSimpleList implements OnInit {
 
   onDirChecked(event: any, dir: number) {
     if (event.currentTarget.checked) {
+      if (this.lists?.[dir]?.links?.length) {
+        this.linkCheckbox.nativeElement.checked = false;
+      }
       this.openned = [...this.openned, dir];
     } else {
       this.openned = this.openned.filter((d) => d !== dir);
+      this.lists?.[dir]?.links?.forEach((l) => {
+        delete this.selectedLinks[l.id];
+      });
+      if (!this.hasUnselectedLinks()) {
+        this.linkCheckbox.nativeElement.checked = true;
+      }
     }
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    const newValue = changes['directory'].currentValue;
+    const newValue = changes['directory']?.currentValue;
     if (this.openned.length === 0 && newValue) {
       this.openned = [newValue];
       this.expanded = { [newValue]: true };

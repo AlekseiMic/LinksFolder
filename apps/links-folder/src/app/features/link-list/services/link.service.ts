@@ -191,7 +191,7 @@ export class LinkService {
       map((res) => {
         if (!res) return false;
         list.links = list.links.filter((l) => !res.includes(l.id));
-        this.list$.next(this.list$.getValue());
+        this.list$.next({...this.list$.getValue()});
         return true;
       })
     );
