@@ -6,7 +6,9 @@
       id="directory"
       formControlName="directory"
     >
-      <option *ngFor="let dir of directory" [value]="dir.value">{{ dir.label }}</option>
+      <option *ngFor="let dir of directory" [value]="dir.value">
+        {{ dir.label }}
+      </option>
     </select>
     <input
       autocomplete="off"
@@ -17,8 +19,16 @@
       id="link"
     />
   </div>
-  <div *ngIf="lino && lino.invalid && (lino.dirty || lino.touched)">
-    <div *ngIf="lino?.errors?.['required']">Link is required</div>
-    <div *ngIf="lino?.errors?.['pattern']">Not a valid url</div>
+  <div class="error-block">
+    <div
+      *ngIf="lino && lino.invalid && (lino.dirty || lino.touched) && lino?.errors?.['required']"
+    >
+      Link is required
+    </div>
+    <div
+      *ngIf="lino && lino.invalid && (lino.dirty || lino.touched) && lino?.errors?.['pattern']"
+    >
+      Not a valid url
+    </div>
   </div>
 </form>

@@ -21,15 +21,27 @@
     >
       {{ getFolder(dir)?.name ?? 'unknown' }}
     </button>
-    <button class="folder__create" (click)="createSubdir(dir)">
-      <svg-icon name="create-folder-icon"></svg-icon>
-    </button>
-    <button class="folder__edit">
-      <svg-icon name="gear-icon"></svg-icon>
-    </button>
-    <button class="folder__delete">
-      <svg-icon name="trash-icon"></svg-icon>
-    </button>
+    <div class="folder-bar">
+      <button
+        title="Create folder"
+        class="folder__create"
+        (click)="createSubdir(dir)"
+      >
+        <svg-icon name="create-folder-icon"></svg-icon>
+      </button>
+      <button title="Edit folder" class="folder__edit">
+        <svg-icon name="gear-icon"></svg-icon>
+      </button>
+      <button title="Import file" class="import-btn">
+        <svg-icon name="import-icon"></svg-icon>
+      </button>
+      <button title="Export folder" class="download-btn">
+        <svg-icon name="download-icon"></svg-icon>
+      </button>
+      <button title="Remove folder" class="folder__delete">
+        <svg-icon name="trash-icon"></svg-icon>
+      </button>
+    </div>
   </div>
   <ng-container *ngIf="isExpanded(dir)">
     <ng-template
@@ -78,12 +90,15 @@
     <h4>
       {{ title }}
     </h4>
-    <div>
+    <div class="right-panel__link-form">
       <app-link-form
         class="link-form"
         [directory]="opennedVariants"
         [hide]="true"
       ></app-link-form>
+      <button class="import-btn">
+        <svg-icon name="import-icon"></svg-icon>
+      </button>
     </div>
 
     <div *ngIf="lists" class="list">
@@ -94,14 +109,20 @@
           (change)="toggleAllLinks($event)"
         />
         <span> {{ selectedLinksCount }} selected </span>
-        <button>
-          <svg-icon name="trash-icon"></svg-icon>
-          Delete
-        </button>
-        <button>
-          <svg-icon name="gear-icon"></svg-icon>
-          Move
-        </button>
+        <div class="action-bar__buttons" *ngIf="selectedLinksCount > 0">
+          <button>
+            <svg-icon name="trash-icon"></svg-icon>
+            Delete
+          </button>
+          <button>
+            <svg-icon name="gear-icon"></svg-icon>
+            Move
+          </button>
+          <button class="download-btn">
+            <svg-icon name="download-icon"></svg-icon>
+            Export
+          </button>
+        </div>
       </div>
       <ng-template
         [ngTemplateOutlet]="linkList"

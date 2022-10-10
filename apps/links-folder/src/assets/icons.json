@@ -31,6 +31,14 @@
     {
       "iconName": "pen-icon",
       "iconPath": "http://localhost:4200/assets/svg/pen.svg"
+    },
+    {
+      "iconName": "download-icon",
+      "iconPath": "http://localhost:4200/assets/svg/download.svg"
+    },
+    {
+      "iconName": "import-icon",
+      "iconPath": "http://localhost:4200/assets/svg/import.svg"
     }
   ],
   "customIcons": []
