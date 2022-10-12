@@ -29,7 +29,7 @@
       >
         <svg-icon name="create-folder-icon"></svg-icon>
       </button>
-      <button title="Edit folder" class="folder__edit">
+      <button title="Edit folder" class="folder__edit" (click)="openSettings(dir)">
         <svg-icon name="gear-icon"></svg-icon>
       </button>
       <button title="Import file" class="import-btn">
@@ -38,7 +38,7 @@
       <button title="Export folder" class="download-btn">
         <svg-icon name="download-icon"></svg-icon>
       </button>
-      <button title="Remove folder" class="folder__delete">
+      <button title="Remove folder" class="folder__delete" (click)="removeDir(dir)">
         <svg-icon name="trash-icon"></svg-icon>
       </button>
     </div>
@@ -110,11 +110,11 @@
         />
         <span> {{ selectedLinksCount }} selected </span>
         <div class="action-bar__buttons" *ngIf="selectedLinksCount > 0">
-          <button>
+          <button (click)="deleteSelected()">
             <svg-icon name="trash-icon"></svg-icon>
             Delete
           </button>
-          <button>
+          <button (click)="moveLinks()">
             <svg-icon name="gear-icon"></svg-icon>
             Move
           </button>

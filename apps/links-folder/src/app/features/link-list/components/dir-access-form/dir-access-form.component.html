@@ -1,0 +1,6 @@
+<form [formGroup]="dirAccessForm" (ngSubmit)='submit()' class="form">
+  <input autocomplete="off" type="text" formControlName="code" id="code" placeholder="Input code... or not" />
+  <input autocomplete="off" type="text" formControlName="username" id="username" placeholder="Input username... or not" />
+  <input autocomplete="off" type="date" formControlName="expires" id="expires" />
+  <button type="submit">Save</button>
+</form>

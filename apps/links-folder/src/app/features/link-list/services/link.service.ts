@@ -22,7 +22,7 @@ export type List = {
   links: Link[];
 };
 
-export type AllLists = null | Record<number, List>;
+export type AllLists = null | Record<number | string, List>;
 
 @Injectable()
 export class LinkService {
@@ -124,7 +124,7 @@ export class LinkService {
             isGuest: false,
             links: [],
           };
-          this.list$.next({...nextList});
+          this.list$.next({ ...nextList });
           return true;
         })
       );
@@ -178,23 +178,70 @@ export class LinkService {
       .pipe(
         map((res) => {
           list.links = [...(list?.links ?? []), ...res];
-          this.list$.next({...this.list$.getValue()});
+          this.list$.next({ ...this.list$.getValue() });
           return true;
         })
       );
   }
 
-  deleteLinks(dirId: number, id: number[]) {
+  deleteLink(dirId: number, id: number) {
     const list = this.getListById(dirId);
-    if (!list) return of(false);
-    return this.http.delete<number[]>(`/v1/link/${id.join(',')}`).pipe(
-      map((res) => {
-        if (!res) return false;
-        list.links = list.links.filter((l) => !res.includes(l.id));
-        this.list$.next({...this.list$.getValue()});
-        return true;
-      })
-    );
+    if (!list) return;
+    return this.http.delete<number[]>(`/v1/link/${id}`).subscribe((res) => {
+      if (!res.includes(id)) return;
+      list.links = list.links.filter((l) => l.id !== id);
+      this.list$.next({ ...this.list$.getValue() });
+    });
+  }
+
+  deleteLinks(links: Link[]) {
+    return this.http
+      .delete<number[]>(`/v1/link/${links.map(({ id }) => id).join(',')}`)
+      .subscribe((res) => {
+        const linksPerDir: Record<number, Record<number, true>> = {};
+        links.forEach(({ id, directory }) => {
+          if (!res.includes(id)) return;
+          if (!linksPerDir[directory]) linksPerDir[directory] = {};
+          linksPerDir[directory][id] = true;
+        });
+        const list = this.list$.getValue();
+        if (!list) return;
+        Object.entries(linksPerDir).forEach(([key, value]) => {
+          if (!list[key]) return;
+          list[key].links = list[key].links.filter(
+            (l) => value[l.id] === undefined
+          );
+        });
+        this.list$.next({ ...list });
+      });
+  }
+
+  moveLinks(links: Link[], dir: number) {
+    return this.http
+      .patch<number[]>(
+        `/v1/link/${links.map(({ id }) => id).join(',')}/directory/${dir}`,
+        {}
+      )
+      .subscribe((res) => {
+        const linksPerDir: Record<number, Record<number, true>> = {};
+        const linksToMove: Link[] = [];
+        links.forEach((l) => {
+          if (!res.includes(l.id)) return;
+          if (!linksPerDir[l.directory]) linksPerDir[l.directory] = {};
+          linksPerDir[l.directory][l.id] = true;
+          linksToMove.push({ ...l, directory: dir });
+        });
+        const list = this.list$.getValue();
+        if (!list) return;
+        Object.entries(linksPerDir).forEach(([key, value]) => {
+          if (!list[key]) return;
+          list[key].links = list[key].links.filter(
+            (l) => value[l.id] === undefined
+          );
+        });
+        list[dir].links = list[dir].links.concat(linksToMove);
+        this.list$.next({ ...list });
+      });
   }
 
   editLinks(directory: number, link: Link) {
@@ -215,12 +262,12 @@ export class LinkService {
     );
   }
 
-  mergeLists(src: number, target: number) {
+  mergeDirs(src: number, target: number) {
     const url = `/v1/directory/${target}/merge/${src}`;
     return this.http.patch<boolean>(url, {}).pipe();
   }
 
-  removeList(id: number) {
+  removeDir(id: number) {
     return this.http.delete<boolean>(`/v1/directory/${id}`, {}).pipe(
       map((val) => {
         if (val) {
@@ -229,6 +276,13 @@ export class LinkService {
 
           if (this.guestDir === id) {
             this.guestDir = undefined;
+          }
+
+          const parent = list[id].parent;
+          if (parent && list[parent]) {
+            list[parent].sublists = list[parent].sublists?.filter(
+              (d) => d !== id
+            );
           }
           delete list[id];
           this.list$.next(list);

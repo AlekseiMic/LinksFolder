@@ -11,6 +11,8 @@ import { ChangeLinkDialog } from '../../dialogs/change-link.dialog';
 import { CreateSubdirDialog } from '../../dialogs/create-subdir-dialog/create-subdir.dialog';
 import { AllLists, LinkService, List } from '../../services/link.service';
 import memoizee from 'memoizee';
+import { SelectDirDialog } from '../../dialogs/select-dir-dialog/select-dir.dialog';
+import { DirSettingsDialog } from '../../dialogs/dir-settings-dialog/dir-settings.dialog';
 
 @Component({
   selector: 'app-link-not-simple-list',
@@ -83,6 +85,12 @@ export class LinkNotSimpleList implements OnInit {
     });
   }
 
+  openSettings(dir: number) {
+    this.dialog.open(DirSettingsDialog, {
+      data: { dir },
+    });
+  }
+
   close(dir: number) {
     this.openned = [];
     this.openned.push(dir);
@@ -124,8 +132,32 @@ export class LinkNotSimpleList implements OnInit {
   }
 
   delete(dir: number, id: number) {
-    if (!dir) return;
-    this.linkService.deleteLinks(dir, [id]).subscribe(() => {});
+    this.linkService.deleteLink(dir, id);
+  }
+
+  deleteSelected() {
+    const selected = this.links.filter(
+      (l) => this.selectedLinks[l.id] === true
+    );
+    this.linkService.deleteLinks(selected);
+    this.selectedLinks = {};
+    this.linkCheckbox.nativeElement.checked = false;
+  }
+
+  moveLinks() {
+    const selected = this.links.filter(
+      (l) => this.selectedLinks[l.id] === true
+    );
+    const dialogRef = this.dialog.open(SelectDirDialog, {
+      data: {
+        onSelect: (dir: number) => {
+          this.linkService.moveLinks(selected, dir);
+          this.selectedLinks = {};
+          this.linkCheckbox.nativeElement.checked = false;
+          dialogRef.close();
+        },
+      },
+    });
   }
 
   edit(dir: number, id: number) {
@@ -151,6 +183,17 @@ export class LinkNotSimpleList implements OnInit {
 
   isMultiDirs() {
     return this.openned.length > 1;
+  }
+
+  removeDir(id: number) {
+    this.linkService.removeDir(id).subscribe(() => {
+      this.openned = this.openned.filter((d) => d !== id);
+      if (this.directory && this.openned.length === 0) {
+        this.openned.push(this.directory);
+        delete this.expanded[id];
+        this.expanded[this.directory] = true;
+      }
+    });
   }
 
   private getOpennedVariants = memoizee(

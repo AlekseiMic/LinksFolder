@@ -55,6 +55,16 @@ export class LinkController {
     }
   }
 
+  @Patch(':id/directory/:dir')
+  async moveLinks(
+    @Param('id') id: string,
+    @Param('dir') dir: string,
+    @ReqUser() user?: AuthUser
+  ) {
+    const ids = id.split(',').map(Number);
+    return this.service.move(ids, Number(dir), user);
+  }
+
   @Delete(':id')
   async delete(
     @Param('id') id: string,

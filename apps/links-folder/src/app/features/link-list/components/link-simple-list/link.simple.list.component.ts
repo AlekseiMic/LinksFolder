@@ -30,8 +30,7 @@ export class LinkSimpleList {
   ) {}
 
   delete(id: number) {
-    if (!this.directory) return;
-    this.linkService.deleteLinks(this.directory, [id]).subscribe(() => {});
+    this.linkService.deleteLink(this.directory, id);
   }
 
   edit(id: number) {

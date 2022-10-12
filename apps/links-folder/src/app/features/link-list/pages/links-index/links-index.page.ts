@@ -63,7 +63,7 @@ export class LinksIndexPage implements OnInit {
         if (guestDir.isGuest && guestDir.owned && guestDir.links.length > 0) {
           this.openMergeDialog(guestDir.id);
         } else if (guestDir.isGuest && guestDir.owned) {
-          this.listService.removeList(guestDir.id).subscribe(() => {});
+          this.listService.removeDir(guestDir.id).subscribe(() => {});
         }
       }
     });

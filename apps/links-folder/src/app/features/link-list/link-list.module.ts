@@ -27,6 +27,9 @@ import { MergeGuestListDialog } from './dialogs/merge-guest-list.dialog';
 import { LinkNotSimpleList } from './components/link-not-simple-list/link.not.simple.list.component';
 import { CreateSubdirFormComponent } from './components/create-subdir-form/create-subdir-form.component';
 import { CreateSubdirDialog } from './dialogs/create-subdir-dialog/create-subdir.dialog';
+import { SelectDirDialog } from './dialogs/select-dir-dialog/select-dir.dialog';
+import { DirSettingsDialog } from './dialogs/dir-settings-dialog/dir-settings.dialog';
+import { DirAccessForm } from './components/dir-access-form/dir-access-form.component';
 
 @NgModule({
   declarations: [
@@ -43,6 +46,9 @@ import { CreateSubdirDialog } from './dialogs/create-subdir-dialog/create-subdir
     MergeGuestListDialog,
     ChangeAccessCodeDialog,
     CreateSubdirDialog,
+    SelectDirDialog,
+    DirSettingsDialog,
+    DirAccessForm
   ],
   imports: [
     AngularSvgIconModule,

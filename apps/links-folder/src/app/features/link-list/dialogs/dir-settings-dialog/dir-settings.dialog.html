@@ -1,0 +1,14 @@
+<app-default-dialog title="Directory Settings" class="large">
+  <div class="form">
+    <label for="dir_name">Directory Name</label><br />
+    <input
+      id="dir_name"
+      name="dir_name"
+      type="text"
+      [value]="dir?.name ?? ''"
+    />
+    <hr />
+
+    <app-dir-access-form></app-dir-access-form>
+  </div>
+</app-default-dialog>

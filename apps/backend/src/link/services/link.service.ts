@@ -22,7 +22,13 @@ type List = {
   name?: string;
   codes: { id: number; code: string; expires: Date }[];
   sublists?: number[];
-  links: { userId: null | number; directory: number; id: number; url: string; text?: string }[];
+  links: {
+    userId: null | number;
+    directory: number;
+    id: number;
+    url: string;
+    text?: string;
+  }[];
 };
 
 @Injectable()
@@ -244,6 +250,7 @@ export class LinkService {
     const toDelete: number[] = [];
     const toCheck: number[] = [];
     const dirs: number[] = [];
+
     const canDelete = (link: Link) => {
       if (link.userId === user?.id) toDelete.push(link.id);
       else toCheck.push(link.directory);
@@ -277,6 +284,50 @@ export class LinkService {
       }
     }
     return result ? toDelete : 0;
+  }
+
+  async move(ids: number[], dir: number, user: AuthUser | undefined) {
+    const link = await this.linkModel.findAll({ where: { id: ids } });
+    const toUpdate: number[] = [];
+    const toCheck: number[] = [];
+    const dirs: number[] = [dir];
+
+    const canDelete = (link: Link) => {
+      if (link.userId === user?.id) toUpdate.push(link.id);
+      else toCheck.push(link.directory);
+    };
+
+    if (!link || link.length === 0) throw new NotFoundException();
+
+    if (link.length > 1) {
+      link.forEach(canDelete);
+    } else canDelete(link[0]);
+
+    if (toCheck.length > 0) {
+      const checkResults = await this.hasAccess(toCheck, user);
+      link.forEach(({ id, directory }) => {
+        if (checkResults[directory]) {
+          dirs.push(directory);
+          toUpdate.push(id);
+        }
+      });
+    }
+
+    if (toUpdate.length === 0) return 0;
+    const result = await this.linkModel.update(
+      { directory: dir },
+      { where: { id: toUpdate } }
+    );
+    if (result) {
+      for (let i = 0; i < dirs.length; i++) {
+        await this.connection.query(
+          'SET @i=0; UPDATE Links SET `sort` = @i:=@i+1 WHERE directory = ' +
+            dirs[i] +
+            ' order by `sort` asc;'
+        );
+      }
+    }
+    return result ? toUpdate : 0;
   }
 
   async hasAccess(

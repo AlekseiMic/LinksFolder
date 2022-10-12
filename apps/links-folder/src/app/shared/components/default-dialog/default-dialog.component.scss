@@ -1,13 +1,21 @@
 $paddingY: 10px;
 $paddingX: 15px;
 
+:host {
+&.large .dialog-wrapper {
+  width: 640px;
+}
+.dialog-wrapper {
+  width: 320px;
+}
+
+}
+
 .dialog-wrapper {
   position: relative;
-  width: 320px;
   padding: $paddingY $paddingX;
   box-sizing: border-box;
   border-radius:5px;
-
 }
 
 h2 {

@@ -23,14 +23,14 @@ export class MergeGuestListDialog {
       return;
     }
     this.linkService
-      .mergeLists(this.data.dirId, this.data.baseDir)
+      .mergeDirs(this.data.dirId, this.data.baseDir)
       .subscribe((v) => {
         if (v) this.dialogRef.close();
       });
   }
 
   async decline(): Promise<void> {
-    this.linkService.removeList(this.data.dirId).subscribe((v) => {
+    this.linkService.removeDir(this.data.dirId).subscribe((v) => {
       if (v) this.dialogRef.close();
     });
   }
