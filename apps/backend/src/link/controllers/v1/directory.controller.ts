@@ -44,6 +44,15 @@ export class DirectoryController {
     return this.service.create(name, parent, user);
   }
 
+  @Post('/:id/access')
+  async addAccess(
+    @Param('id') dir: string,
+    @Body() { code, username, expiresIn }: { code?: string; username?: string; expiresIn: Date },
+    @ReqUser() user?: AuthUser
+  ) {
+    return this.service.addAccessRule(Number(dir), { code, username, expiresIn}, user);
+  }
+
   @Patch('/:id/access/:accessId')
   async editAccess(
     @Param('id') id: string | number,

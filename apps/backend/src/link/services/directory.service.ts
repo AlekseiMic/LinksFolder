@@ -2,12 +2,13 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Directory } from 'link/models/directory.model';
 import { DirectoryToUser } from 'link/models/directory.to.user.model';
-import { AuthUser } from 'user/user.model';
+import { AuthUser, User } from 'user/user.model';
 import * as dayjs from 'dayjs';
 import { DestroyOptions, Op } from 'sequelize';
 import { GuestService } from './guest.service';
@@ -50,6 +51,49 @@ export class DirectoryService {
     );
 
     return result;
+  }
+
+  async addAccessRule(
+    dir: number,
+    values: {
+      code: string | undefined;
+      username: string | undefined;
+      expiresIn: Date;
+    },
+    user?: AuthUser
+  ) {
+    if (!user) throw new ForbiddenException();
+    const expiresIn = dayjs(values.expiresIn).toDate();
+    let code = values.code;
+    let userId: number | undefined;
+    if (values.username) {
+      code = undefined;
+      userId = (
+        await this.userModel.findOne({ where: { username: values.username } })
+      )?.id;
+      if (!userId) throw new NotFoundException();
+    }
+    const access = new DirectoryToUser({
+      createdBy: user.id,
+      directoryId: dir,
+      userId,
+      code,
+      expiresIn,
+    });
+    const result = await access.save();
+    if (!result) throw new InternalServerErrorException();
+    return {
+      result: true,
+      code: {
+        id: access.id,
+        code: access.code,
+        userId: access.userId,
+        createdBy: access.createdBy,
+        createdAt: access.createdAt,
+        updatedAt: access.updatedAt,
+        expiresIn: access.expiresIn,
+      },
+    };
   }
 
   async hasAccess(dirId: number, user?: AuthUser, token?: string) {
@@ -101,6 +145,7 @@ export class DirectoryService {
   constructor(
     @Inject('IDirectoryRepository') private repo: IDirectoryRepository,
     @InjectModel(Link) private readonly linkModel: typeof Link,
+    @InjectModel(User) private readonly userModel: typeof User,
     @InjectModel(DirectoryToUser)
     private readonly dirToUser: typeof DirectoryToUser,
     private guestService: GuestService,

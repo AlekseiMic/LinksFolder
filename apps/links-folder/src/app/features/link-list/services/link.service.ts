@@ -17,7 +17,15 @@ export type List = {
   isGuest: boolean | undefined;
   owned: boolean;
   name?: string;
-  codes: { id: number; code: string; expires: Date }[];
+  codes: {
+    id: number;
+    code: string;
+    userId?: number;
+    expiresIn: Date;
+    createdAt: Date;
+    updatedAt: Date;
+    createdBy?: number;
+  }[];
   sublists?: number[];
   links: Link[];
 };
@@ -50,6 +58,36 @@ export class LinkService {
     return this.list$.getValue()?.[id];
   }
 
+  addAccessRule(
+    dir: number,
+    data: { code?: string; username?: string; expiresIn?: Date }
+  ) {
+    const url = `/v1/directory/${dir}/access/`;
+    return this.http
+      .post<{
+        result: boolean;
+        code: {
+          id: number;
+          code: string;
+          expiresIn: Date;
+          createdBy: number;
+          createdAt: Date;
+          updatedAt: Date;
+        };
+      }>(url, data)
+      .pipe(
+        map((value) => {
+          if (!value.result) return false;
+          const list = this.list$.getValue();
+          const directory = list?.[dir];
+          if (!directory) return false;
+          directory.codes.push(value.code);
+          this.list$.next({ ...list });
+          return value.code;
+        })
+      );
+  }
+
   editAccess(
     id: number,
     accessId: number,
@@ -72,7 +110,7 @@ export class LinkService {
           list.codes.map((code) => {
             if (code.id === accessId) {
               code.code = value.code ?? code.code;
-              code.expires = value.expiresIn ?? code.expires;
+              code.expiresIn = value.expiresIn ?? code.expiresIn;
             }
             return code;
           });

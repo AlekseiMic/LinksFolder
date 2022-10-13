@@ -1,14 +1,19 @@
 <app-default-dialog title="Directory Settings" class="large">
-  <div class="form">
-    <label for="dir_name">Directory Name</label><br />
-    <input
-      id="dir_name"
-      name="dir_name"
-      type="text"
-      [value]="dir?.name ?? ''"
-    />
+  <div class="content">
+    <form [formGroup]="editNameForm">
+      <label>
+        <span>Name</span>
+        <input
+          id="name"
+          autocomplete="off"
+          type="text"
+          formControlName="name"
+          (keyup.enter)="onEditName()"
+        />
+      </label>
+    </form>
     <hr />
-
-    <app-dir-access-form></app-dir-access-form>
+    <button (click)="addAccessRule()">Add</button>
+    <div *ngFor="let code of codes">{{ code.id}} {{ code.userId }} {{code.createdBy}} {{ code.createdAt}} {{code.updatedAt}}</div>
   </div>
 </app-default-dialog>

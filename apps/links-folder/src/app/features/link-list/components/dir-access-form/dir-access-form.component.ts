@@ -11,16 +11,20 @@ export class DirAccessForm implements OnInit {
 
   @Input() username?: string;
 
-  @Input() expires?: Date;
+  @Input() expiresIn?: Date;
 
-  @Output() onSubmit: EventEmitter<{ code?: string, username?: string, expires: Date }> = new EventEmitter();
+  @Output() onSubmit: EventEmitter<{
+    code?: string;
+    username?: string;
+    expiresIn: Date;
+  }> = new EventEmitter();
 
   constructor(private formBuilder: UntypedFormBuilder) {}
 
   dirAccessForm = this.formBuilder.group({
     code: '',
     username: '',
-    expires: new Date(),
+    expiresIn: new Date(),
   });
 
   submit(): void {
@@ -30,6 +34,6 @@ export class DirAccessForm implements OnInit {
   ngOnInit(): void {
     this.dirAccessForm.controls['code'].reset(this.code);
     this.dirAccessForm.controls['username'].reset(this.username);
-    this.dirAccessForm.controls['expires'].reset(this.expires);
+    this.dirAccessForm.controls['expiresIn'].reset(this.expiresIn);
   }
 }

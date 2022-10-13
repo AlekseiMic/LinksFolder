@@ -33,7 +33,6 @@ export class LinkFormComponent implements OnInit {
     let newValue = changes['directory'].currentValue;
     if (newValue && newValue.length === 1) newValue = newValue[0].value;
     if (typeof newValue === 'number') {
-      console.log('???');
       this.newLinkForm.controls['directory'].reset(newValue);
     }
   }

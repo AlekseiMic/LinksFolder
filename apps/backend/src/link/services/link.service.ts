@@ -20,7 +20,14 @@ type List = {
   isGuest?: boolean;
   owned: boolean;
   name?: string;
-  codes: { id: number; code: string; expires: Date }[];
+  codes: {
+    id: number;
+    code: string;
+    expiresIn: Date;
+    createdAt: Date;
+    updatedAt: Date;
+    createdBy?: number;
+  }[];
   sublists?: number[];
   links: {
     userId: null | number;
@@ -102,7 +109,16 @@ export class LinkService {
 
     return {
       id: access.directoryId, // dir.id
-      codes: [{ id: access.id, code: access.code, expires: access.expiresIn }],
+      codes: [
+        {
+          id: access.id,
+          code: access.code,
+          expiresIn: access.expiresIn,
+          createdAt: access.createdAt,
+          updatedAt: access.updatedAt,
+          createdBy: access.createdBy,
+        },
+      ],
       editable: token === access.authToken,
       isGuest: true,
       owned: token === access.authToken,
@@ -126,7 +142,16 @@ export class LinkService {
 
     return {
       id: access.directoryId, // dir.id
-      codes: [{ id: access.id, code: access.code, expires: access.expiresIn }],
+      codes: [
+        {
+          id: access.id,
+          code: access.code,
+          expiresIn: access.expiresIn,
+          createdAt: access.createdAt,
+          updatedAt: access.updatedAt,
+          createdBy: access.createdBy,
+        },
+      ],
       editable: true,
       owned: true,
       isGuest: true,
@@ -197,7 +222,10 @@ export class LinkService {
           acc.push({
             id: dtu.id,
             code: dtu.code,
-            expires: dtu.expiresIn,
+            expiresIn: dtu.expiresIn,
+            createdAt: dtu.createdAt,
+            updatedAt: dtu.updatedAt,
+            createdBy: dtu.createdBy,
           });
           return acc;
         }, []),
