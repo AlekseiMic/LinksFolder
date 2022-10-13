@@ -10,7 +10,7 @@ import { DirectoryToUser } from 'link/models/directory.to.user.model';
 import { Link } from 'link/models/link.model';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { AuthUser } from 'user/user.model';
+import { AuthUser, User } from 'user/user.model';
 
 type List = {
   id: number;
@@ -22,11 +22,11 @@ type List = {
   name?: string;
   codes: {
     id: number;
-    code: string;
+    code?: string;
+    owned: boolean;
+    username?: string;
     expiresIn: Date;
-    createdAt: Date;
     updatedAt: Date;
-    createdBy?: number;
   }[];
   sublists?: number[];
   links: {
@@ -95,6 +95,7 @@ export class LinkService {
 
   async getLinksByCode(code: string, token?: string) {
     const access = await this.dirToUser.findOne({
+      include: [{ model: User }],
       where: { code },
     });
 
@@ -113,10 +114,10 @@ export class LinkService {
         {
           id: access.id,
           code: access.code,
+          owned: token && access.authToken === token,
+          username: access.user?.username,
           expiresIn: access.expiresIn,
-          createdAt: access.createdAt,
           updatedAt: access.updatedAt,
-          createdBy: access.createdBy,
         },
       ],
       editable: token === access.authToken,
@@ -129,6 +130,7 @@ export class LinkService {
 
   async getLinksByToken(token: string) {
     const access = await this.dirToUser.findOne({
+      include: [{ model: User }],
       where: { authToken: token },
     });
 
@@ -146,10 +148,10 @@ export class LinkService {
         {
           id: access.id,
           code: access.code,
+          owned: token && access.authToken === token,
+          username: access.user?.username,
           expiresIn: access.expiresIn,
-          createdAt: access.createdAt,
           updatedAt: access.updatedAt,
-          createdBy: access.createdBy,
         },
       ],
       editable: true,
@@ -195,7 +197,7 @@ export class LinkService {
     const dirs =
       dirConditions.length > 0
         ? await this.directory.findAll({
-            include: [{ model: DirectoryToUser }],
+            include: [{ model: DirectoryToUser, include: [{ model: User }] }],
             where: { [Op.or]: dirConditions },
             order: [['lft', 'asc']],
           })
@@ -222,10 +224,10 @@ export class LinkService {
           acc.push({
             id: dtu.id,
             code: dtu.code,
+            owned: dtu.createdBy === user.id,
+            username: dtu.user?.username,
             expiresIn: dtu.expiresIn,
-            createdAt: dtu.createdAt,
             updatedAt: dtu.updatedAt,
-            createdBy: dtu.createdBy,
           });
           return acc;
         }, []),

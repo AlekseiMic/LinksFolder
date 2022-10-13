@@ -12,7 +12,10 @@ import { Directory } from './directory.model';
 export class DirectoryToUser extends Model {
   @ForeignKey(() => User)
   @Column
-  userId: number;
+  userId?: number;
+
+  @BelongsTo(() => User, 'userId')
+  user: User;
 
   @ForeignKey(() => User)
   @Column

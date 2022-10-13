@@ -20,11 +20,10 @@ export type List = {
   codes: {
     id: number;
     code: string;
-    userId?: number;
+    owned: boolean;
+    username?: string;
     expiresIn: Date;
-    createdAt: Date;
     updatedAt: Date;
-    createdBy?: number;
   }[];
   sublists?: number[];
   links: Link[];
@@ -58,6 +57,20 @@ export class LinkService {
     return this.list$.getValue()?.[id];
   }
 
+  deleteAccess(dir: number, id: number) {
+    const url = `/v1/directory/${dir}/access/${id}`;
+    return this.http.delete<boolean>(url).pipe(
+      map((result) => {
+        if (!result) return false;
+        const list = this.list$.getValue();
+        if (!list?.[dir]) return false;
+        list[dir].codes = list[dir].codes.filter((c) => c.id !== id);
+        this.list$.next({ ...list });
+        return true;
+      })
+    );
+  }
+
   addAccessRule(
     dir: number,
     data: { code?: string; username?: string; expiresIn?: Date }
@@ -70,8 +83,8 @@ export class LinkService {
           id: number;
           code: string;
           expiresIn: Date;
-          createdBy: number;
-          createdAt: Date;
+          username?: string;
+          owned: boolean;
           updatedAt: Date;
         };
       }>(url, data)
@@ -91,7 +104,12 @@ export class LinkService {
   editAccess(
     id: number,
     accessId: number,
-    data: { code?: string; extend?: number }
+    data: {
+      code?: string;
+      expiresIn?: Date;
+      username?: string | null;
+      extend?: number;
+    }
   ) {
     const list = this.getListById(id);
 
@@ -103,19 +121,27 @@ export class LinkService {
 
     const url = `/v1/directory/${list.id}/access/${accessId}`;
     return this.http
-      .patch<{ result: boolean; code: string; expiresIn: Date }>(url, data)
+      .patch<{
+        result: boolean;
+        code: string;
+        username?: string;
+        updatedAt: Date;
+        expiresIn: Date;
+      }>(url, data)
       .pipe(
         map((value) => {
           if (!value.result) return false;
           list.codes.map((code) => {
             if (code.id === accessId) {
-              code.code = value.code ?? code.code;
-              code.expiresIn = value.expiresIn ?? code.expiresIn;
+              code.code = value.code;
+              code.username = value.username;
+              code.expiresIn = value.expiresIn;
+              code.updatedAt = value.updatedAt;
             }
             return code;
           });
 
-          this.list$.next(this.list$.getValue());
+          this.list$.next({ ...this.list$.getValue() });
           return true;
         })
       );

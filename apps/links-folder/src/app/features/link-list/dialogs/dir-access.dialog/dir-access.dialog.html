@@ -1,3 +1,8 @@
 <app-default-dialog title="Add access rule">
-  <app-dir-access-form (onSubmit)="onSubmit($event)" ></app-dir-access-form>
+  <app-dir-access-form
+    [code]="data.code"
+    [username]="data.username"
+    [expiresIn]="data.expiresIn"
+    (onSubmit)="onSubmit($event)"
+  ></app-dir-access-form>
 </app-default-dialog>

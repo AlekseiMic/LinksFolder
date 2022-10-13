@@ -1,7 +1,7 @@
 <app-default-dialog title="Directory Settings" class="large">
   <div class="content">
     <form [formGroup]="editNameForm">
-      <label>
+      <label class="dir-name">
         <span>Name</span>
         <input
           id="name"
@@ -12,8 +12,27 @@
         />
       </label>
     </form>
-    <hr />
-    <button (click)="addAccessRule()">Add</button>
-    <div *ngFor="let code of codes">{{ code.id}} {{ code.userId }} {{code.createdBy}} {{ code.createdAt}} {{code.updatedAt}}</div>
+    <div class="access">
+      <button class="access__add-btn" (click)="addAccessRule()">Add</button>
+      <ul class="access__list">
+        <div class="access__item access__item--header">
+          <div>Code</div>
+          <div>Username</div>
+          <div>ExpiresIn</div>
+          <div>UpdatedAt</div>
+          <div></div>
+        </div>
+        <div class="access__item" *ngFor="let code of codes">
+          <div>{{ code.code }}</div>
+          <div>{{ code.username }}</div>
+          <div>{{ code.expiresIn | date:'shortDate' }}</div>
+          <div>{{ code.updatedAt | date:'shortDate' }}</div>
+          <div class="access__item-actions">
+            <button (click)="editAccessRule(code.id)">Edit</button>
+            <button (click)="deleteAccess(code.id)">Delete</button>
+          </div>
+        </div>
+      </ul>
+    </div>
   </div>
 </app-default-dialog>

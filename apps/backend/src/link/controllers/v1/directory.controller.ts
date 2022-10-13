@@ -44,13 +44,31 @@ export class DirectoryController {
     return this.service.create(name, parent, user);
   }
 
+  @Delete('/:dir/access/:id')
+  async deleteAccess(
+    @Param('dir') dir: string,
+    @Param('id') id: string,
+    @ReqUser() user?: AuthUser
+  ) {
+    return this.service.deleteAccess(Number(dir), Number(id), user);
+  }
+
   @Post('/:id/access')
   async addAccess(
     @Param('id') dir: string,
-    @Body() { code, username, expiresIn }: { code?: string; username?: string; expiresIn: Date },
+    @Body()
+    {
+      code,
+      username,
+      expiresIn,
+    }: { code?: string; username?: string; expiresIn: Date },
     @ReqUser() user?: AuthUser
   ) {
-    return this.service.addAccessRule(Number(dir), { code, username, expiresIn}, user);
+    return this.service.addAccessRule(
+      Number(dir),
+      { code, username, expiresIn },
+      user
+    );
   }
 
   @Patch('/:id/access/:accessId')
@@ -58,11 +76,22 @@ export class DirectoryController {
     @Param('id') id: string | number,
     @Param('accessId') accessId: string | number,
     @Body()
-    { name, code, extend }: { extend?: number; code?: string; name: string },
+    {
+      username,
+      code,
+      extend,
+      expiresIn,
+    }: { expiresIn?: Date; extend?: number; code?: string; username: string },
     @GuestToken() token: string | undefined,
     @ReqUser() user?: AuthUser
-  ): Promise<{ result: boolean; code?: string }> {
-    return this.service.edit(id, accessId, { name, code, extend }, user, token);
+  ) {
+    return this.service.edit(
+      id,
+      accessId,
+      { username, code, extend, expiresIn },
+      user,
+      token
+    );
   }
 
   @Patch('/:id/merge/:dir')

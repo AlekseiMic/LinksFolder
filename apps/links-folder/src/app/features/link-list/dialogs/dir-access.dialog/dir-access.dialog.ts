@@ -11,7 +11,7 @@ export class DirAccessDialog {
     @Inject(MAT_DIALOG_DATA)
     public data: {
       code?: string;
-      expiresIn?: number;
+      expiresIn?: Date;
       username?: string;
       onSubmit: (values: {
         code?: string;

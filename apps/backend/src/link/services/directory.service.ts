@@ -21,6 +21,14 @@ import { Link } from 'link/models/link.model';
 
 @Injectable()
 export class DirectoryService {
+  async deleteAccess(dir: number, access: number, user?: AuthUser) {
+    if (!user) return false;
+    const result = await this.dirToUser.destroy({
+      where: { directoryId: dir, id: access, createdBy: user.id },
+    });
+    return result >= 1;
+  }
+
   async createLinks(
     dirId: number,
     links: LinkDto[],
@@ -73,6 +81,7 @@ export class DirectoryService {
       )?.id;
       if (!userId) throw new NotFoundException();
     }
+    if (userId && userId === user.id) return false;
     const access = new DirectoryToUser({
       createdBy: user.id,
       directoryId: dir,
@@ -87,9 +96,8 @@ export class DirectoryService {
       code: {
         id: access.id,
         code: access.code,
-        userId: access.userId,
-        createdBy: access.createdBy,
-        createdAt: access.createdAt,
+        username: values.username,
+        owned: access.createdBy === user.id,
         updatedAt: access.updatedAt,
         expiresIn: access.expiresIn,
       },
@@ -248,20 +256,47 @@ export class DirectoryService {
   async edit(
     id: string | number,
     accessId: string | number,
-    { name, code, extend }: { code?: string; name?: string; extend?: number },
+    {
+      username,
+      code,
+      extend,
+      expiresIn,
+    }: { code?: string; expiresIn?: Date; username?: string; extend?: number },
     user?: AuthUser,
     authToken?: string
   ) {
     const access = await this.dirToUser.findOne({ where: { id: accessId } });
     if (!access) throw new NotFoundException();
-    if (authToken !== access.authToken && user?.id !== access.createdBy)
+    if (authToken !== access.authToken && user?.id !== access.createdBy) {
       throw new ForbiddenException();
-    access.expiresIn = dayjs()
-      .add(extend ?? 25, 'minutes')
-      .toDate();
+    }
+    if (expiresIn) {
+      access.expiresIn = dayjs(expiresIn).toDate();
+    } else if (extend) {
+      access.expiresIn = dayjs().add(extend, 'minutes').toDate();
+    }
     if (code) access.code = code;
+    if (username) {
+      code = undefined;
+      access.userId = (
+        await this.userModel.findOne({ where: { username } })
+      )?.id;
+      if (!access.userId) throw new NotFoundException();
+      if (access.userId === user?.id) return { result: false };
+    } else if (username === null) {
+      access.userId = undefined;
+    }
+    if (!access.userId && !access.code) {
+      access.code = nanoid(5);
+    }
     const result = await access.save();
-    return { result: !!result, code: access.code, expiresIn: access.expiresIn };
+    return {
+      result: !!result,
+      code: access.code,
+      updatedAt: access.updatedAt,
+      username,
+      expiresIn: access.expiresIn,
+    };
   }
 
   async find(id?: number[]) {
@@ -270,7 +305,6 @@ export class DirectoryService {
   }
 
   async delete(res: Response, id: number, authToken?: string, user?: AuthUser) {
-    console.log(id, user);
     if (!id || !user) return 0;
     const condition: DestroyOptions = { where: { id, author: user?.id || 0 } };
     if (user && authToken) {
