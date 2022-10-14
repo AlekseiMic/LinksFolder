@@ -57,6 +57,16 @@ export class LinkService {
     return this.list$.getValue()?.[id];
   }
 
+  importFile(dir: number, file: File) {
+    const form = new FormData();
+    form.append('file[]', file);
+    return this.http
+      .post(`/v1/directory/${dir}/link`, form, {})
+      .subscribe((res) => {
+        console.log(res);
+      });
+  }
+
   deleteAccess(dir: number, id: number) {
     const url = `/v1/directory/${dir}/access/${id}`;
     return this.http.delete<boolean>(url).pipe(

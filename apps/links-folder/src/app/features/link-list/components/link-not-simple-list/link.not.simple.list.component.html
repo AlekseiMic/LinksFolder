@@ -29,7 +29,11 @@
       >
         <svg-icon name="create-folder-icon"></svg-icon>
       </button>
-      <button title="Edit folder" class="folder__edit" (click)="openSettings(dir)">
+      <button
+        title="Edit folder"
+        class="folder__edit"
+        (click)="openSettings(dir)"
+      >
         <svg-icon name="gear-icon"></svg-icon>
       </button>
       <button title="Import file" class="import-btn">
@@ -38,7 +42,11 @@
       <button title="Export folder" class="download-btn">
         <svg-icon name="download-icon"></svg-icon>
       </button>
-      <button title="Remove folder" class="folder__delete" (click)="removeDir(dir)">
+      <button
+        title="Remove folder"
+        class="folder__delete"
+        (click)="removeDir(dir)"
+      >
         <svg-icon name="trash-icon"></svg-icon>
       </button>
     </div>
@@ -90,16 +98,7 @@
     <h4>
       {{ title }}
     </h4>
-    <div class="right-panel__link-form">
-      <app-link-form
-        class="link-form"
-        [directory]="opennedVariants"
-        [hide]="true"
-      ></app-link-form>
-      <button class="import-btn">
-        <svg-icon name="import-icon"></svg-icon>
-      </button>
-    </div>
+    <app-link-form [directory]="opennedVariants" [hide]="true"></app-link-form>
 
     <div *ngIf="lists" class="list">
       <div class="action-bar">

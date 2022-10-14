@@ -79,41 +79,6 @@
   h4 {
     font-size: 18px;
   }
-
-  &__link-form {
-    display: flex;
-    align-items: flex-start;
-    .import-btn {
-      margin: 0;
-      padding: 0;
-      margin-left: 20px;
-      border: 0;
-      background: transparent;
-      width: 40px;
-      height: 40px;
-      line-height: 40px;
-      position: relative;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      &:hover {
-        color: lighten(#5227cc, 15%);
-        box-shadow: 0 0 3px 1px lighten(#5227cc, 20%);
-      }
-      svg-icon {
-        position: absolute;
-        top: 50%;
-        left: 45%;
-        transform: translate(-50%, -50%);
-        display: block;
-        width: 70%;
-        height: 70%;
-      }
-    }
-  }
-  .link-form {
-    display: block;
-    max-width: 400px;
-  }
 }
 
 .list {

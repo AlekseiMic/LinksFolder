@@ -29,6 +29,80 @@ export class DirectoryService {
     return result >= 1;
   }
 
+  async importFiles(
+    dirId: number,
+    files: Express.Multer.File[],
+    user?: AuthUser
+  ) {
+    if (!user) throw new ForbiddenException('Not authorized');
+    const dir = await this.repo.findOne({ id: dirId, author: user.id });
+    if (!dir) throw new ForbiddenException();
+    type Li = {
+      name: string;
+      subdirs: Li[];
+      links: { name: string; link: string }[];
+    };
+    const getLinksRecursive = (obj: any) => {
+      const result: Li = { name: obj.title, subdirs: [], links: [] };
+      if (obj.children) {
+        obj.children.forEach((c: any) => {
+          if (c.typeCode === 2) {
+            const res = getLinksRecursive(c);
+            if (res) result.subdirs.push(res);
+          }
+          if (c.typeCode === 1) {
+            result.links.push({ name: c.title, link: c.uri });
+          }
+        });
+      }
+      if (result.subdirs.length === 0 && result.links.length === 0) return null;
+      return result;
+    };
+    const toImport: Li[] = [];
+    files.forEach((file) => {
+      const jsn = JSON.parse(file.buffer.toString());
+      const res = getLinksRecursive(jsn);
+      if (res) toImport.push(...res.subdirs);
+    });
+    const addDirs = async (dirs: any, parentDir: number) => {
+      for (const d of dirs) {
+        const newDir = new Directory({ name: d.name, author: user.id });
+        const res = await this.nsHelper.append(this.repo, newDir, parentDir);
+        d.id = res.id;
+        if (d.subdirs) {
+          await addDirs(d.subdirs, d.id);
+        }
+      }
+    };
+    await addDirs(toImport, dirId);
+    console.dir(toImport, { depth: 5 });
+    const addLinks = (dirs: any) => {
+      const res: any = [];
+      dirs.forEach((d: any) => {
+        if (d.links) {
+          d.links.forEach((l: any, i: number) => {
+            if (!d.id) return;
+            res.push(
+              new Link({
+                userId: user.id,
+                url: l.link,
+                directory: d.id,
+                text: l.name,
+                sort: i + 1,
+              })
+            );
+          });
+        }
+        if (d.subdirs) {
+          res.push(...addLinks(d.subdirs));
+        }
+      });
+      return res;
+    };
+    await this.linkModel.bulkCreate(addLinks(toImport));
+    return false;
+  }
+
   async createLinks(
     dirId: number,
     links: LinkDto[],

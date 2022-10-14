@@ -1,5 +1,7 @@
 import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { FormControl, UntypedFormBuilder, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { ImportLinksDialog } from '../../dialogs/import-links-dialog/import-links.dialog';
 import { LinkService } from '../../services/link.service';
 
 const linkRegex =
@@ -21,7 +23,8 @@ export class LinkFormComponent implements OnInit {
 
   constructor(
     private formBuilder: UntypedFormBuilder,
-    private linkService: LinkService
+    private linkService: LinkService,
+    private dialog: MatDialog
   ) {}
 
   newLinkForm = this.formBuilder.group({
@@ -35,6 +38,14 @@ export class LinkFormComponent implements OnInit {
     if (typeof newValue === 'number') {
       this.newLinkForm.controls['directory'].reset(newValue);
     }
+  }
+
+  openImportDialog() {
+    this.dialog.open(ImportLinksDialog, {
+      data: {
+        dir: this.newLinkForm.value.directory,
+      },
+    });
   }
 
   onCreateLink(): void {

@@ -4,10 +4,13 @@ import {
   Delete,
   Get,
   Param,
+  ParseFilePipe,
   Patch,
   Post,
   Res,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { Directory } from '../../models/directory.model';
 import { DirectoryService } from '../../services/directory.service';
@@ -15,8 +18,28 @@ import { OptionalJwtAuthGuard } from 'auth/guards/optional-jwt-auth.guard';
 import { GuestToken } from 'auth/decorators/guest-token.decorator';
 import { Response } from 'express';
 import { LinkDto } from 'link/dto/LinkDto';
+// import { ensureDir } from 'fs-extra';
 import { ReqUser } from 'auth/decorators/user.decorator';
+import { FilesInterceptor } from '@nestjs/platform-express';
+// import { resolve } from 'path';
 import { AuthUser } from 'user/user.model';
+// import { nanoid } from 'nanoid';
+import multer from 'multer';
+import { Express } from 'express'
+// import * as dayjs from 'dayjs';
+import { JsonValidationPipe } from 'common/pipes/json-validation.pipe';
+
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     const folder = `./files/${dayjs().format('YYYY-MM')}`;
+//     ensureDir(resolve(folder)).then(() => {
+//       cb(null, folder);
+//     });
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, '' + Date.now() + '-' + nanoid());
+//   },
+// });
 
 @UseGuards(OptionalJwtAuthGuard)
 @Controller({
@@ -27,12 +50,20 @@ export class DirectoryController {
   constructor(private service: DirectoryService) {}
 
   @Post('/:id/link')
+  @UseInterceptors(FilesInterceptor('file[]'))
   async createLink(
     @Param('id') dir: string,
     @Body() links: LinkDto[],
     @GuestToken() token: string | undefined,
-    @ReqUser() user?: AuthUser
+    @ReqUser() user?: AuthUser,
+    @UploadedFiles(
+      new ParseFilePipe({ validators: [new JsonValidationPipe({})] })
+    )
+    files?: Express.Multer.File[]
   ) {
+    if (files && files.length > 0) {
+      return this.service.importFiles(Number(dir), files, user);
+    }
     return this.service.createLinks(Number(dir), links, user, token);
   }
 

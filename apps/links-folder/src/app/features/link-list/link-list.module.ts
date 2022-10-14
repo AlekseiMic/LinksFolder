@@ -31,6 +31,7 @@ import { SelectDirDialog } from './dialogs/select-dir-dialog/select-dir.dialog';
 import { DirSettingsDialog } from './dialogs/dir-settings-dialog/dir-settings.dialog';
 import { DirAccessForm } from './components/dir-access-form/dir-access-form.component';
 import { DirAccessDialog } from './dialogs/dir-access.dialog/dir-access.dialog';
+import { ImportLinksDialog } from './dialogs/import-links-dialog/import-links.dialog';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import { DirAccessDialog } from './dialogs/dir-access.dialog/dir-access.dialog';
     SelectDirDialog,
     DirSettingsDialog,
     DirAccessForm,
-    DirAccessDialog
+    DirAccessDialog,
+    ImportLinksDialog
   ],
   imports: [
     AngularSvgIconModule,
