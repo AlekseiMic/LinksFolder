@@ -40,7 +40,7 @@ export class DirectoryService {
     type Li = {
       name: string;
       subdirs: Li[];
-      links: { name: string; link: string }[];
+      links: { text: string; url: string }[];
     };
     const getLinksRecursive = (obj: any) => {
       const result: Li = { name: obj.title, subdirs: [], links: [] };
@@ -51,7 +51,7 @@ export class DirectoryService {
             if (res) result.subdirs.push(res);
           }
           if (c.typeCode === 1) {
-            result.links.push({ name: c.title, link: c.uri });
+            result.links.push({ text: c.title, url: c.uri });
           }
         });
       }
@@ -82,15 +82,10 @@ export class DirectoryService {
         if (d.links) {
           d.links.forEach((l: any, i: number) => {
             if (!d.id) return;
-            res.push(
-              new Link({
-                userId: user.id,
-                url: l.link,
-                directory: d.id,
-                text: l.name,
-                sort: i + 1,
-              })
-            );
+            l.userId = user.id;
+            l.directory = d.id;
+            l.sort = i + 1;
+            res.push(l);
           });
         }
         if (d.subdirs) {
