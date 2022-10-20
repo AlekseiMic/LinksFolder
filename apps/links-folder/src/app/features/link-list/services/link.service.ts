@@ -33,6 +33,12 @@ export type AllLists = null | Record<number | string, List>;
 
 @Injectable()
 export class LinkService {
+  addImportedLists(dir: number, ids: number[], lists: Record<string, List>) {
+    const newLists = {...this.list$.getValue(), ...lists };
+    if (!newLists || !newLists[dir]) return;
+    newLists[dir].sublists?.push(...ids);
+    this.list$.next(newLists);
+  }
   private lastFetch: number;
 
   private lastCode: string | undefined;
@@ -60,11 +66,7 @@ export class LinkService {
   importFile(dir: number, file: File) {
     const form = new FormData();
     form.append('file[]', file);
-    return this.http
-      .post(`/v1/directory/${dir}/link`, form, {})
-      .subscribe((res) => {
-        console.log(res);
-      });
+    return this.http.post<{ids: number[], lists: Record<number, List>}>(`/v1/directory/${dir}/link`, form, {});
   }
 
   deleteAccess(dir: number, id: number) {
@@ -342,9 +344,9 @@ export class LinkService {
   }
 
   removeDir(id: number) {
-    return this.http.delete<boolean>(`/v1/directory/${id}`, {}).pipe(
+    return this.http.delete<Record<number, boolean>>(`/v1/directory/${id}`, {}).pipe(
       map((val) => {
-        if (val) {
+        if (val[id]) {
           const list = this.list$.getValue();
           if (!list) return;
 
@@ -361,8 +363,12 @@ export class LinkService {
           delete list[id];
           this.list$.next(list);
         }
-        return val;
+        return val[id];
       })
     );
+  }
+
+  removeImportedDirs(ids: number[]) {
+    return this.http.delete<Record<number, boolean>>(`/v1/directory/${ids.join(',')}`, {});
   }
 }

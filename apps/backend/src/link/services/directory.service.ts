@@ -18,6 +18,7 @@ import { IDirectoryRepository } from 'link/repositories/interfaces/i.directory.r
 import { nanoid } from 'nanoid';
 import { LinkDto } from 'link/dto/LinkDto';
 import { Link } from 'link/models/link.model';
+import { List } from './link.service';
 
 @Injectable()
 export class DirectoryService {
@@ -37,13 +38,24 @@ export class DirectoryService {
     if (!user) throw new ForbiddenException('Not authorized');
     const dir = await this.repo.findOne({ id: dirId, author: user.id });
     if (!dir) throw new ForbiddenException();
+    const result: Record<number, List> = {};
     type Li = {
+      id?: number;
       name: string;
       subdirs: Li[];
-      links: { text: string; url: string }[];
+      links: {
+        userId: number;
+        text: string;
+        url: string;
+      }[];
     };
+
     const getLinksRecursive = (obj: any) => {
-      const result: Li = { name: obj.title, subdirs: [], links: [] };
+      const result: Li = {
+        name: obj.title,
+        subdirs: [],
+        links: [],
+      };
       if (obj.children) {
         obj.children.forEach((c: any) => {
           if (c.typeCode === 2) {
@@ -51,38 +63,51 @@ export class DirectoryService {
             if (res) result.subdirs.push(res);
           }
           if (c.typeCode === 1) {
-            result.links.push({ text: c.title, url: c.uri });
+            result.links.push({ userId: user.id, text: c.title, url: c.uri });
           }
         });
       }
       if (result.subdirs.length === 0 && result.links.length === 0) return null;
       return result;
     };
+
     const toImport: Li[] = [];
     files.forEach((file) => {
       const jsn = JSON.parse(file.buffer.toString());
       const res = getLinksRecursive(jsn);
       if (res) toImport.push(...res.subdirs);
     });
-    const addDirs = async (dirs: any, parentDir: number) => {
+
+    const addDirs = async (dirs: Li[], parentDir: number) => {
       for (const d of dirs) {
         const newDir = new Directory({ name: d.name, author: user.id });
         const res = await this.nsHelper.append(this.repo, newDir, parentDir);
+        if (result[parentDir]) result[parentDir].sublists?.push(res.id);
+        result[res.id] = {
+          ...d,
+          parent: parentDir,
+          codes: [],
+          id: res.id,
+          sublists: [],
+          owned: true,
+          editable: true,
+          links: [],
+        };
         d.id = res.id;
         if (d.subdirs) {
-          await addDirs(d.subdirs, d.id);
+          await addDirs(d.subdirs, res.id);
         }
       }
     };
+
     await addDirs(toImport, dirId);
-    console.dir(toImport, { depth: 5 });
-    const addLinks = (dirs: any) => {
+
+    const addLinks = (dirs: Li[]) => {
       const res: any = [];
       dirs.forEach((d: any) => {
         if (d.links) {
           d.links.forEach((l: any, i: number) => {
             if (!d.id) return;
-            l.userId = user.id;
             l.directory = d.id;
             l.sort = i + 1;
             res.push(l);
@@ -94,8 +119,20 @@ export class DirectoryService {
       });
       return res;
     };
-    await this.linkModel.bulkCreate(addLinks(toImport));
-    return false;
+
+    const links = await this.linkModel.bulkCreate(addLinks(toImport));
+    links.forEach((l) => {
+      if (result[l.directory]) {
+        result[l.directory].links.push({
+          id: l.id,
+          url: l.url,
+          text: l.text,
+          userId: l.userId,
+          directory: l.directory,
+        });
+      }
+    });
+    return { ids: toImport.map(({ id }) => id), lists: result };
   }
 
   async createLinks(
@@ -373,10 +410,23 @@ export class DirectoryService {
     return this.repo.findAll();
   }
 
-  async delete(res: Response, id: number, authToken?: string, user?: AuthUser) {
-    if (!id || !user) return 0;
+  async deleteMany(ids: number[], user?: AuthUser) {
+    const result: Record<number, boolean> = {};
+    for (const id of ids) {
+      result[id] = await this.delete(id, undefined, undefined, user);
+    }
+    return result;
+  }
+
+  async delete(
+    id: number,
+    res?: Response,
+    authToken?: string,
+    user?: AuthUser
+  ) {
+    if (!id || !user) return false;
     const condition: DestroyOptions = { where: { id, author: user?.id || 0 } };
-    if (user && authToken) {
+    if (res && user && authToken) {
       const directory = await this.dirToUser.findOne({
         where: { directoryId: id, authToken },
       });

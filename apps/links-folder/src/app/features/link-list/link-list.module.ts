@@ -32,6 +32,7 @@ import { DirSettingsDialog } from './dialogs/dir-settings-dialog/dir-settings.di
 import { DirAccessForm } from './components/dir-access-form/dir-access-form.component';
 import { DirAccessDialog } from './dialogs/dir-access.dialog/dir-access.dialog';
 import { ImportLinksDialog } from './dialogs/import-links-dialog/import-links.dialog';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -52,7 +53,7 @@ import { ImportLinksDialog } from './dialogs/import-links-dialog/import-links.di
     DirSettingsDialog,
     DirAccessForm,
     DirAccessDialog,
-    ImportLinksDialog
+    ImportLinksDialog,
   ],
   imports: [
     AngularSvgIconModule,
@@ -65,6 +66,7 @@ import { ImportLinksDialog } from './dialogs/import-links-dialog/import-links.di
     MatDialogModule,
     SharedModule,
     MatSnackBarModule,
+    MatProgressSpinnerModule,
   ],
   providers: [LinkListService, LinkService, DragNDropManagerService],
 })

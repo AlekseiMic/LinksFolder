@@ -18,28 +18,11 @@ import { OptionalJwtAuthGuard } from 'auth/guards/optional-jwt-auth.guard';
 import { GuestToken } from 'auth/decorators/guest-token.decorator';
 import { Response } from 'express';
 import { LinkDto } from 'link/dto/LinkDto';
-// import { ensureDir } from 'fs-extra';
 import { ReqUser } from 'auth/decorators/user.decorator';
 import { FilesInterceptor } from '@nestjs/platform-express';
-// import { resolve } from 'path';
 import { AuthUser } from 'user/user.model';
-// import { nanoid } from 'nanoid';
 import multer from 'multer';
-import { Express } from 'express'
-// import * as dayjs from 'dayjs';
 import { JsonValidationPipe } from 'common/pipes/json-validation.pipe';
-
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     const folder = `./files/${dayjs().format('YYYY-MM')}`;
-//     ensureDir(resolve(folder)).then(() => {
-//       cb(null, folder);
-//     });
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, '' + Date.now() + '-' + nanoid());
-//   },
-// });
 
 @UseGuards(OptionalJwtAuthGuard)
 @Controller({
@@ -57,7 +40,7 @@ export class DirectoryController {
     @GuestToken() token: string | undefined,
     @ReqUser() user?: AuthUser,
     @UploadedFiles(
-      new ParseFilePipe({ validators: [new JsonValidationPipe({})] })
+      new ParseFilePipe({ fileIsRequired: false, validators: [new JsonValidationPipe({})] })
     )
     files?: Express.Multer.File[]
   ) {
@@ -148,7 +131,11 @@ export class DirectoryController {
     @Res({ passthrough: true }) res: Response,
     @Param('id') id: string,
     @ReqUser() user?: AuthUser
-  ): Promise<boolean | number> {
-    return this.service.delete(res, Number(id), token, user);
+  ): Promise<Record<number, boolean>> {
+    const ids = id.split(',').map(Number);
+    if (ids.length === 1) {
+      return { [id]: await this.service.delete(ids[0], res, token, user) };
+    }
+    return this.service.deleteMany(ids, user);
   }
 }

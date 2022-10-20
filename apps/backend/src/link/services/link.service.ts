@@ -12,7 +12,7 @@ import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { AuthUser, User } from 'user/user.model';
 
-type List = {
+export type List = {
   id: number;
   parent?: number;
   editable: boolean;

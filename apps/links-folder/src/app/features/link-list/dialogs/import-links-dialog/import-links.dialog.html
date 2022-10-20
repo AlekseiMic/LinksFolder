@@ -1,3 +1,69 @@
-<app-default-dialog>
-  <input #fileInput type='file' (change)="onUpload($event)">
+<app-default-dialog class="large">
+  <div class="content">
+    <input
+      [style.display]="'none'"
+      #fileInput
+      type="file"
+      (change)="onUpload($event)"
+    />
+    <mat-spinner
+      *ngIf="fileInProcess"
+      class="loading-indicator"
+      [diameter]="150"
+    ></mat-spinner>
+    <div *ngIf="fileProcessed">
+      <div>
+        <ng-template
+          *ngFor="let d of ids ?? []"
+          [ngTemplateOutlet]="folderList"
+          [ngTemplateOutletContext]="{
+        $implicit: d,
+        depth: 0
+      }"
+        >
+        </ng-template>
+      </div>
+      <div class="actions">
+        <button (click)="onClose()" class="success-btn">OK</button>
+        <button
+          *ngIf="hasDirsToRemove()"
+          class="remove-btn"
+          (click)="onDirsRemove()"
+        >
+          Remove selected
+        </button>
+      </div>
+    </div>
+  </div>
 </app-default-dialog>
+
+<ng-template #folderList let-dir let-depth="depth">
+  <div class="folder" [style.margin-left.px]="depth * 8">
+    <label>
+      <input
+        type="checkbox"
+        class="folder__checkbox"
+        (change)="onDirSelect(lists[dir])"
+        [checked]="!!dirsToRemove[dir]"
+      />
+      <span> {{ lists[dir].name ?? ' --- ' }} </span>
+    </label>
+    <div *ngIf="lists[dir].links.length > 0" class="links">
+      <div class="link">
+        {{ lists[dir].links[0].text ?? '-' }} ({{lists[dir].links[0].url}})
+      </div>
+      <div *ngIf="lists[dir].links.length > 1" class="links__count">
+        +{{ lists[dir].links.length - 1 }} more
+      </div>
+    </div>
+  </div>
+  <ng-template
+    *ngFor="let d of lists[dir].sublists ?? []"
+    [ngTemplateOutlet]="folderList"
+    [ngTemplateOutletContext]="{
+        $implicit: d,
+        depth: depth + 1
+      }"
+  >
+  </ng-template>
+</ng-template>
