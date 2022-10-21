@@ -40,7 +40,10 @@ export class DirectoryController {
     @GuestToken() token: string | undefined,
     @ReqUser() user?: AuthUser,
     @UploadedFiles(
-      new ParseFilePipe({ fileIsRequired: false, validators: [new JsonValidationPipe({})] })
+      new ParseFilePipe({
+        fileIsRequired: false,
+        validators: [new JsonValidationPipe({})],
+      })
     )
     files?: Express.Multer.File[]
   ) {
@@ -56,6 +59,15 @@ export class DirectoryController {
     @ReqUser() user?: AuthUser
   ): Promise<Directory | null> {
     return this.service.create(name, parent, user);
+  }
+
+  @Patch('/:id')
+  async editDir(
+    @Body() { name, parent }: { name?: string; parent?: number },
+    @Param('id') id: string,
+    @ReqUser() user?: AuthUser
+  ): Promise<boolean> {
+    return this.service.edit(Number(id), { name, parent }, user);
   }
 
   @Delete('/:dir/access/:id')
@@ -99,7 +111,7 @@ export class DirectoryController {
     @GuestToken() token: string | undefined,
     @ReqUser() user?: AuthUser
   ) {
-    return this.service.edit(
+    return this.service.editAccess(
       id,
       accessId,
       { username, code, extend, expiresIn },

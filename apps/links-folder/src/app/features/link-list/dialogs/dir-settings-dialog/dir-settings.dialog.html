@@ -1,6 +1,6 @@
 <app-default-dialog title="Directory Settings" class="large">
   <div class="content">
-    <form [formGroup]="editNameForm">
+    <form [formGroup]="editForm" (submit)="onEdit()">
       <label class="dir-name">
         <span>Name</span>
         <input
@@ -8,12 +8,15 @@
           autocomplete="off"
           type="text"
           formControlName="name"
-          (keyup.enter)="onEditName()"
         />
+        <select id="parent" formControlName="parent">
+          <option *ngFor="let d of avaliableParents" [value]="d.id">{{ d.name }}</option>
+        </select>
       </label>
+      <button *ngIf="editForm.dirty">Save</button>
     </form>
     <div class="access">
-      <button class="access__add-btn" (click)="addAccessRule()">Add</button>
+      <button class="access__add-btn" (click)="onAddAccessRule()">Add</button>
       <ul class="access__list">
         <div class="access__item access__item--header">
           <div>Code</div>
@@ -28,8 +31,8 @@
           <div>{{ code.expiresIn | date:'shortDate' }}</div>
           <div>{{ code.updatedAt | date:'shortDate' }}</div>
           <div class="access__item-actions">
-            <button (click)="editAccessRule(code.id)">Edit</button>
-            <button (click)="deleteAccess(code.id)">Delete</button>
+            <button (click)="onEditAccess(code.id)">Edit</button>
+            <button (click)="onDeleteAccess(code.id)">Delete</button>
           </div>
         </div>
       </ul>

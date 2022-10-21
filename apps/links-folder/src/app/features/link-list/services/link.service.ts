@@ -33,8 +33,28 @@ export type AllLists = null | Record<number | string, List>;
 
 @Injectable()
 export class LinkService {
+  editDir(id: number, name?: string, parent?: number) {
+    return this.http.patch(`/v1/directory/${id}`, { name, parent }).pipe(
+      map((res) => {
+        const list = { ...this.list$.getValue() };
+        if (!res || !list[id]) return;
+        if (name) list[id].name = name;
+        if (parent) {
+          const oldParent = list[id].parent;
+          if (oldParent && list[oldParent]) {
+            list[oldParent].sublists = list[oldParent].sublists?.filter(
+              (child) => child !== id
+            );
+          }
+          list[id].parent = parent;
+          list[parent].sublists?.push(id);
+        }
+        this.list$.next(list);
+      })
+    );
+  }
   addImportedLists(dir: number, ids: number[], lists: Record<string, List>) {
-    const newLists = {...this.list$.getValue(), ...lists };
+    const newLists = { ...this.list$.getValue(), ...lists };
     if (!newLists || !newLists[dir]) return;
     newLists[dir].sublists?.push(...ids);
     this.list$.next(newLists);
@@ -66,7 +86,11 @@ export class LinkService {
   importFile(dir: number, file: File) {
     const form = new FormData();
     form.append('file[]', file);
-    return this.http.post<{ids: number[], lists: Record<number, List>}>(`/v1/directory/${dir}/link`, form, {});
+    return this.http.post<{ ids: number[]; lists: Record<number, List> }>(
+      `/v1/directory/${dir}/link`,
+      form,
+      {}
+    );
   }
 
   deleteAccess(dir: number, id: number) {
@@ -344,31 +368,36 @@ export class LinkService {
   }
 
   removeDir(id: number) {
-    return this.http.delete<Record<number, boolean>>(`/v1/directory/${id}`, {}).pipe(
-      map((val) => {
-        if (val[id]) {
-          const list = this.list$.getValue();
-          if (!list) return;
+    return this.http
+      .delete<Record<number, boolean>>(`/v1/directory/${id}`, {})
+      .pipe(
+        map((val) => {
+          if (val[id]) {
+            const list = this.list$.getValue();
+            if (!list) return;
 
-          if (this.guestDir === id) {
-            this.guestDir = undefined;
-          }
+            if (this.guestDir === id) {
+              this.guestDir = undefined;
+            }
 
-          const parent = list[id].parent;
-          if (parent && list[parent]) {
-            list[parent].sublists = list[parent].sublists?.filter(
-              (d) => d !== id
-            );
+            const parent = list[id].parent;
+            if (parent && list[parent]) {
+              list[parent].sublists = list[parent].sublists?.filter(
+                (d) => d !== id
+              );
+            }
+            delete list[id];
+            this.list$.next(list);
           }
-          delete list[id];
-          this.list$.next(list);
-        }
-        return val[id];
-      })
-    );
+          return val[id];
+        })
+      );
   }
 
   removeImportedDirs(ids: number[]) {
-    return this.http.delete<Record<number, boolean>>(`/v1/directory/${ids.join(',')}`, {});
+    return this.http.delete<Record<number, boolean>>(
+      `/v1/directory/${ids.join(',')}`,
+      {}
+    );
   }
 }

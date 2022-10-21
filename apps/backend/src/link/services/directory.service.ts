@@ -22,6 +22,28 @@ import { List } from './link.service';
 
 @Injectable()
 export class DirectoryService {
+  async edit(
+    id: number,
+    data: { name?: string; parent?: number },
+    user?: AuthUser
+  ): Promise<boolean> {
+    if (!user) throw new ForbiddenException();
+    if (!data.parent && !data.name) return true;
+    const dir = await this.repo.findOne({ where: { author: user.id, id } });
+    if (!dir) throw new NotFoundException();
+    if (data.name) {
+      dir.name = data.name;
+      await dir.save();
+    }
+    if (data.parent) {
+      const parent = await this.repo.findOne({
+        where: { id: data.parent, author: user.id },
+      });
+      return this.nsHelper.moveTo(this.repo, dir, parent);
+    }
+    return true;
+  }
+
   async deleteAccess(dir: number, access: number, user?: AuthUser) {
     if (!user) return false;
     const result = await this.dirToUser.destroy({
@@ -359,7 +381,7 @@ export class DirectoryService {
     return dir.save();
   }
 
-  async edit(
+  async editAccess(
     id: string | number,
     accessId: string | number,
     {

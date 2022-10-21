@@ -13,6 +13,7 @@ import { AllLists, LinkService, List } from '../../services/link.service';
 import memoizee from 'memoizee';
 import { SelectDirDialog } from '../../dialogs/select-dir-dialog/select-dir.dialog';
 import { DirSettingsDialog } from '../../dialogs/dir-settings-dialog/dir-settings.dialog';
+import { ImportLinksDialog } from '../../dialogs/import-links-dialog/import-links.dialog';
 
 @Component({
   selector: 'app-link-not-simple-list',
@@ -34,6 +35,14 @@ export class LinkNotSimpleList implements OnInit {
 
   constructor(private dialog: MatDialog, private linkService: LinkService) {}
 
+  openImportDialog(dir: number) {
+    this.dialog.open(ImportLinksDialog, {
+      data: {
+        dir,
+      },
+    });
+  }
+
   onDirChecked(event: any, dir: number) {
     if (event.currentTarget.checked) {
       if (this.lists?.[dir]?.links?.length) {
@@ -45,7 +54,9 @@ export class LinkNotSimpleList implements OnInit {
       this.lists?.[dir]?.links?.forEach((l) => {
         delete this.selectedLinks[l.id];
       });
-      if (!this.hasUnselectedLinks()) {
+      if (this.openned.length === 0) {
+        this.linkCheckbox.nativeElement.checked = false;
+      } else if (!this.hasUnselectedLinks()) {
         this.linkCheckbox.nativeElement.checked = true;
       }
     }

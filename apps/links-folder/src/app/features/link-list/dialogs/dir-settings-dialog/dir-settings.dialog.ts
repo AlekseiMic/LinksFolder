@@ -17,8 +17,11 @@ import * as dayjs from 'dayjs';
 export class DirSettingsDialog {
   public dir: List;
 
-  editNameForm = this.formBuilder.group({
+  public avaliableParents: List[] = [];
+
+  editForm = this.formBuilder.group({
     name: new FormControl(''),
+    parent: new FormControl(),
   });
 
   get codes() {
@@ -41,15 +44,29 @@ export class DirSettingsDialog {
       this.dialogRef.close();
       return;
     }
-    this.dir = dir;
-    this.editNameForm.controls['name'].reset(dir.name);
+    this.dir = { ...dir };
+    const allDirs = this.linkService.list$.getValue();
+    this.avaliableParents = allDirs
+      ? Object.values(allDirs).filter((d) => d.owned)
+      : [];
+    this.editForm.controls['name'].reset(dir.name);
+    this.editForm.controls['parent'].reset(dir.parent);
   }
 
-  onEditName() {
-    this.dir.name = this.editNameForm.value.name;
+  onEdit() {
+    const newName = this.editForm.value.name;
+    const newParent = this.editForm.value.parent;
+    this.linkService
+      .editDir(this.dir.id, newName, newParent || undefined)
+      .subscribe(() => {
+        this.editForm.reset({
+          name: newName,
+          parent: newParent,
+        });
+      });
   }
 
-  editAccessRule(id: number) {
+  onEditAccess(id: number) {
     const code = this.codes.find((c) => c.id === id);
     if (!code) return;
     const dialogRef = this.dialog.open(DirAccessDialog, {
@@ -77,11 +94,11 @@ export class DirSettingsDialog {
     });
   }
 
-  deleteAccess(id: number) {
+  onDeleteAccess(id: number) {
     this.linkService.deleteAccess(this.dir.id, id).subscribe(() => {});
   }
 
-  addAccessRule() {
+  onAddAccessRule() {
     const dialogRef = this.dialog.open(DirAccessDialog, {
       data: {
         onSubmit: (values: {
