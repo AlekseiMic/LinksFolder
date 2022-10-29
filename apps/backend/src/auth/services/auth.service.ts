@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { AuthUser, User } from '../user/user.model';
-import { UserService } from '../user/user.service';
+import { AuthUser, User } from '../entities/user.model';
+import { UserService } from './user.service';
 import { SessionService } from './session.service';
 import { JwtService } from './jwt.service';
-import { Session } from './session.model';
+import { Session } from '../entities/session.model';
 import { DirectoryService } from 'link/services/directory.service';
 
 @Injectable()
@@ -42,7 +42,7 @@ export class AuthService {
   async refreshAccessToken(refreshToken: string) {
     const session = await this.sessionService.findByToken(refreshToken);
     if (!session) return null;
-    const user = await this.userService.findById(session.userId);
+    const user = await this.userService.findById(session.createdBy);
     if (!user) return null;
     const token = this.jwtService.create({ name: user.username, id: user.id });
     return { user, session, token };

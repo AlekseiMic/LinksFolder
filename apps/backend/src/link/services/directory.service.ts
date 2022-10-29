@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Directory } from 'link/models/directory.model';
-import { DirectoryToUser } from 'link/models/directory.to.user.model';
-import { AuthUser, User } from 'user/user.model';
+import { DirectoryAccess } from 'link/models/directory-access.model';
+import { AuthUser, User } from 'auth/entities/user.model';
 import * as dayjs from 'dayjs';
 import { DestroyOptions, Op } from 'sequelize';
 import { GuestService } from './guest.service';
@@ -46,7 +46,7 @@ export class DirectoryService {
 
   async deleteAccess(dir: number, access: number, user?: AuthUser) {
     if (!user) return false;
-    const result = await this.dirToUser.destroy({
+    const result = await this.access.destroy({
       where: { directoryId: dir, id: access, createdBy: user.id },
     });
     return result >= 1;
@@ -144,13 +144,13 @@ export class DirectoryService {
 
     const links = await this.linkModel.bulkCreate(addLinks(toImport));
     links.forEach((l) => {
-      if (result[l.directory]) {
-        result[l.directory].links.push({
+      if (result[l.directoryId]) {
+        result[l.directoryId].links.push({
           id: l.id,
           url: l.url,
           text: l.text,
-          userId: l.userId,
-          directory: l.directory,
+          userId: l.createdBy,
+          directory: l.directoryId,
         });
       }
     });
@@ -210,7 +210,7 @@ export class DirectoryService {
       if (!userId) throw new NotFoundException();
     }
     if (userId && userId === user.id) return false;
-    const access = new DirectoryToUser({
+    const access = new DirectoryAccess({
       createdBy: user.id,
       directoryId: dir,
       userId,
@@ -245,10 +245,7 @@ export class DirectoryService {
     const expireCond = {
       ...(!user && token
         ? {
-            [Op.or]: [
-              { expiresIn: { [Op.gte]: Date.now() } },
-              { authToken: token },
-            ],
+            [Op.or]: [{ expiresIn: { [Op.gte]: Date.now() } }, { token }],
           }
         : {
             expiresIn: { [Op.gte]: Date.now() },
@@ -258,7 +255,7 @@ export class DirectoryService {
       include: [
         {
           required: false,
-          model: DirectoryToUser,
+          model: DirectoryAccess,
           where: {
             ...userCond,
             ...expireCond,
@@ -271,8 +268,8 @@ export class DirectoryService {
     if (!dir) throw new NotFoundException();
     let hasAccess = dir.author === user?.id;
     if (!hasAccess) {
-      hasAccess = !!dir.directoryToUsers.find(
-        (a) => a.userId === user?.id || a.authToken === token
+      hasAccess = !!dir.access.find(
+        (a) => a.userId === user?.id || a.token === token
       );
     }
     return hasAccess;
@@ -282,8 +279,8 @@ export class DirectoryService {
     @Inject('IDirectoryRepository') private repo: IDirectoryRepository,
     @InjectModel(Link) private readonly linkModel: typeof Link,
     @InjectModel(User) private readonly userModel: typeof User,
-    @InjectModel(DirectoryToUser)
-    private readonly dirToUser: typeof DirectoryToUser,
+    @InjectModel(DirectoryAccess)
+    private readonly access: typeof DirectoryAccess,
     private guestService: GuestService,
     private readonly nsHelper: NestedSetsSequelizeHelper
   ) {}
@@ -302,9 +299,9 @@ export class DirectoryService {
         where: { id: dir },
         include: [
           {
-            model: DirectoryToUser,
+            model: DirectoryAccess,
             required: false,
-            where: { authToken: token },
+            where: { token },
           },
         ],
       }),
@@ -312,14 +309,14 @@ export class DirectoryService {
     ]);
 
     if (!item || !target) return false;
-    if (item.author === null && item.directoryToUsers.length > 0) {
+    if (item.author === null && item.access.length > 0) {
       item.author = user.id;
       await this.repo.save(item);
       await this.linkModel.update(
         { userId: user.id },
-        { where: { directory: item.id } }
+        { where: { directoryId: item.id } }
       );
-      await this.dirToUser.update(
+      await this.access.update(
         { userId: user.id },
         { where: { directoryId: item.id } }
       );
@@ -342,24 +339,24 @@ export class DirectoryService {
   }
 
   async findDirByToken(token: string) {
-    const dir = await this.dirToUser.findOne({
-      where: { authToken: token },
+    const dir = await this.access.findOne({
+      where: { token: token },
     });
     return dir;
   }
 
   async findDirByCode(code: string) {
-    const dir = await this.dirToUser.findOne({
+    const dir = await this.access.findOne({
       where: { code },
     });
     return dir;
   }
 
   async createGuestAccess(directoryId: number, expiresIn: Date) {
-    const access = new DirectoryToUser({
+    const access = new DirectoryAccess({
       directoryId,
       code: nanoid(5),
-      authToken: nanoid(16),
+      token: nanoid(16),
       expiresIn,
     });
     return access.save();
@@ -391,11 +388,11 @@ export class DirectoryService {
       expiresIn,
     }: { code?: string; expiresIn?: Date; username?: string; extend?: number },
     user?: AuthUser,
-    authToken?: string
+    token?: string
   ) {
-    const access = await this.dirToUser.findOne({ where: { id: accessId } });
+    const access = await this.access.findOne({ where: { id: accessId } });
     if (!access) throw new NotFoundException();
-    if (authToken !== access.authToken && user?.id !== access.createdBy) {
+    if (token !== access.token && user?.id !== access.createdBy) {
       throw new ForbiddenException();
     }
     if (expiresIn) {
@@ -440,17 +437,12 @@ export class DirectoryService {
     return result;
   }
 
-  async delete(
-    id: number,
-    res?: Response,
-    authToken?: string,
-    user?: AuthUser
-  ) {
+  async delete(id: number, res?: Response, token?: string, user?: AuthUser) {
     if (!id || !user) return false;
     const condition: DestroyOptions = { where: { id, author: user?.id || 0 } };
-    if (res && user && authToken) {
-      const directory = await this.dirToUser.findOne({
-        where: { directoryId: id, authToken },
+    if (res && user && token) {
+      const directory = await this.access.findOne({
+        where: { directoryId: id, token },
       });
 
       if (directory) {

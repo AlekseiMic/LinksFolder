@@ -1,5 +1,4 @@
 import { Injectable, FileValidator } from '@nestjs/common';
-import { resolve } from 'path';
 import { fromBuffer } from 'file-type';
 
 type MFile = Express.Multer.File;

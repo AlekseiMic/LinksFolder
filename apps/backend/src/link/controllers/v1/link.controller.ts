@@ -12,7 +12,7 @@ import { LinkService } from '../../services/link.service';
 import { OptionalJwtAuthGuard } from 'auth/guards/optional-jwt-auth.guard';
 import { GuestToken } from 'auth/decorators/guest-token.decorator';
 import { ReqUser } from 'auth/decorators/user.decorator';
-import { AuthUser } from 'user/user.model';
+import { AuthUser } from 'auth/entities/user.model';
 import { GuestService } from 'link/services/guest.service';
 import { Response } from 'express';
 

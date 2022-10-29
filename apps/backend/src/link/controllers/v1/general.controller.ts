@@ -3,7 +3,7 @@ import { GuestToken } from 'auth/decorators/guest-token.decorator';
 import { ReqUser } from 'auth/decorators/user.decorator';
 import { OptionalJwtAuthGuard } from 'auth/guards/optional-jwt-auth.guard';
 import { GeneralService } from 'link/services/general.service';
-import { AuthUser } from 'user/user.model';
+import { AuthUser } from 'auth/entities/user.model';
 import { Response } from 'express';
 
 @UseGuards(OptionalJwtAuthGuard)

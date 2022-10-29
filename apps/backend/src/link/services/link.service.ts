@@ -6,11 +6,11 @@ import {
 } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/sequelize';
 import { Directory } from 'link/models/directory.model';
-import { DirectoryToUser } from 'link/models/directory.to.user.model';
+import { DirectoryAccess } from 'link/models/directory-access.model';
 import { Link } from 'link/models/link.model';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { AuthUser, User } from 'user/user.model';
+import { AuthUser, User } from 'auth/entities/user.model';
 
 export type List = {
   id: number;
@@ -43,8 +43,8 @@ export class LinkService {
   constructor(
     @InjectConnection() private readonly connection: Sequelize,
     @InjectModel(Link) private readonly linkModel: typeof Link,
-    @InjectModel(DirectoryToUser)
-    private readonly dirToUser: typeof DirectoryToUser,
+    @InjectModel(DirectoryAccess)
+    private readonly access: typeof DirectoryAccess,
     @InjectModel(Directory)
     private readonly directory: typeof Directory
   ) {}
@@ -59,8 +59,8 @@ export class LinkService {
     if (!link) throw new NotFoundException();
 
     if (
-      link.userId !== user?.id &&
-      !(await this.hasAccess(link.directory, user, token))
+      link.createdBy !== user?.id &&
+      !(await this.hasAccess(link.directoryId, user, token))
     ) {
       throw new ForbiddenException();
     }
@@ -94,7 +94,7 @@ export class LinkService {
   }
 
   async getLinksByCode(code: string, token?: string) {
-    const access = await this.dirToUser.findOne({
+    const access = await this.access.findOne({
       include: [{ model: User }],
       where: { code },
     });
@@ -102,7 +102,7 @@ export class LinkService {
     if (!access) return null;
 
     const isExpired = access.expiresIn.getTime() < Date.now();
-    if (isExpired && token !== access.authToken) return null;
+    if (isExpired && token !== access.token) return null;
 
     const result = await this.linkModel.findAll({
       where: { directory: access.directoryId },
@@ -114,24 +114,24 @@ export class LinkService {
         {
           id: access.id,
           code: access.code,
-          owned: token && access.authToken === token,
+          owned: token && access.token === token,
           username: access.user?.username,
           expiresIn: access.expiresIn,
           updatedAt: access.updatedAt,
         },
       ],
-      editable: token === access.authToken,
+      editable: token === access.token,
       isGuest: true,
-      owned: token === access.authToken,
+      owned: token === access.token,
       name: 'GuestDir', //dir.name
       links: result,
     };
   }
 
   async getLinksByToken(token: string) {
-    const access = await this.dirToUser.findOne({
+    const access = await this.access.findOne({
       include: [{ model: User }],
-      where: { authToken: token },
+      where: { token },
     });
 
     // const dir
@@ -148,7 +148,7 @@ export class LinkService {
         {
           id: access.id,
           code: access.code,
-          owned: token && access.authToken === token,
+          owned: token && access.token === token,
           username: access.user?.username,
           expiresIn: access.expiresIn,
           updatedAt: access.updatedAt,
@@ -179,7 +179,7 @@ export class LinkService {
     const received = await this.directory.findAll({
       include: [
         {
-          model: DirectoryToUser,
+          model: DirectoryAccess,
           where: { userId: user.id, expiresIn: { [Op.gte]: Date.now() } },
           required: true,
           attributes: [],
@@ -197,7 +197,7 @@ export class LinkService {
     const dirs =
       dirConditions.length > 0
         ? await this.directory.findAll({
-            include: [{ model: DirectoryToUser, include: [{ model: User }] }],
+            include: [{ model: DirectoryAccess, include: [{ model: User }] }],
             where: { [Op.or]: dirConditions },
             order: [['lft', 'asc']],
           })
@@ -214,7 +214,7 @@ export class LinkService {
         owned: true,
         name: dir.name,
         sublists: [],
-        codes: dir.directoryToUsers.reduce((acc: List['codes'], dtu) => {
+        codes: dir.access.reduce((acc: List['codes'], dtu) => {
           if (
             dir.author !== user.id &&
             dtu.userId !== user.id &&
@@ -263,12 +263,12 @@ export class LinkService {
     });
 
     links.forEach((link) => {
-      result[link.directory].links.push({
+      result[link.directoryId].links.push({
         id: link.id,
         text: link.text,
         url: link.url,
-        directory: link.directory,
-        userId: link.userId,
+        directory: link.directoryId,
+        userId: link.createdBy,
       });
     });
 
@@ -282,8 +282,8 @@ export class LinkService {
     const dirs: number[] = [];
 
     const canDelete = (link: Link) => {
-      if (link.userId === user?.id) toDelete.push(link.id);
-      else toCheck.push(link.directory);
+      if (link.createdBy === user?.id) toDelete.push(link.id);
+      else toCheck.push(link.directoryId);
     };
 
     if (!link || link.length === 0) throw new NotFoundException();
@@ -294,9 +294,9 @@ export class LinkService {
 
     if (toCheck.length > 0) {
       const checkResults = await this.hasAccess(toCheck, user, token);
-      link.forEach(({ id, directory }) => {
-        if (checkResults[directory]) {
-          dirs.push(directory);
+      link.forEach(({ id, directoryId }) => {
+        if (checkResults[directoryId]) {
+          dirs.push(directoryId);
           toDelete.push(id);
         }
       });
@@ -307,7 +307,7 @@ export class LinkService {
     if (result) {
       for (let i = 0; i < dirs.length; i++) {
         await this.connection.query(
-          'SET @i=0; UPDATE Links SET `sort` = @i:=@i+1 WHERE directory = ' +
+          'SET @i=0; UPDATE Links SET `sort` = @i:=@i+1 WHERE directoryId = ' +
             dirs[i] +
             ' order by `sort` asc;'
         );
@@ -323,8 +323,8 @@ export class LinkService {
     const dirs: number[] = [dir];
 
     const canDelete = (link: Link) => {
-      if (link.userId === user?.id) toUpdate.push(link.id);
-      else toCheck.push(link.directory);
+      if (link.createdBy === user?.id) toUpdate.push(link.id);
+      else toCheck.push(link.directoryId);
     };
 
     if (!link || link.length === 0) throw new NotFoundException();
@@ -335,9 +335,9 @@ export class LinkService {
 
     if (toCheck.length > 0) {
       const checkResults = await this.hasAccess(toCheck, user);
-      link.forEach(({ id, directory }) => {
-        if (checkResults[directory]) {
-          dirs.push(directory);
+      link.forEach(({ id, directoryId }) => {
+        if (checkResults[directoryId]) {
+          dirs.push(directoryId);
           toUpdate.push(id);
         }
       });
@@ -345,13 +345,13 @@ export class LinkService {
 
     if (toUpdate.length === 0) return 0;
     const result = await this.linkModel.update(
-      { directory: dir },
+      { directoryId: dir },
       { where: { id: toUpdate } }
     );
     if (result) {
       for (let i = 0; i < dirs.length; i++) {
         await this.connection.query(
-          'SET @i=0; UPDATE Links SET `sort` = @i:=@i+1 WHERE directory = ' +
+          'SET @i=0; UPDATE Links SET `sort` = @i:=@i+1 WHERE directoryId = ' +
             dirs[i] +
             ' order by `sort` asc;'
         );
@@ -387,10 +387,7 @@ export class LinkService {
     const expireCond = {
       ...(!user && token
         ? {
-            [Op.or]: [
-              { expiresIn: { [Op.gte]: Date.now() } },
-              { authToken: token },
-            ],
+            [Op.or]: [{ expiresIn: { [Op.gte]: Date.now() } }, { token }],
           }
         : {
             expiresIn: { [Op.gte]: Date.now() },
@@ -400,7 +397,7 @@ export class LinkService {
       include: [
         {
           required: false,
-          model: DirectoryToUser,
+          model: DirectoryAccess,
           where: {
             ...userCond,
             ...expireCond,
@@ -415,8 +412,8 @@ export class LinkService {
     const checkHasAccess = (dir: Directory) => {
       let hasAccess = dir.author === user?.id;
       if (!hasAccess) {
-        hasAccess = !!dir.directoryToUsers.find(
-          (a) => a.userId === user?.id || a.authToken === token
+        hasAccess = !!dir.access.find(
+          (a) => a.userId === user?.id || a.token === token
         );
       }
       return hasAccess;

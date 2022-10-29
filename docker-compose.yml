@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+    link-folder:
+        build: .
+        container_name: linkFolder
+        volumes:
+            - .:/home/node/app
+        ports:
+            - 4200:4200
+            - 3333:3333
+        networks:
+            - linkfoldernet
+        restart: unless-stopped
+        command: bash -c "npm run start"
+        depends_on:
+          - dbLF
+        logging:
+          options:
+            max-size: "3m"
+            max-file: "5"
+    dbLF:
+        image: mariadb
+        container_name: dbLF
+        environment:
+            - MARIADB_USER=root
+            - MARIADB_ROOT_PASSWORD=123qwe123
+            - MARIADB_DATABASE=linkfolder
+        ports:
+            - 3336:3306
+        networks:
+            - linkfoldernet
+        restart: unless-stopped
+networks:
+    linkfoldernet:
+        name: linkfoldernet
+volumes:
+    cache:
+        name: cache
+    linkfolder-db:
+        name: linkfolder-db

@@ -1,5 +1,5 @@
 import { Column, HasMany, Index, Model, Table } from 'sequelize-typescript';
-import { DirectoryToUser } from './directory.to.user.model';
+import { DirectoryAccess } from './directory-access.model';
 import { Link } from './link.model';
 
 @Table
@@ -10,10 +10,10 @@ export class Directory extends Model {
   @Column
   author: number;
 
-  @HasMany(() => DirectoryToUser)
-  directoryToUsers: DirectoryToUser[];
+  @HasMany(() => DirectoryAccess)
+  access: DirectoryAccess[];
 
-  @HasMany(() => Link, 'directory')
+  @HasMany(() => Link, 'directoryId')
   links: Link[];
 
   @Column

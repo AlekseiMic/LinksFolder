@@ -1,11 +1,11 @@
 import { BelongsTo, Column, ForeignKey, Model, Table } from "sequelize-typescript";
-import { User } from '../user/user.model';
+import { User } from './user.model';
 
 @Table
 export class Session extends Model {
   @ForeignKey(() => User)
   @Column
-  userId: number
+  createdBy: number
 
   @BelongsTo(() => User)
   user: User

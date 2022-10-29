@@ -5,30 +5,30 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-import { User } from 'user/user.model';
+import { User } from 'auth/entities/user.model';
 import { Directory } from './directory.model';
 
 @Table
 export class Link extends Model {
-  @ForeignKey(() => User)
-  @Column
-  userId: number;
-
-  @BelongsTo(() => User, 'userId')
-  user: User;
-
   @Column
   url: string;
 
   @Column
-  directory: number;
-
-  @BelongsTo(() => User, 'directory')
-  dir: Directory;
+  directoryId: number;
 
   @Column
   text: string;
 
   @Column
   sort: number;
+
+  @ForeignKey(() => User)
+  @Column
+  createdBy: number;
+
+  @BelongsTo(() => User, 'createdBy')
+  user: User;
+
+  @BelongsTo(() => User, 'directoryId')
+  directory: Directory;
 }

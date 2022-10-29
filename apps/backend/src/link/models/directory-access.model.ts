@@ -5,28 +5,18 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-import { User } from 'user/user.model';
+import { User } from 'auth/entities/user.model';
 import { Directory } from './directory.model';
 
 @Table
-export class DirectoryToUser extends Model {
+export class DirectoryAccess extends Model {
   @ForeignKey(() => User)
   @Column
   userId?: number;
 
-  @BelongsTo(() => User, 'userId')
-  user: User;
-
-  @ForeignKey(() => User)
-  @Column
-  createdBy: number;
-
   @ForeignKey(() => Directory)
   @Column
   directoryId: number;
-
-  @BelongsTo(() => Directory, 'directoryId')
-  directory: Directory;
 
   @Column
   expiresIn: Date;
@@ -35,8 +25,15 @@ export class DirectoryToUser extends Model {
   code: string;
 
   @Column
-  authToken: string;
+  token: string;
 
+  @ForeignKey(() => User)
   @Column
-  subfolders: boolean;
+  createdBy: number;
+
+  @BelongsTo(() => Directory, 'directoryId')
+  directory: Directory;
+
+  @BelongsTo(() => User, 'userId')
+  user: User;
 }

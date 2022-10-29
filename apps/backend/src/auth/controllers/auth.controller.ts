@@ -1,7 +1,7 @@
 import { Controller, HttpException, Post, Req, Res } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService } from '../services/auth.service';
 import { Request, Response, CookieOptions } from 'express';
-import { User } from '../user/user.model';
+import { User } from '../entities/user.model';
 
 const refreshCookieOptions: CookieOptions = {
   secure: true,

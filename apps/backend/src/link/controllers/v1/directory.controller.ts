@@ -20,7 +20,7 @@ import { Response } from 'express';
 import { LinkDto } from 'link/dto/LinkDto';
 import { ReqUser } from 'auth/decorators/user.decorator';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { AuthUser } from 'user/user.model';
+import { AuthUser } from 'auth/entities/user.model';
 import multer from 'multer';
 import { JsonValidationPipe } from 'common/pipes/json-validation.pipe';
 

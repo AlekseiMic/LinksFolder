@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
-import { AuthUser } from 'user/user.model';
+import { AuthUser } from 'auth/entities/user.model';
 import { DirectoryService } from './directory.service';
 import { GuestService } from './guest.service';
 import { LinkService } from './link.service';
@@ -21,7 +21,7 @@ export class GeneralService {
     if (token) return false;
     if (user) return false;
     const { directory, access } = await this.dirService.createGuestDir();
-    this.guestService.setCookie(res.cookie.bind(res), access.authToken);
+    this.guestService.setCookie(res.cookie.bind(res), access.token);
     return {
       id: directory.id,
       codes: [{ id: access.id, code: access.code, expires: access.expiresIn }],
