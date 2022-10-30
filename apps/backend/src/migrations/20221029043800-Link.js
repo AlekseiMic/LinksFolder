@@ -15,7 +15,7 @@ module.exports = {
         sort: Sequelize.DataTypes.INTEGER,
         directoryId: {
           type: Sequelize.DataTypes.INTEGER,
-          references: { model: 'Directory', key: 'id' },
+          references: { model: 'Directories', key: 'id' },
         },
         createdBy: {
           type: Sequelize.DataTypes.INTEGER,

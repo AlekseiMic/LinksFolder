@@ -4,7 +4,7 @@
 module.exports = {
   async up(qi, Sequelize) {
     return qi
-      .createTable('DirectoryAccess', {
+      .createTable('DirectoryAccesses', {
         id: {
           autoIncrement: true,
           primaryKey: true,
@@ -14,7 +14,7 @@ module.exports = {
         token: Sequelize.DataTypes.STRING,
         directoryId: {
           type: Sequelize.DataTypes.INTEGER,
-          references: { model: 'Directory', key: 'id' },
+          references: { model: 'Directories', key: 'id' },
         },
         userId: {
           type: Sequelize.DataTypes.INTEGER,
@@ -39,8 +39,8 @@ module.exports = {
       })
       .then(() =>
         Promise.all([
-          qi.addIndex('DirectoryAccess', ['userId', 'directoryId']),
-          qi.addIndex('DirectoryAccess', ['createdBy', 'directoryId']),
+          qi.addIndex('DirectoryAccesses', ['userId', 'directoryId']),
+          qi.addIndex('DirectoryAccesses', ['createdBy', 'directoryId']),
         ])
       )
       .catch(async (e) =>
@@ -51,6 +51,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    queryInterface.dropTable('DirectoryAccess');
+    queryInterface.dropTable('DirectoryAccesses');
   },
 };

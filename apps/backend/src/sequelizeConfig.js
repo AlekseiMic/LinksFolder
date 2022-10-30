@@ -10,6 +10,9 @@ const getDbConfig = (nodeEnv) => {
       dialect: 'mariadb',
       repositoryMode: false,
       autoLoadModels: true,
+      dialectOptions: {
+        multipleStatements: true,
+      },
       synchronize: false,
     },
     migration: {
@@ -18,6 +21,9 @@ const getDbConfig = (nodeEnv) => {
       password: process.env['DB_PASSWORD_MIGRATION'],
       database: process.env['DB_DATABASE_MIGRATION'],
       host: process.env['DB_HOST_MIGRATION'],
+      dialectOptions: {
+        multipleStatements: true,
+      },
       port: process.env['DB_PORT_MIGRATION'],
     },
     test: {
@@ -28,6 +34,9 @@ const getDbConfig = (nodeEnv) => {
       dialect: 'mariadb',
       repositoryMode: false,
       autoLoadModels: true,
+      dialectOptions: {
+        multipleStatements: true,
+      },
       synchronize: false,
     },
     production: {
@@ -38,6 +47,9 @@ const getDbConfig = (nodeEnv) => {
       dialect: 'mariadb',
       repositoryMode: false,
       autoLoadModels: true,
+      dialectOptions: {
+        multipleStatements: true,
+      },
       synchronize: false,
     },
   };

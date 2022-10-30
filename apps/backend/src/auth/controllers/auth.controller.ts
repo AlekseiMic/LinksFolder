@@ -47,7 +47,10 @@ export class AuthController {
     const refreshToken = req.cookies['refreshToken'];
     if (!refreshToken) throw new HttpException('Unauthorized', 401);
     const result = await this.authService.refreshAccessToken(refreshToken);
-    if (!result) throw new HttpException('Unauthorized', 401);
+    if (!result) {
+      response.clearCookie('refreshToken', refreshCookieOptions);
+      throw new HttpException('Unauthorized', 401);
+    }
     const { user, token, session } = result;
     response.cookie('refreshToken', session.token, refreshCookieOptions);
     return { user, token };

@@ -29,7 +29,7 @@ export class DirectoryService {
   ): Promise<boolean> {
     if (!user) throw new ForbiddenException();
     if (!data.parent && !data.name) return true;
-    const dir = await this.repo.findOne({ where: { author: user.id, id } });
+    const dir = await this.repo.findOne({ where: { createdBy: user.id, id } });
     if (!dir) throw new NotFoundException();
     if (data.name) {
       dir.name = data.name;
@@ -37,7 +37,7 @@ export class DirectoryService {
     }
     if (data.parent) {
       const parent = await this.repo.findOne({
-        where: { id: data.parent, author: user.id },
+        where: { id: data.parent, createdBy: user.id },
       });
       return this.nsHelper.moveTo(this.repo, dir, parent);
     }
@@ -58,7 +58,7 @@ export class DirectoryService {
     user?: AuthUser
   ) {
     if (!user) throw new ForbiddenException('Not authorized');
-    const dir = await this.repo.findOne({ id: dirId, author: user.id });
+    const dir = await this.repo.findOne({ id: dirId, createdBy: user.id });
     if (!dir) throw new ForbiddenException();
     const result: Record<number, List> = {};
     type Li = {
@@ -102,7 +102,7 @@ export class DirectoryService {
 
     const addDirs = async (dirs: Li[], parentDir: number) => {
       for (const d of dirs) {
-        const newDir = new Directory({ name: d.name, author: user.id });
+        const newDir = new Directory({ name: d.name, createdBy: user.id });
         const res = await this.nsHelper.append(this.repo, newDir, parentDir);
         if (result[parentDir]) result[parentDir].sublists?.push(res.id);
         result[res.id] = {
@@ -168,7 +168,7 @@ export class DirectoryService {
     }
 
     const maxOrderLink = await this.linkModel.findOne({
-      where: { directory: dirId },
+      where: { directoryId: dirId },
       order: [['sort', 'DESC']],
     });
 
@@ -180,7 +180,7 @@ export class DirectoryService {
           url,
           text,
           userId: user?.id,
-          directory: dirId,
+          directoryId: dirId,
           sort: maxOrder + idx + 1,
         })
       )
@@ -266,7 +266,7 @@ export class DirectoryService {
     });
 
     if (!dir) throw new NotFoundException();
-    let hasAccess = dir.author === user?.id;
+    let hasAccess = dir.createdBy === user?.id;
     if (!hasAccess) {
       hasAccess = !!dir.access.find(
         (a) => a.userId === user?.id || a.token === token
@@ -305,12 +305,12 @@ export class DirectoryService {
           },
         ],
       }),
-      this.repo.findOne({ where: { id, author: user.id } }),
+      this.repo.findOne({ where: { id, createdBy: user.id } }),
     ]);
 
     if (!item || !target) return false;
-    if (item.author === null && item.access.length > 0) {
-      item.author = user.id;
+    if (item.createdBy === null && item.access.length > 0) {
+      item.createdBy = user.id;
       await this.repo.save(item);
       await this.linkModel.update(
         { userId: user.id },
@@ -321,7 +321,7 @@ export class DirectoryService {
         { where: { directoryId: item.id } }
       );
     }
-    if (item.author !== user.id) throw new NotFoundException();
+    if (item.createdBy !== user.id) throw new NotFoundException();
     const result = await this.nsHelper.moveTo(this.repo, item, target);
     if (result) {
       this.guestService.removeCookie(res);
@@ -368,7 +368,7 @@ export class DirectoryService {
     user?: AuthUser
   ): Promise<Directory> {
     const dir = new Directory({ name });
-    if (user) dir.author = user.id;
+    if (user) dir.createdBy = user.id;
     if (!parent) return this.nsHelper.makeRoot(this.repo, dir);
     if (!(await this.hasAccess(parent, user))) throw new NotFoundException();
     return this.nsHelper.append(this.repo, dir, parent);
@@ -439,7 +439,7 @@ export class DirectoryService {
 
   async delete(id: number, res?: Response, token?: string, user?: AuthUser) {
     if (!id || !user) return false;
-    const condition: DestroyOptions = { where: { id, author: user?.id || 0 } };
+    const condition: DestroyOptions = { where: { id, createdBy: user?.id || 0 } };
     if (res && user && token) {
       const directory = await this.access.findOne({
         where: { directoryId: id, token },

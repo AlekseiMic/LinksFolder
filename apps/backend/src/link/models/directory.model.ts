@@ -8,10 +8,7 @@ export class Directory extends Model {
   name: string;
 
   @Column
-  author: number;
-
-  @HasMany(() => DirectoryAccess)
-  access: DirectoryAccess[];
+  createdBy: number;
 
   @HasMany(() => Link, 'directoryId')
   links: Link[];
@@ -27,4 +24,7 @@ export class Directory extends Model {
   @Column
   @Index('idx_nested-set')
   depth: number;
+
+  @HasMany(() => DirectoryAccess)
+  access: DirectoryAccess[];
 }

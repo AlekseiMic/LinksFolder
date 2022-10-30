@@ -139,7 +139,7 @@ export class LinkService {
     if (!access) return null;
 
     const result = await this.linkModel.findAll({
-      where: { directory: access.directoryId },
+      where: { directoryId: access.directoryId },
     });
 
     return {
@@ -165,7 +165,7 @@ export class LinkService {
   async getUserLinks(user?: AuthUser) {
     if (!user) return null;
     const rootDir = await this.directory.findOne({
-      where: { author: user.id },
+      where: { createdBy: user.id },
       order: [['lft', 'asc']],
     });
     if (!rootDir) return null;
@@ -216,7 +216,7 @@ export class LinkService {
         sublists: [],
         codes: dir.access.reduce((acc: List['codes'], dtu) => {
           if (
-            dir.author !== user.id &&
+            dir.createdBy !== user.id &&
             dtu.userId !== user.id &&
             dtu.createdBy !== user.id
           )
@@ -234,7 +234,7 @@ export class LinkService {
       };
 
       let parentId = rootDir.id;
-      const prev = dir.author === user.id ? prevOwn : prevReceived;
+      const prev = dir.createdBy === user.id ? prevOwn : prevReceived;
 
       if (dir.depth > 0 && prev.length > 0) {
         while (
@@ -259,7 +259,7 @@ export class LinkService {
     });
 
     const links = await this.linkModel.findAll({
-      where: { directory: Object.keys(result) },
+      where: { directoryId: Object.keys(result) },
     });
 
     links.forEach((link) => {
@@ -307,9 +307,9 @@ export class LinkService {
     if (result) {
       for (let i = 0; i < dirs.length; i++) {
         await this.connection.query(
-          'SET @i=0; UPDATE Links SET `sort` = @i:=@i+1 WHERE directoryId = ' +
+          'SET @i=0; UPDATE Links SET sort=@i:=@i+1 WHERE `directoryId`=' +
             dirs[i] +
-            ' order by `sort` asc;'
+            ' order by sort ASC;'
         );
       }
     }
@@ -351,9 +351,9 @@ export class LinkService {
     if (result) {
       for (let i = 0; i < dirs.length; i++) {
         await this.connection.query(
-          'SET @i=0; UPDATE Links SET `sort` = @i:=@i+1 WHERE directoryId = ' +
+          'SET @i=0; UPDATE Links SET sort=@i:=@i+1 WHERE directoryId = ' +
             dirs[i] +
-            ' order by `sort` asc;'
+            ' order by sort asc;'
         );
       }
     }
@@ -410,7 +410,7 @@ export class LinkService {
     if (!Array.isArray(dirId) && !dir) throw new NotFoundException();
 
     const checkHasAccess = (dir: Directory) => {
-      let hasAccess = dir.author === user?.id;
+      let hasAccess = dir.createdBy === user?.id;
       if (!hasAccess) {
         hasAccess = !!dir.access.find(
           (a) => a.userId === user?.id || a.token === token

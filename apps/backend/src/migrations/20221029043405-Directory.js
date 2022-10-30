@@ -4,7 +4,7 @@
 module.exports = {
   async up(qi, Sequelize) {
     return qi
-      .createTable('Directory', {
+      .createTable('Directories', {
         id: {
           autoIncrement: true,
           primaryKey: true,
@@ -27,10 +27,10 @@ module.exports = {
           allowNull: false,
         },
       })
-      .then(() => qi.addIndex('Directory', ['lft', 'rht', 'depth']));
+      .then(() => qi.addIndex('Directories', ['lft', 'rht', 'depth']));
   },
 
   async down(queryInterface, Sequelize) {
-    queryInterface.dropTable('Directory');
+    queryInterface.dropTable('Directories');
   },
 };
