@@ -1,9 +1,10 @@
 import { Column, HasMany, Index, Model, Table } from 'sequelize-typescript';
 import { Link } from './link.entity';
 import { DirectoryAccess } from './directory-access.entity';
+import { NSModel } from './ns.entity';
 
 @Table
-export class Directory extends Model {
+export class Directory extends Model<Directory> implements NSModel {
   @Column
   name: string;
 

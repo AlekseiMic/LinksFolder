@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthUser } from 'models';
-import { LinkService } from '../services/link.service';
 import { DirectoryService } from '../services/directory.service';
 import { GuestService } from '../services/guest.service';
 
@@ -9,7 +8,6 @@ import { GuestService } from '../services/guest.service';
 export class GeneralService {
   constructor(
     private readonly dirService: DirectoryService,
-    private readonly linkService: LinkService,
     private readonly guestService: GuestService
   ) {}
 

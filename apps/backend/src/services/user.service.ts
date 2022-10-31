@@ -1,32 +1,24 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
+import { Inject, Injectable } from '@nestjs/common';
 import { User } from 'models';
+import { USER_REPOSITORY, IUserRepository } from 'repositories';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User) private readonly userModel: typeof User) {}
+  @Inject(USER_REPOSITORY) private readonly repo: IUserRepository;
 
   async create(username: string, password: string): Promise<User> {
     const user = new User();
     user.username = username;
     await user.setPassword(password);
-    try {
-      await user.save();
-    } catch (error: any) {
-      if (error.name === 'SequelizeUniqueConstraintError') {
-        throw new Error('NotUnique');
-      }
-    }
+    await this.repo.save(user);
     return user;
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    const result = await this.userModel.findOne({ where: { username } });
-    return result;
+    return this.repo.findOne({ where: { username } });
   }
 
   async findById(id: number): Promise<User | null> {
-    const result = await this.userModel.findOne({ where: { id } });
-    return result;
+    return this.repo.findOne({ where: { id } });
   }
 }

@@ -9,7 +9,7 @@ import { Directory } from './directory.entity';
 import { User } from './user.entity';
 
 @Table
-export class DirectoryAccess extends Model {
+export class DirectoryAccess extends Model<DirectoryAccess> {
   @ForeignKey(() => User)
   @Column
   userId?: number;
@@ -22,18 +22,18 @@ export class DirectoryAccess extends Model {
   expiresIn: Date;
 
   @Column
-  code: string;
+  code?: string;
 
   @Column
   token: string;
 
   @ForeignKey(() => User)
   @Column
-  createdBy: number;
+  createdBy?: number;
 
   @BelongsTo(() => Directory, 'directoryId')
-  directory: Directory;
+  directory?: Directory;
 
   @BelongsTo(() => User, 'userId')
-  user: User;
+  user?: User;
 }

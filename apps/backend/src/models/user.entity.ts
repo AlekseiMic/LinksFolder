@@ -2,7 +2,7 @@ import { AllowNull, Column, Model, Table } from 'sequelize-typescript';
 import { hash, compare } from 'bcrypt';
 
 @Table
-export class User extends Model {
+export class User extends Model<User> {
   @AllowNull(false)
   @Column({ type: 'varchar(50)', unique: 'idx_username' })
   username: string;

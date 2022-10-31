@@ -1,29 +1,26 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
+import { Inject, Injectable } from '@nestjs/common';
 import { User, Session } from 'models';
+import { ISessionRepository, SESSION_REPOSITORY } from 'repositories';
 import { v4 } from 'uuid';
 
 @Injectable()
 export class SessionService {
-  constructor(
-    @InjectModel(Session) private readonly sessionModel: typeof Session
-  ) {}
+  @Inject(SESSION_REPOSITORY) private readonly repo: ISessionRepository;
 
   async create(user: User): Promise<Session> {
     const session = new Session();
     session.createdBy = user.id;
     session.token = v4();
-    await session.save();
-    return session;
+    return this.repo.save(session);
   }
 
   async findByToken(token: string): Promise<Session | null> {
-    const session = await this.sessionModel.findOne({ where: { token } });
+    const session = await this.repo.findOne({ where: { token } });
     return session;
   }
 
   async removeByToken(token: string): Promise<boolean> {
-    const result = await this.sessionModel.destroy({ where: { token }});
+    const result = await this.repo.removeAll({ where: { token } });
     return result !== 0;
   }
 }

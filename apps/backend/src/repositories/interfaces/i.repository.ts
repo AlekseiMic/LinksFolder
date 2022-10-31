@@ -19,12 +19,7 @@ export interface IRepository<T extends Model> {
     attributes: {
       [key in keyof Attributes<T>]?: Attributes<T>[key] | Fn | Col | Literal;
     },
-    conditions?: Omit<UpdateOptions<Attributes<T>>, 'returning'> & {
-      returning: Exclude<
-        UpdateOptions<Attributes<T>>['returning'],
-        undefined | false
-      >;
-    }
+    conditions?: UpdateOptions<Attributes<T>>
   ): Promise<number>;
   exists(conditions: FindOptions<Attributes<T>>): Promise<boolean>;
   removeAll(conditions: DestroyOptions<Attributes<T>>): Promise<number>;

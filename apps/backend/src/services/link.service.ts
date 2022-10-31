@@ -1,11 +1,20 @@
 import {
   ForbiddenException,
   HttpException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/sequelize';
 import { AuthUser, User, Directory, DirectoryAccess, Link } from 'models';
+import {
+  DIRECTORY_ACCESS_REPOSITORY,
+  DIRECTORY_REPOSITORY,
+  IDirectoryAccessRepository,
+  IDirectoryRepository,
+  ILinkRepository,
+  LINK_REPOSITORY,
+} from 'repositories';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
@@ -37,14 +46,13 @@ export type List = {
 
 @Injectable()
 export class LinkService {
-  constructor(
-    @InjectConnection() private readonly connection: Sequelize,
-    @InjectModel(Link) private readonly linkModel: typeof Link,
-    @InjectModel(DirectoryAccess)
-    private readonly access: typeof DirectoryAccess,
-    @InjectModel(Directory)
-    private readonly directory: typeof Directory
-  ) {}
+  @Inject(LINK_REPOSITORY) private readonly repo: ILinkRepository;
+  @Inject(DIRECTORY_ACCESS_REPOSITORY)
+  private readonly access: IDirectoryAccessRepository;
+  @Inject(DIRECTORY_REPOSITORY)
+  private readonly directory: IDirectoryRepository;
+
+  constructor(@InjectConnection() private readonly connection: Sequelize) {}
 
   async edit(
     linkId: number,
@@ -52,7 +60,7 @@ export class LinkService {
     user?: AuthUser,
     token?: string
   ) {
-    const link = await this.linkModel.findOne({ where: { id: linkId } });
+    const link = await this.repo.findOne({ where: { id: linkId } });
     if (!link) throw new NotFoundException();
 
     if (
@@ -62,8 +70,11 @@ export class LinkService {
       throw new ForbiddenException();
     }
 
-    const result = await this.linkModel.update(data, { where: { id: linkId } });
-    return result[0] > 0;
+    const result = await this.repo.updateAttributes(data, {
+      where: { id: linkId },
+    });
+
+    return result > 0;
   }
 
   async find(code?: string, user?: AuthUser, token?: string) {
@@ -101,7 +112,7 @@ export class LinkService {
     const isExpired = access.expiresIn.getTime() < Date.now();
     if (isExpired && token !== access.token) return null;
 
-    const result = await this.linkModel.findAll({
+    const result = await this.repo.findAll({
       where: { directory: access.directoryId },
     });
 
@@ -135,7 +146,7 @@ export class LinkService {
 
     if (!access) return null;
 
-    const result = await this.linkModel.findAll({
+    const result = await this.repo.findAll({
       where: { directoryId: access.directoryId },
     });
 
@@ -255,7 +266,7 @@ export class LinkService {
       result[dir.id] = list;
     });
 
-    const links = await this.linkModel.findAll({
+    const links = await this.repo.findAll({
       where: { directoryId: Object.keys(result) },
     });
 
@@ -273,7 +284,7 @@ export class LinkService {
   }
 
   async delete(linkId: number | number[], user?: AuthUser, token?: string) {
-    const link = await this.linkModel.findAll({ where: { id: linkId } });
+    const link = await this.repo.findAll({ where: { id: linkId } });
     const toDelete: number[] = [];
     const toCheck: number[] = [];
     const dirs: number[] = [];
@@ -300,7 +311,7 @@ export class LinkService {
     }
 
     if (toDelete.length === 0) return 0;
-    const result = await this.linkModel.destroy({ where: { id: toDelete } });
+    const result = await this.repo.removeAll({ where: { id: toDelete } });
     if (result) {
       for (let i = 0; i < dirs.length; i++) {
         await this.connection.query(
@@ -314,7 +325,7 @@ export class LinkService {
   }
 
   async move(ids: number[], dir: number, user: AuthUser | undefined) {
-    const link = await this.linkModel.findAll({ where: { id: ids } });
+    const link = await this.repo.findAll({ where: { id: ids } });
     const toUpdate: number[] = [];
     const toCheck: number[] = [];
     const dirs: number[] = [dir];
@@ -341,7 +352,7 @@ export class LinkService {
     }
 
     if (toUpdate.length === 0) return 0;
-    const result = await this.linkModel.update(
+    const result = await this.repo.updateAttributes(
       { directoryId: dir },
       { where: { id: toUpdate } }
     );

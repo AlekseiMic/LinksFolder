@@ -64,9 +64,7 @@ export abstract class SqlRepository<T extends Model> implements IRepository<T> {
     attributes: {
       [key in keyof Attributes<T>]?: Attributes<T>[key] | Fn | Col | Literal;
     },
-    conditions: Omit<UpdateOptions<Attributes<T>>, 'returning'> & {
-      returning: true | (keyof Attributes<T>)[];
-    }
+    conditions: UpdateOptions<Attributes<T>>
   ): Promise<number> {
     const result = await this.db.update(attributes, conditions);
     return result[0];

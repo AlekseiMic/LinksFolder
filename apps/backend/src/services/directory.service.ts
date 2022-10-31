@@ -5,26 +5,35 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
 import { Link, Directory, DirectoryAccess, AuthUser, User } from 'models';
 import dayjs from 'dayjs';
 import { DestroyOptions, Op } from 'sequelize';
 import { Response } from 'express';
 import { nanoid } from 'nanoid';
 import { LinkDto } from 'dto';
-import { DIRECTORY_REPOSITORY, IDirectoryRepository } from 'repositories';
+import {
+  DIRECTORY_ACCESS_REPOSITORY,
+  DIRECTORY_REPOSITORY,
+  IDirectoryAccessRepository,
+  IDirectoryRepository,
+  ILinkRepository,
+  IUserRepository,
+  LINK_REPOSITORY,
+  USER_REPOSITORY,
+} from 'repositories';
 import { List } from './link.service';
 import { NestedSetsSequelizeHelper } from './nested-sets-sequelize.service';
 import { GuestService } from './guest.service';
 
 @Injectable()
 export class DirectoryService {
+  @Inject(DIRECTORY_REPOSITORY) private repo: IDirectoryRepository;
+  @Inject(LINK_REPOSITORY) private readonly linkModel: ILinkRepository;
+  @Inject(USER_REPOSITORY) private readonly userModel: IUserRepository;
+  @Inject(DIRECTORY_ACCESS_REPOSITORY)
+  private readonly access: IDirectoryAccessRepository;
+
   constructor(
-    @Inject(DIRECTORY_REPOSITORY) private repo: IDirectoryRepository,
-    @InjectModel(Link) private readonly linkModel: typeof Link,
-    @InjectModel(User) private readonly userModel: typeof User,
-    @InjectModel(DirectoryAccess)
-    private readonly access: typeof DirectoryAccess,
     private readonly nsHelper: NestedSetsSequelizeHelper,
     private readonly guestService: GuestService
   ) {}
@@ -54,7 +63,7 @@ export class DirectoryService {
 
   async deleteAccess(dir: number, access: number, user?: AuthUser) {
     if (!user) return false;
-    const result = await this.access.destroy({
+    const result = await this.access.removeAll({
       where: { directoryId: dir, id: access, createdBy: user.id },
     });
     return result >= 1;
@@ -112,7 +121,10 @@ export class DirectoryService {
 
     const addDirs = async (dirs: Li[], parentDir: number) => {
       for (const d of dirs) {
-        const newDir = new Directory({name: d.name, createdBy: user.id });
+        const newDir = new Directory({
+          name: d.name,
+          createdBy: user.id,
+        } as any);
         const res = await this.nsHelper.append(this.repo, newDir, parentDir);
         if (result[parentDir]) result[parentDir].sublists?.push(res.id);
         result[res.id] = {
@@ -152,7 +164,7 @@ export class DirectoryService {
       return res;
     };
 
-    const links = await this.linkModel.bulkCreate(addLinks(toImport));
+    const links = await this.linkModel.saveMultiple(addLinks(toImport), {});
     links.forEach((l) => {
       if (result[l.directoryId]) {
         result[l.directoryId].links.push({
@@ -173,6 +185,7 @@ export class DirectoryService {
     user?: AuthUser,
     token?: string
   ) {
+    if (!user) return;
     if (!(await this.hasAccess(dirId, user, token))) {
       throw new ForbiddenException();
     }
@@ -186,13 +199,15 @@ export class DirectoryService {
 
     const result = await Promise.all(
       links.map(({ url, text }, idx) =>
-        this.linkModel.create({
-          url,
-          text,
-          createdBy: user?.id,
-          directoryId: dirId,
-          sort: maxOrder + idx + 1,
-        })
+        this.linkModel.save(
+          new Link({
+            url,
+            text: text || url,
+            createdBy: user.id,
+            directoryId: dirId,
+            sort: maxOrder + idx + 1,
+          } as any)
+        )
       )
     );
 
@@ -226,7 +241,7 @@ export class DirectoryService {
       userId,
       code,
       expiresIn,
-    });
+    } as any);
     const result = await access.save();
     if (!result) throw new InternalServerErrorException();
     return {
@@ -312,11 +327,11 @@ export class DirectoryService {
     if (item.createdBy === null && item.access.length > 0) {
       item.createdBy = user.id;
       await this.repo.save(item);
-      await this.linkModel.update(
-        { userId: user.id },
+      await this.linkModel.updateAttributes(
+        { createdBy: user.id },
         { where: { directoryId: item.id } }
       );
-      await this.access.update(
+      await this.access.updateAttributes(
         { userId: user.id },
         { where: { directoryId: item.id } }
       );
@@ -358,7 +373,7 @@ export class DirectoryService {
       code: nanoid(5),
       token: nanoid(16),
       expiresIn,
-    });
+    } as any);
     return access.save();
   }
 
@@ -367,7 +382,8 @@ export class DirectoryService {
     parent: null | number,
     user?: AuthUser
   ): Promise<Directory> {
-    const dir = new Directory({ name });
+    const dir = new Directory();
+    dir.name = name;
     if (user) dir.createdBy = user.id;
     if (!parent) return this.nsHelper.makeRoot(this.repo, dir);
     if (!(await this.hasAccess(parent, user))) throw new NotFoundException();

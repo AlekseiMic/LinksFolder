@@ -31,8 +31,8 @@ export class AuthService {
     password: string
   ): Promise<{ user: User; session: Session; token: string }> {
     const user = await this.userService.findByUsername(login);
-    if (!user || !(await user.checkPassword(password)))
-      throw new Error('User not found');
+    const isValidUser = user && (await user.checkPassword(password));
+    if (!isValidUser) throw new Error('User not found');
     const session = await this.sessionService.create(user);
     const token = this.jwtService.create({ name: user.username, id: user.id });
     return { user, session, token };

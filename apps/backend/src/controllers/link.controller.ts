@@ -39,9 +39,9 @@ export class LinkController {
 
   @Get(':code?')
   async find(
-    @GuestToken() token: string | undefined,
     @Res({ passthrough: true }) res: Response,
     @Param('code') code?: string,
+    @GuestToken() token?: string,
     @ReqUser() user?: AuthUser
   ) {
     try {

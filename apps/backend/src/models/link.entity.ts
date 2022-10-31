@@ -9,7 +9,7 @@ import { User } from './user.entity';
 import { Directory } from './directory.entity';
 
 @Table
-export class Link extends Model {
+export class Link extends Model<Link> {
   @Column
   url: string;
 
