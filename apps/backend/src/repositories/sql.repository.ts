@@ -16,9 +16,10 @@ import { Col, Fn, Literal } from 'sequelize/types/utils';
 export abstract class SqlRepository<T extends Model> implements IRepository<T> {
   protected db: Repository<T>;
 
-  constructor(private readonly connection: Sequelize, sequelizeClass: any) {
+  constructor(public connection: Sequelize, sequelizeClass: any) {
     this.db = connection.getRepository(sequelizeClass);
     this.db.build();
+    this.connection = connection;
   }
 
   async exists(
@@ -78,7 +79,7 @@ export abstract class SqlRepository<T extends Model> implements IRepository<T> {
     return this.db.findAll(conditions);
   }
 
-  findOne(conditions: NonNullFindOptions<Attributes<T>>): Promise<T> {
+  findOne(conditions: FindOptions<Attributes<T>>): Promise<T | null> {
     return this.db.findOne(conditions);
   }
 

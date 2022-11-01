@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Link, Directory, DirectoryAccess, AuthUser, User } from 'models';
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 import { DestroyOptions, Op } from 'sequelize';
 import { Response } from 'express';
 import { nanoid } from 'nanoid';
@@ -185,7 +185,6 @@ export class DirectoryService {
     user?: AuthUser,
     token?: string
   ) {
-    if (!user) return;
     if (!(await this.hasAccess(dirId, user, token))) {
       throw new ForbiddenException();
     }
@@ -203,7 +202,7 @@ export class DirectoryService {
           new Link({
             url,
             text: text || url,
-            createdBy: user.id,
+            createdBy: user?.id,
             directoryId: dirId,
             sort: maxOrder + idx + 1,
           } as any)

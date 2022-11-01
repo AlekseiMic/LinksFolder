@@ -68,7 +68,7 @@ export class LinkController {
     @Param('id') id: string,
     @GuestToken() token: string | undefined,
     @ReqUser() user?: AuthUser
-  ): Promise<number | number[]> {
+  ) {
     const ids = id.split(',').map(Number);
     return this.service.delete(ids, user, token);
   }
