@@ -29,6 +29,10 @@
       "iconPath": "http://localhost:4200/assets/svg/create-folder.svg"
     },
     {
+      "iconName": "import-icon",
+      "iconPath": "http://localhost:4200/assets/svg/import.svg"
+    },
+    {
       "iconName": "pen-icon",
       "iconPath": "http://localhost:4200/assets/svg/pen.svg"
     },
@@ -37,8 +41,20 @@
       "iconPath": "http://localhost:4200/assets/svg/download.svg"
     },
     {
-      "iconName": "import-icon",
-      "iconPath": "http://localhost:4200/assets/svg/import.svg"
+      "iconName": "download-icon",
+      "iconPath": "http://localhost:4200/assets/svg/download.svg"
+    },
+    {
+      "iconName": "lightbulb-icon",
+      "iconPath": "http://localhost:4200/assets/svg/lightbulb.svg"
+    },
+    {
+      "iconName": "login-icon",
+      "iconPath": "http://localhost:4200/assets/svg/login.svg"
+    },
+    {
+      "iconName": "logout-icon",
+      "iconPath": "http://localhost:4200/assets/svg/logout.svg"
     }
   ],
   "customIcons": []

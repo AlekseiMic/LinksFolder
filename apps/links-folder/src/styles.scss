@@ -1,13 +1,47 @@
-/* You can add global styles to this file, and also import other style files */
-@import 'normalize.scss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-html,
-body {
-  height: 100%;
+@layer base {
+  html {
+    font-family: Roboto, 'Helvetica Neue', sans-serif;
+    color: var(--default-100);
+    background-color: var(--bg-default);
+  }
+  body {
+  }
 }
-body {
-  margin: 0;
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
+:root {
+  --default-100: #111;
+  --default-70: #444;
+  --default-50: #666;
+  --default-30: #888;
+  --default-10: #aaa;
+  --bg-default: #fff;
+  --primary-100: #fff;
+  --bg-primary-100: #5227cc;
+  --bg-primary-80: #9274e5;
+  --height-header: 50px;
+  --accent-100: #5227cc;
+  --bg-accent-100: #5227cc;
+  --lightbulb: #fff;
+  --bg-input: #eee;
+  --bg-input-with-error: #Fbb;
+  --bg-dialog: #eee;
+  --dialog: #333;
+}
+
+html.dark {
+  --default-100: #fff;
+  --bg-default: #333;
+  --primary-100: #fff;
+  --bg-primary-100: #999;
+  --lightbulb: yellow;
+}
+
+.mat-menu-item{
+  line-height:35px;
+  height:35px;
 }
 
 .success {
@@ -23,4 +57,13 @@ body {
     border-radius: 0;
     margin: 0;
   }
+}
+
+:focus {
+    outline: 0;
+}
+
+::-moz-focus-inner {
+    border: 0;
+    padding: 0;
 }

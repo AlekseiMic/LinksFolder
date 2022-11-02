@@ -10,7 +10,6 @@ import { MergeGuestListDialog } from '../../dialogs/merge-guest-list.dialog';
 @Component({
   selector: 'app-link-list-index',
   templateUrl: './links-index.page.html',
-  styleUrls: ['./links-index.page.scss'],
 })
 export class LinksIndexPage implements OnInit {
   private routeSub: Subscription;

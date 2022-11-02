@@ -1,0 +1,26 @@
+<div class="">
+  <label
+    [ngClass]="{
+      'text-red-800 ': errors.length > 0,
+      'block text-sm': true
+    }"
+    [for]="name"
+  >
+    <span>{{ label }}</span>
+    <span class="text-red-800">{{ required ? '*' : '' }}</span>
+  </label>
+  <div
+    [ngClass]="{
+      'border-red-800 bg-bgInputError bg-bgInputWithError': errors.length > 0,
+      'border-black bg-bgInput': errors.length === 0,
+      'border rounded overflow-hidden focus-within:border-bgPrimary100': true
+    }"
+  >
+    <ng-content></ng-content>
+  </div>
+  <div class="min-h-[1.25rem] text-red-800">
+    <span class="block text-sm" *ngFor="let error of errors">
+      {{ error | fieldError }}
+    </span>
+  </div>
+</div>

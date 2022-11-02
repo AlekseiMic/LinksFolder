@@ -6,5 +6,5 @@ import { Component, Input } from '@angular/core';
   styleUrls: ['./default-dialog.component.scss'],
 })
 export class DefaultDialogComponent {
-  @Input() title: string = 'Title';
+  @Input() title: false | string = 'Title';
 }

@@ -1,24 +1,31 @@
-<header>
-  <a [routerLink]="['/']" class="logo">LinkFolder</a>
-  <div *ngIf="!isLogged; else logout" class="actions">
-    <button btn (click)="openSigninDialog()">Signin</button>
-    <button btn (click)="openSignupDialog()">Signup</button>
+<header class="w-screen top-0 fixed bg-bgPrimary100 text-primary100">
+  <div
+    class="container mx-auto flex justify-between items-center h-header z-10"
+  >
+    <a [routerLink]="['/']" class="text-2xl font-bold no-underline"
+      >LinkFolder</a
+    >
+    <div class="flex-grow"></div>
+    <button class="mr-3 text-lightbulb" (click)="onToggleTheme()">
+      <svg-icon
+        name="lightbulb-icon"
+        [svgStyle]="{ height: '18px' }"
+        class="block"
+      ></svg-icon>
+    </button>
+    <button *ngIf="!isLogged" (click)="onSignin()">
+      <svg-icon
+        name="login-icon"
+        [svgStyle]="{ height: '18px' }"
+        class="block"
+      ></svg-icon>
+    </button>
+    <button *ngIf="isLogged" (click)="onLogout()" class="">
+      <svg-icon
+        name="logout-icon"
+        [svgStyle]="{ height: '18px' }"
+        class="block"
+      ></svg-icon>
+    </button>
   </div>
-  <ng-template #logout>
-    <div class="actions">
-      <div ngbDropdown>
-        <button
-          mat-button
-          [matMenuTriggerFor]="profileMenu"
-          class="profile-btn"
-        >
-          <span class="avatar"></span>
-          <span class="username">{{ user?.name ?? 'Noname' }}</span>
-        </button>
-        <mat-menu #profileMenu="matMenu">
-          <button mat-menu-item (click)="onLogout()">Logout</button>
-        </mat-menu>
-      </div>
-    </div>
-  </ng-template>
 </header>

@@ -1,26 +1,33 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
-import { DynamicDialogComponent } from '../../dialogs/DynamicDialog/dynamic.dialog.component';
-import { User } from '../../models/user.model';
 import { AuthService } from '../../services/auth.service';
+import { ThemeService } from '../../services/theme.service';
 import { SigninComponent } from '../signin/signin.component';
-import { SignupComponent } from '../signup/signup.component';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit {
   isLogged: boolean | undefined;
-  user: undefined | null | User = null;
+
+  theme: 'light' | 'dark' = 'light';
+
   private authSub: Subscription;
 
-  constructor(private auth: AuthService, public dialog: MatDialog) {
-    this.auth.subscribeToAuthChange((v) => {
+  private themeSub: Subscription;
+
+  constructor(
+    private auth: AuthService,
+    private themeService: ThemeService,
+    public dialog: MatDialog
+  ) {
+    this.authSub = this.auth.subscribeToAuthChange((v) => {
       this.isLogged = v;
-      this.user = this.auth.user;
+    });
+    this.themeSub = this.themeService.theme$.subscribe((v) => {
+      this.theme = v;
     });
   }
 
@@ -28,21 +35,18 @@ export class HeaderComponent implements OnInit {
 
   ngOnDestroy(): void {
     this.authSub.unsubscribe();
+    this.themeSub.unsubscribe();
   }
 
   onLogout() {
     this.auth.logout();
   }
 
-  openSigninDialog() {
-    this.dialog.open(DynamicDialogComponent, {
-      data: { component: SigninComponent },
-    });
+  onToggleTheme() {
+    this.themeService.toggleTheme();
   }
 
-  openSignupDialog() {
-    this.dialog.open(DynamicDialogComponent, {
-      data: { component: SignupComponent },
-    });
+  onSignin() {
+    this.dialog.open(SigninComponent, {});
   }
 }

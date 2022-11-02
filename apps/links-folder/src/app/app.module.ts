@@ -10,6 +10,7 @@ import { AngularSvgIconModule } from 'angular-svg-icon';
 import { AngularSvgIconPreloaderModule } from 'angular-svg-icon-preloader';
 import { AuthService } from './shared/services/auth.service';
 import { ApiInterceptor } from './core/interceptors/api.interceptor';
+import { ThemeService } from './shared/services/theme.service';
 
 const routes: Routes = [
   {
@@ -37,6 +38,7 @@ const routes: Routes = [
   ],
   providers: [
     AuthService,
+    ThemeService,
     { provide: HTTP_INTERCEPTORS, useClass: ApiInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],

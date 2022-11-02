@@ -1,8 +1,15 @@
-<p>
-  Please login
-</p>
-<form [formGroup]='loginForm' (submit)='submit()'>
-  <label for="username">Login: <input type="text" formControlName="login"></label><br>
-  <label for="password">Password: <input type="password" formControlName="password"></label><br>
-  <button type="submit">Submit</button>
-</form>
+<app-default-dialog title="Signin">
+  <form [formGroup]="loginForm" (submit)="submit()">
+    <app-textfield label="Login" formControlName="login"></app-textfield>
+    <app-textfield
+      label="Password"
+      type="password"
+      formControlName="password"
+    ></app-textfield>
+    <button btn full type="submit">Sign in</button>
+  </form>
+  <div class="mt-4 text-center mb-4">
+    Don’t have an account?
+    <button class="p-0 m-0 text-accent100" (click)="onSignup()">Sign up</button>
+  </div>
+</app-default-dialog>

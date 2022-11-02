@@ -6,7 +6,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { JwtService } from './services/jwt.service';
 import { SignupComponent } from './components/signup/signup.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { DynamicDialogComponent } from './dialogs/DynamicDialog/dynamic.dialog.component';
 import { DefaultLayoutComponent } from './components/defaultLayout/default.layout.component';
 import { HeaderComponent } from './components/header/header.component';
 import { AppButton } from './components/button/button.component';
@@ -14,16 +13,21 @@ import { DefaultDialogComponent } from './components/default-dialog/default-dial
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { CustomMatDialog } from '../core/CustomMatDialog';
 import { RouterModule } from '@angular/router';
+import { FieldWrapperComponent } from './components/field-wrapper/field-wrapper.component';
+import { TextfieldComponent } from './components/textfield/textfield.component';
+import { FieldErrorsPipe } from './pipes/field-errors.pipe';
 
 @NgModule({
   declarations: [
     SigninComponent,
     SignupComponent,
-    DynamicDialogComponent,
     DefaultLayoutComponent,
     HeaderComponent,
     AppButton,
     DefaultDialogComponent,
+    FieldWrapperComponent,
+    TextfieldComponent,
+    FieldErrorsPipe
   ],
   imports: [
     AngularSvgIconModule,

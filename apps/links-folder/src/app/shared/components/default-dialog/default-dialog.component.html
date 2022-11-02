@@ -1,9 +1,7 @@
 <div class="dialog-wrapper">
-  <h2 mat-dialog-title>{{ title }}</h2>
+  <h2 *ngIf="title" mat-dialog-title>{{ title }}</h2>
   <mat-dialog-content>
     <ng-content></ng-content>
   </mat-dialog-content>
-  <button class="close" mat-button mat-dialog-close>
-    <svg-icon name="close-icon"></svg-icon>
-  </button>
+  <button class="close" mat-button mat-dialog-close></button>
 </div>

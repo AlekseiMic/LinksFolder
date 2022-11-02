@@ -18,7 +18,7 @@
       (keyup.enter)="onCreateLink()"
       id="link"
     />
-    <button type="button" class="import-btn" (click)="openImportDialog()">
+    <button *ngIf="showImportButton" type="button" class="import-btn" (click)="openImportDialog()">
       <svg-icon name="import-icon"></svg-icon>
     </button>
   </div>

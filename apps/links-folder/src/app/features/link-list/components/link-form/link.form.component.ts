@@ -21,6 +21,8 @@ export class LinkFormComponent implements OnInit {
 
   @Input() hide = false;
 
+  @Input() showImportButton: boolean = false;
+
   constructor(
     private formBuilder: UntypedFormBuilder,
     private linkService: LinkService,
