@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: '[btn]',
@@ -6,7 +6,5 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrls: ['./button.component.scss'],
 })
 export class AppButton implements OnInit {
-  @Input('full') full: any = true;
-
   ngOnInit(): void {}
 }

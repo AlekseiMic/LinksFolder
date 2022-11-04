@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Link, LinkService } from '../services/link.service';
+import { LinkService } from '../../services/link.service';
+import { Link, SimpleLink } from '../../types';
 
 @Component({
   selector: 'change-link-dialog',
@@ -12,21 +13,17 @@ export class ChangeLinkDialog {
     private linkService: LinkService,
     @Inject(MAT_DIALOG_DATA)
     public data: { directory: number; id: number; link: Link }
-  ) {
-    const list = this.linkService.getListById(data.directory);
-    if (!list) {
-      this.dialogRef.close();
-      return;
-    }
+  ) {}
+
+  ngOnInit() {
+    const list = this.linkService.getListById(this.data.directory);
+    if (!list) return this.dialogRef.close();
     const link = list.links.find((el) => el.id == this.data.id);
-    if (!link) {
-      this.dialogRef.close();
-      return;
-    }
+    if (!link) return this.dialogRef.close();
     this.data.link = { ...link };
   }
 
-  async onSubmit(values: { url: string; text: string }): Promise<void> {
+  async onSubmit(values: SimpleLink): Promise<void> {
     this.linkService
       .editLinks(this.data.directory, { ...this.data.link, ...values })
       .subscribe((result) => {

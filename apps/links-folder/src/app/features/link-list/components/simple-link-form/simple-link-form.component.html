@@ -1,0 +1,18 @@
+<div
+  class="w-6/12 {{
+    hasLinks ? 'pt-4' : 'h-body pb-header max-h-[640px]'
+  }} mx-auto flex flex-col justify-center items-center "
+>
+  <p
+    class="{{
+      hasLinks ? 'text-[20px]' : 'text-[34px]'
+    }} leading-none font-bold"
+  >
+    insert link and press <span class="text-accent100">enter</span>
+  </p>
+  <app-link-form
+    class="w-full"
+    [height]="40"
+    (onSubmit)="raiseOnSubmit($event)"
+  ></app-link-form>
+</div>

@@ -7,13 +7,14 @@ import {
   ViewChild,
 } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ChangeLinkDialog } from '../../dialogs/change-link.dialog';
+import { ChangeLinkDialog } from '../../dialogs/change-link.dialog/change-link.dialog';
 import { CreateSubdirDialog } from '../../dialogs/create-subdir-dialog/create-subdir.dialog';
-import { AllLists, LinkService, List } from '../../services/link.service';
+import { AllLists, LinkService } from '../../services/link.service';
 import memoizee from 'memoizee';
 import { SelectDirDialog } from '../../dialogs/select-dir-dialog/select-dir.dialog';
 import { DirSettingsDialog } from '../../dialogs/dir-settings-dialog/dir-settings.dialog';
 import { ImportLinksDialog } from '../../dialogs/import-links-dialog/import-links.dialog';
+import { List, SimpleLink } from '../../types';
 
 @Component({
   selector: 'app-link-not-simple-list',
@@ -35,12 +36,24 @@ export class LinkNotSimpleList implements OnInit {
 
   constructor(private dialog: MatDialog, private linkService: LinkService) {}
 
+  ngOnInit(): void {}
+
+  ngOnChanges(changes: SimpleChanges) {
+    const newValue = changes['directory']?.currentValue;
+    if (this.openned.length === 0 && newValue) {
+      this.openned = [newValue];
+      this.expanded = { [newValue]: true };
+    }
+  }
+
+  ngOnDestroy() {}
+
+  onCreateLinks(data: { dir: number, links: SimpleLink[]}) {
+    this.linkService.addLinks(data.dir, data.links);
+  }
+
   openImportDialog(dir: number) {
-    this.dialog.open(ImportLinksDialog, {
-      data: {
-        dir,
-      },
-    });
+    this.dialog.open(ImportLinksDialog, { data: { dir } });
   }
 
   onDirChecked(event: any, dir: number) {
@@ -59,14 +72,6 @@ export class LinkNotSimpleList implements OnInit {
       } else if (!this.hasUnselectedLinks()) {
         this.linkCheckbox.nativeElement.checked = true;
       }
-    }
-  }
-
-  ngOnChanges(changes: SimpleChanges) {
-    const newValue = changes['directory']?.currentValue;
-    if (this.openned.length === 0 && newValue) {
-      this.openned = [newValue];
-      this.expanded = { [newValue]: true };
     }
   }
 
@@ -91,15 +96,11 @@ export class LinkNotSimpleList implements OnInit {
   }
 
   createSubdir(dir: number) {
-    this.dialog.open(CreateSubdirDialog, {
-      data: { dir },
-    });
+    this.dialog.open(CreateSubdirDialog, { data: { dir } });
   }
 
   openSettings(dir: number) {
-    this.dialog.open(DirSettingsDialog, {
-      data: { dir },
-    });
+    this.dialog.open(DirSettingsDialog, { data: { dir } });
   }
 
   close(dir: number) {
@@ -249,8 +250,4 @@ export class LinkNotSimpleList implements OnInit {
   get links() {
     return this.getLinks(this.lists, this.openned);
   }
-
-  ngOnInit(): void {}
-
-  ngOnDestroy() {}
 }

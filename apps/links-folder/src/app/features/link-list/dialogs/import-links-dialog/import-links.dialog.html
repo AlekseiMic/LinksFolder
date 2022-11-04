@@ -1,38 +1,58 @@
-<app-default-dialog class="large">
-  <div class="content">
+<app-default-dialog
+  title="Import links"
+  class="large block min-h-[300px] overflow-auto"
+>
+  <label class="block">
     <input
       [style.display]="'none'"
       #fileInput
       type="file"
       (change)="onUpload($event)"
     />
-    <mat-spinner
-      *ngIf="fileInProcess"
-      class="loading-indicator"
-      [diameter]="150"
-    ></mat-spinner>
-    <div *ngIf="fileProcessed">
-      <div>
-        <ng-template
-          *ngFor="let d of ids ?? []"
-          [ngTemplateOutlet]="folderList"
-          [ngTemplateOutletContext]="{
+    <div
+      *ngIf="!fileProcessed && !fileInProcess"
+      btn
+      full
+      rounded
+      class="cursor-pointer h-16 text-xl mt-20"
+    >
+      Select file...
+    </div>
+  </label>
+
+  <mat-spinner
+    *ngIf="fileInProcess"
+    class="loading-indicator"
+    [diameter]="150"
+  ></mat-spinner>
+
+  <div *ngIf="fileProcessed">
+    <p class="p-4 bg-yellow-100 text-center text-primary-80">
+      You can select directories to remove
+    </p>
+    <ng-template
+      *ngFor="let d of ids ?? []"
+      [ngTemplateOutlet]="folderList"
+      [ngTemplateOutletContext]="{
         $implicit: d,
         depth: 0
       }"
-        >
-        </ng-template>
-      </div>
-      <div class="actions">
-        <button (click)="onClose()" class="success-btn">OK</button>
-        <button
-          *ngIf="hasDirsToRemove()"
-          class="remove-btn"
-          (click)="onDirsRemove()"
-        >
-          Remove selected
-        </button>
-      </div>
+    >
+    </ng-template>
+    <div class="actions">
+      <button btn primary rounded (click)="onClose()" class="h-8 w-[150px]">
+        OK
+      </button>
+      <button
+        *ngIf="hasDirsToRemove()"
+        btn
+        danger
+        rounded
+        class="h-8 w-[200px] ml-auto"
+        (click)="onDirsRemove()"
+      >
+        Remove selected
+      </button>
     </div>
   </div>
 </app-default-dialog>
@@ -50,7 +70,7 @@
     </label>
     <div *ngIf="lists[dir].links.length > 0" class="links">
       <div class="link">
-        {{ lists[dir].links[0].text ?? '-' }} ({{lists[dir].links[0].url}})
+        {{ lists[dir].links[0].text }} ({{lists[dir].links[0].url}})
       </div>
       <div *ngIf="lists[dir].links.length > 1" class="links__count">
         +{{ lists[dir].links.length - 1 }} more

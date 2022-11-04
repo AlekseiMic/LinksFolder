@@ -1,64 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, of, throwError } from 'rxjs';
-
-export type Link = {
-  directory: number;
-  url: string;
-  text?: string;
-  id: number;
-};
-
-export type List = {
-  id: number;
-  parent?: number;
-  editable: boolean;
-  author?: number;
-  isGuest: boolean | undefined;
-  owned: boolean;
-  name?: string;
-  codes: {
-    id: number;
-    code: string;
-    owned: boolean;
-    username?: string;
-    expiresIn: Date;
-    updatedAt: Date;
-  }[];
-  sublists?: number[];
-  links: Link[];
-};
+import { Link, List, SimpleLink } from '../types';
 
 export type AllLists = null | Record<number | string, List>;
 
 @Injectable()
 export class LinkService {
-  editDir(id: number, name?: string, parent?: number) {
-    return this.http.patch(`/v1/directory/${id}`, { name, parent }).pipe(
-      map((res) => {
-        const list = { ...this.list$.getValue() };
-        if (!res || !list[id]) return;
-        if (name) list[id].name = name;
-        if (parent) {
-          const oldParent = list[id].parent;
-          if (oldParent && list[oldParent]) {
-            list[oldParent].sublists = list[oldParent].sublists?.filter(
-              (child) => child !== id
-            );
-          }
-          list[id].parent = parent;
-          list[parent].sublists?.push(id);
-        }
-        this.list$.next(list);
-      })
-    );
-  }
-  addImportedLists(dir: number, ids: number[], lists: Record<string, List>) {
-    const newLists = { ...this.list$.getValue(), ...lists };
-    if (!newLists || !newLists[dir]) return;
-    newLists[dir].sublists?.push(...ids);
-    this.list$.next(newLists);
-  }
   private lastFetch: number;
 
   private lastCode: string | undefined;
@@ -93,11 +41,39 @@ export class LinkService {
     );
   }
 
+  editDir(id: number, name?: string, parent?: number) {
+    return this.http.patch(`/v1/directory/${id}`, { name, parent }).pipe(
+      map((res) => {
+        const list = { ...this.list$.getValue() };
+        if (!res || !list[id]) return;
+        if (name) list[id].name = name;
+        if (parent) {
+          const oldParent = list[id].parent;
+          if (oldParent && list[oldParent]) {
+            list[oldParent].sublists = list[oldParent].sublists?.filter(
+              (child) => child !== id
+            );
+          }
+          list[id].parent = parent;
+          list[parent].sublists?.push(id);
+        }
+        this.list$.next(list);
+      })
+    );
+  }
+
+  addImportedLists(dir: number, ids: number[], lists: Record<string, List>) {
+    const newLists = { ...this.list$.getValue(), ...lists };
+    if (!newLists || !newLists[dir]) return;
+    newLists[dir].sublists?.push(...ids);
+    this.list$.next(newLists);
+  }
+
   deleteAccess(dir: number, id: number) {
     const url = `/v1/directory/${dir}/access/${id}`;
-    return this.http.delete<boolean>(url).pipe(
+    return this.http.delete<{ result: boolean}>(url).pipe(
       map((result) => {
-        if (!result) return false;
+        if (!result.result) return false;
         const list = this.list$.getValue();
         if (!list?.[dir]) return false;
         list[dir].codes = list[dir].codes.filter((c) => c.id !== id);
@@ -203,17 +179,17 @@ export class LinkService {
     });
   }
 
-  createDir(dir: number, name: string) {
+  createDir(parent: number, name: string) {
     return this.http
       .post<{ id: number; name: string }>(`/v1/directory`, {
         name,
-        parent: dir,
+        parent,
       })
       .pipe(
         map((value) => {
           const nextList = this.list$.getValue();
           if (!nextList) return false;
-          nextList[dir]?.sublists?.push(value.id);
+          nextList[parent]?.sublists?.push(value.id);
           nextList[value.id] = {
             name: value.name,
             id: value.id,
@@ -266,22 +242,15 @@ export class LinkService {
       });
   }
 
-  addLinks(dirId: number, links: Omit<Link, 'id' | 'directory'>[]) {
+  addLinks(dirId: number, links: SimpleLink[]) {
     const list = this.getListById(dirId);
     const url = list ? `/v1/directory/${list.id}/link/` : '/v1/link/';
     if (!list) return of(false);
-    return this.http
-      .post<{ id: number; url: string; directory: number; text?: string }[]>(
-        url,
-        links
-      )
-      .pipe(
-        map((res) => {
-          list.links = [...(list?.links ?? []), ...res];
-          this.list$.next({ ...this.list$.getValue() });
-          return true;
-        })
-      );
+    return this.http.post<Link[]>(url, links).subscribe((res) => {
+      list.links = [...(list?.links ?? []), ...res];
+      this.list$.next({ ...this.list$.getValue() });
+      return true;
+    });
   }
 
   deleteLink(dirId: number, id: number) {

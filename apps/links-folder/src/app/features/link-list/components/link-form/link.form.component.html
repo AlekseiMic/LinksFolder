@@ -1,37 +1,15 @@
-<form [formGroup]="newLinkForm" [ngClass]="{ small: !showDescription, hide }">
-  <p>Insert link and press <span>Enter</span></p>
-  <div class="wrapper">
-    <select
-      *ngIf="directory && directory.length > 1"
-      id="directory"
-      formControlName="directory"
-    >
-      <option *ngFor="let dir of directory" [value]="dir.value">
-        {{ dir.label }}
-      </option>
-    </select>
-    <input
-      autocomplete="off"
-      type="text"
-      placeholder="https://..."
-      formControlName="link"
-      (keyup.enter)="onCreateLink()"
-      id="link"
-    />
-    <button *ngIf="showImportButton" type="button" class="import-btn" (click)="openImportDialog()">
-      <svg-icon name="import-icon"></svg-icon>
-    </button>
-  </div>
-  <div class="error-block">
-    <div
-      *ngIf="lino && lino.invalid && (lino.dirty || lino.touched) && lino?.errors?.['required']"
-    >
-      Link is required
-    </div>
-    <div
-      *ngIf="lino && lino.invalid && (lino.dirty || lino.touched) && lino?.errors?.['pattern']"
-    >
-      Not a valid url
-    </div>
-  </div>
-</form>
+<app-field-wrapper
+  [errors]="errors"
+  [roundedLeft]="roundedLeft"
+  [roundedRight]="roundedRight"
+>
+  <input
+    class="w-full border-0 focus:outline-0 focus-visible:outline-0 focus-visible:shadow-none px-3 text-lg bg-transparent"
+    [style.height.px]="height"
+    autocomplete="off"
+    [formControl]="formControl"
+    placeholder="https://..."
+    (keyup.enter)="onCreateLink()"
+    id="link"
+  />
+</app-field-wrapper>

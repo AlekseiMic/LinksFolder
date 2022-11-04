@@ -56,7 +56,7 @@ export abstract class SqlRepository<T extends Model> implements IRepository<T> {
     options: BulkCreateOptions<Attributes<T>> | undefined
   ) {
     return this.db.bulkCreate(
-      t.map((e) => e.get()),
+      t.map((e) => (e instanceof Model ? e.get() : e)),
       options
     );
   }

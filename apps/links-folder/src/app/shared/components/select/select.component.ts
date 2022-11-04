@@ -9,17 +9,17 @@ import {
 } from '@angular/forms';
 
 @Component({
-  selector: 'app-textfield',
-  templateUrl: 'textfield.component.html',
+  selector: 'app-select',
+  templateUrl: 'select.component.html',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
-      useExisting: TextfieldComponent,
+      useExisting: SelectComponent,
       multi: true,
     },
   ],
 })
-export class TextfieldComponent implements ControlValueAccessor {
+export class SelectComponent implements ControlValueAccessor {
   @ViewChild(FormControlDirective, { static: true })
   formControlDerictive: FormControlDirective;
 
@@ -29,8 +29,6 @@ export class TextfieldComponent implements ControlValueAccessor {
 
   @Input('label') label?: string;
 
-  @Input('autocomplete') autocomplete?: string = 'on';
-
   @Input('id') id?: string;
 
   @Input('roundedLeft') roundedLeft?: number;
@@ -39,7 +37,7 @@ export class TextfieldComponent implements ControlValueAccessor {
 
   @Input('height') height = 32;
 
-  @Input('type') type = 'text';
+  @Input('options') options?: { value: string | number; label: string }[] = [];
 
   constructor(private controlContainer: ControlContainer) {}
 

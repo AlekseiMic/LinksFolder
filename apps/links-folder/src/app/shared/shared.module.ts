@@ -16,6 +16,7 @@ import { RouterModule } from '@angular/router';
 import { FieldWrapperComponent } from './components/field-wrapper/field-wrapper.component';
 import { TextfieldComponent } from './components/textfield/textfield.component';
 import { FieldErrorsPipe } from './pipes/field-errors.pipe';
+import { SelectComponent } from './components/select/select.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { FieldErrorsPipe } from './pipes/field-errors.pipe';
     DefaultDialogComponent,
     FieldWrapperComponent,
     TextfieldComponent,
-    FieldErrorsPipe
+    FieldErrorsPipe,
+    SelectComponent,
   ],
   imports: [
     AngularSvgIconModule,
@@ -39,6 +41,14 @@ import { FieldErrorsPipe } from './pipes/field-errors.pipe';
     RouterModule,
   ],
   providers: [JwtService, { provide: MatDialog, useClass: CustomMatDialog }],
-  exports: [SigninComponent, DefaultLayoutComponent, DefaultDialogComponent],
+  exports: [
+    SelectComponent,
+    FieldWrapperComponent,
+    AppButton,
+    TextfieldComponent,
+    SigninComponent,
+    DefaultLayoutComponent,
+    DefaultDialogComponent,
+  ],
 })
 export class SharedModule {}

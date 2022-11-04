@@ -1,6 +1,7 @@
 import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { LinkService, List } from '../../services/link.service';
+import { LinkService } from '../../services/link.service';
+import { List } from '../../types';
 
 @Component({
   selector: 'app-import-links-dialog',

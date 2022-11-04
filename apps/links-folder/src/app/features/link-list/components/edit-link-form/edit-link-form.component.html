@@ -1,7 +1,5 @@
 <form [formGroup]="editLinkForm" (ngSubmit)="submit()" class="form">
-  <label for="url"> URL </label>
-  <input autocomplete="off" type="text" formControlName="url" id="url" />
-  <label for="text"> TEXT </label>
-  <input autocomplete="off" type="text" formControlName="text" id="text" />
-  <button type="submit">Save</button>
+  <app-textfield label="Url" autocomplete="off" type="text" formControlName="url" id="url"></app-textfield>
+  <app-textfield label="Text" autocomplete="off" type="text" formControlName="text" id="text"></app-textfield>
+  <button class="h-12 mt-2" btn primary full rounded type="submit">Save</button>
 </form>

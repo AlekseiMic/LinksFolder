@@ -11,5 +11,9 @@ export class FieldWrapperComponent {
 
   @Input('required') required: boolean;
 
-  @Input('errors') errors: [string, any][];
+  @Input('roundedLeft') roundedLeft?: number = 4;
+
+  @Input('roundedRight') roundedRight?: number = 4;
+
+  @Input('errors') errors: [string, any][] = [];
 }

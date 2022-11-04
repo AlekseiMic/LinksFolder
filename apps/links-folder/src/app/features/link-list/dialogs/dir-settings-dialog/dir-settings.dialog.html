@@ -1,41 +1,75 @@
 <app-default-dialog title="Directory Settings" class="large">
-  <div class="content">
-    <form [formGroup]="editForm" (submit)="onEdit()">
-      <label class="dir-name">
-        <span>Name</span>
-        <input
-          id="name"
-          autocomplete="off"
-          type="text"
-          formControlName="name"
-        />
-        <select id="parent" formControlName="parent">
-          <option *ngFor="let d of avaliableParents" [value]="d.id">{{ d.name }}</option>
-        </select>
-      </label>
-      <button *ngIf="editForm.dirty">Save</button>
+  <div class="relative">
+    <form
+      class="flex gap-x-2 items-center"
+      [formGroup]="editForm"
+      (submit)="onEdit()"
+    >
+      <app-textfield
+        class="max-w-[200px]"
+        id="name"
+        [height]="32"
+        label="Directory Name"
+        autocomplete="off"
+        type="text"
+        formControlName="name"
+      ></app-textfield>
+      <app-select
+        *ngIf="availableParents.length > 0"
+        class="max-w-[200px]"
+        id="parent"
+        [height]="32"
+        formControlName="parent"
+        label="Parent Directory"
+        [options]="availableParents"
+      >
+      </app-select>
+      <button
+        btn
+        primary
+        rounded
+        class="w-[150px] h-8 ml-auto"
+        *ngIf="editForm.dirty"
+      >
+        Save
+      </button>
     </form>
-    <div class="access">
-      <button class="access__add-btn" (click)="onAddAccessRule()">Add</button>
-      <ul class="access__list">
+    <div class="access pt-5 pb-10">
+      <div class="access__table">
         <div class="access__item access__item--header">
           <div>Code</div>
           <div>Username</div>
-          <div>ExpiresIn</div>
-          <div>UpdatedAt</div>
+          <div>Expires In</div>
+          <div>Updated At</div>
           <div></div>
         </div>
-        <div class="access__item" *ngFor="let code of codes">
-          <div>{{ code.code }}</div>
-          <div>{{ code.username }}</div>
-          <div>{{ code.expiresIn | date:'shortDate' }}</div>
-          <div>{{ code.updatedAt | date:'shortDate' }}</div>
-          <div class="access__item-actions">
-            <button (click)="onEditAccess(code.id)">Edit</button>
-            <button (click)="onDeleteAccess(code.id)">Delete</button>
+        <div class="access__body max-h-[100px] overflow-auto">
+          <div class="access__item" *ngFor="let code of codes">
+            <div>{{ code.code }}</div>
+            <div>{{ code.username ?? '-' }}</div>
+            <div>{{ code.expiresIn | date:'shortDate' }}</div>
+            <div>{{ code.updatedAt | date:'shortDate' }}</div>
+            <div class="access__item-actions flex gap-x-2">
+              <button btn icon (click)="onEditAccess(code.id)">
+                <svg-icon class="w-3" name="pen-icon"></svg-icon>
+              </button>
+              <button btn icon (click)="onDeleteAccess(code.id)">
+                <svg-icon class="w-3" name="trash-icon"></svg-icon>
+              </button>
+            </div>
           </div>
         </div>
-      </ul>
+      </div>
     </div>
+    <button
+      class="absolute bottom-0 left-0 h-8"
+      btn
+      full
+      primary
+      rounded
+      (click)="onAddAccessRule()"
+    >
+      Add
+    </button>
   </div>
 </app-default-dialog>

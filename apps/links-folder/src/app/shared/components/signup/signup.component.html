@@ -1,4 +1,4 @@
-<app-default-dialog title="Signup">
+<app-default-dialog title="Sign up">
   <form [formGroup]="signupForm" (submit)="submit()">
     <app-textfield label="Login" formControlName="login"></app-textfield>
     <app-textfield
@@ -6,9 +6,11 @@
       type="password"
       formControlName="password"
     ></app-textfield>
-    <button btn full type="submit">Sign up</button>
+    <button rounded primary btn full class="h-10 text-lg" type="submit">
+      Sign up
+    </button>
   </form>
-  <div class="mt-4 text-center mb-4">
+  <div class="mt-4 text-center">
     Already have an account?
     <button class="p-0 m-0 text-accent100" (click)="onSignin()">Sign in</button>
   </div>

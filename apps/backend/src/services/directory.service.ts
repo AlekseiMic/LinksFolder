@@ -62,11 +62,11 @@ export class DirectoryService {
   }
 
   async deleteAccess(dir: number, access: number, user?: AuthUser) {
-    if (!user) return false;
+    if (!user) throw new ForbiddenException();
     const result = await this.access.removeAll({
       where: { directoryId: dir, id: access, createdBy: user.id },
     });
-    return result >= 1;
+    return { result: result >= 1 };
   }
 
   async importFiles(
@@ -75,11 +75,14 @@ export class DirectoryService {
     user?: AuthUser
   ) {
     if (!user) throw new ForbiddenException('Not authorized');
+
     const dir = await this.repo.findOne({
       where: { id: dirId, createdBy: user.id },
     });
+
     if (!dir) throw new ForbiddenException();
     const result: Record<number, List> = {};
+
     type Li = {
       id?: number;
       name: string;
@@ -97,6 +100,7 @@ export class DirectoryService {
         subdirs: [],
         links: [],
       };
+
       if (obj.children) {
         obj.children.forEach((c: any) => {
           if (c.typeCode === 2) {
@@ -108,6 +112,7 @@ export class DirectoryService {
           }
         });
       }
+
       if (result.subdirs.length === 0 && result.links.length === 0) return null;
       return result;
     };
@@ -165,6 +170,7 @@ export class DirectoryService {
     };
 
     const links = await this.linkModel.saveMultiple(addLinks(toImport), {});
+
     links.forEach((l) => {
       if (result[l.directoryId]) {
         result[l.directoryId].links.push({
@@ -449,6 +455,7 @@ export class DirectoryService {
     for (const id of ids) {
       result[id] = await this.delete(id, undefined, undefined, user);
     }
+    console.log(result);
     return result;
   }
 
@@ -470,6 +477,7 @@ export class DirectoryService {
     try {
       return await this.nsHelper.delete(this.repo, condition);
     } catch (err) {
+      console.log(err);
       return false;
     }
   }

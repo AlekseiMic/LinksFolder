@@ -13,7 +13,7 @@ export class SqlDirectoryRepository
     super(connection, Directory);
   }
 
-  async getAvaliable(
+  async getAvailable(
     userId: number
   ): Promise<{ root: Directory | null; received: Directory[] }> {
     const rootDirPromise = this.findOne({

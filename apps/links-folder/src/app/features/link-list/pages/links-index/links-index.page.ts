@@ -1,7 +1,7 @@
 import { DOCUMENT, Location, LocationStrategy } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { AllLists, LinkService, List } from '../../services/link.service';
+import { AllLists, LinkService } from '../../services/link.service';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from 'apps/links-folder/src/app/shared/services/auth.service';
@@ -19,7 +19,6 @@ export class LinksIndexPage implements OnInit {
   public routeCode?: string;
   public isAuthorized: boolean | undefined;
   public list: AllLists = {};
-  public root: List | undefined;
   public baseDir: number | undefined;
 
   constructor(
@@ -50,22 +49,22 @@ export class LinksIndexPage implements OnInit {
     this.listSub = this.listService.list$.subscribe((listObj) => {
       this.baseDir = this.listService.rootDir;
       this.list = listObj ?? {};
-      this.root = undefined;
-
-      if (!this.baseDir || !listObj || !listObj[this.baseDir]) return;
-
-      this.root = this.list[this.baseDir];
 
       if (this.listService.guestDir) {
-        const guestDir = listObj[this.listService.guestDir];
-        this.baseDir = this.listService.guestDir;
-        if (guestDir.isGuest && guestDir.owned && guestDir.links.length > 0) {
-          this.openMergeDialog(guestDir.id);
-        } else if (guestDir.isGuest && guestDir.owned) {
-          this.listService.removeDir(guestDir.id).subscribe(() => {});
-        }
+        // const guestDir = listObj[this.listService.guestDir];
+        // this.baseDir = this.listService.guestDir;
+        // if (guestDir.isGuest && guestDir.owned && guestDir.links.length > 0) {
+        //   this.openMergeDialog(guestDir.id);
+        // } else if (guestDir.isGuest && guestDir.owned) {
+        //   this.listService.removeDir(guestDir.id).subscribe(() => {});
+        // }
       }
     });
+  }
+
+  get root() {
+    if (!this.list || !this.baseDir || !this.list[this.baseDir]) return null;
+    return this.list[this.baseDir];
   }
 
   hasLinks() {

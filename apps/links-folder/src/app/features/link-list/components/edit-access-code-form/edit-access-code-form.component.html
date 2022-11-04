@@ -1,4 +1,12 @@
-<form [formGroup]="editAccessCodeForm" (ngSubmit)='submit()' class="form">
-  <input autocomplete="off" type="text" formControlName="code" id="name" />
-  <button type="submit">Save</button>
+<form [formGroup]="editAccessCodeForm" (ngSubmit)="submit()">
+  <app-textfield
+    autocomplete="off"
+    label=""
+    type="text"
+    formControlName="code"
+    id="name"
+  ></app-textfield>
+  <button btn primary full rounded class="h-10 text-lg mt-2" type="submit">
+    Save
+  </button>
 </form>

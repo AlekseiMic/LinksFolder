@@ -36,7 +36,11 @@
       >
         <svg-icon name="gear-icon"></svg-icon>
       </button>
-      <button title="Import file" (click)="openImportDialog(dir)" class="import-btn">
+      <button
+        title="Import file"
+        (click)="openImportDialog(dir)"
+        class="import-btn"
+      >
         <svg-icon name="import-icon"></svg-icon>
       </button>
       <button title="Export folder" class="download-btn">
@@ -98,7 +102,8 @@
     <h4>
       {{ title }}
     </h4>
-    <app-link-form [directory]="opennedVariants" [hide]="true" [showImportButton]="true"></app-link-form>
+
+    <app-not-simple-link-form (onSubmit)="onCreateLinks($event)" [directories]="opennedVariants"></app-not-simple-link-form>
 
     <div *ngIf="lists" class="list">
       <div class="action-bar">

@@ -3,9 +3,10 @@ import { Location } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ChangeLinkDialog } from '../../dialogs/change-link.dialog';
-import { LinkService, List } from '../../services/link.service';
+import { ChangeLinkDialog } from '../../dialogs/change-link.dialog/change-link.dialog';
+import { LinkService } from '../../services/link.service';
 import { ChangeAccessCodeDialog } from '../../dialogs/change-access-code.dialog';
+import { Link, List, SimpleLink } from '../../types';
 
 @Component({
   selector: 'app-link-simple-list',
@@ -13,9 +14,9 @@ import { ChangeAccessCodeDialog } from '../../dialogs/change-access-code.dialog'
   styleUrls: ['./link.simple.list.component.scss'],
 })
 export class LinkSimpleList {
-  @Input() canEdit?: boolean;
+  @Input() canEdit?: boolean = false;
 
-  @Input() links: { url: string; text?: string; id: number }[] = [];
+  @Input() links: Link[] = [];
 
   @Input() codes: List['codes'];
 
@@ -29,6 +30,10 @@ export class LinkSimpleList {
     private linkService: LinkService
   ) {}
 
+  onCreateLinks(links: SimpleLink[]) {
+    this.linkService.addLinks(this.directory, links);
+  }
+
   delete(id: number) {
     this.linkService.deleteLink(this.directory, id);
   }
@@ -39,7 +44,7 @@ export class LinkSimpleList {
     });
   }
 
-  hasLinks() {
+  get hasLinks() {
     return this.links.length > 0;
   }
 
@@ -57,7 +62,7 @@ export class LinkSimpleList {
 
   extendLinkLifetime(dirId: number, accessId: number) {
     this.linkService.extendLifetime(dirId, accessId).subscribe((value) => {
-      this.snackBar.open(value ? 'Success!' : 'Error!', undefined, {
+      this.snackBar.open(value ? 'Access granted for the next hour!' : 'Error!', undefined, {
         panelClass: value ? 'success' : 'error',
         duration: 5000,
         verticalPosition: 'top',

@@ -1,11 +1,10 @@
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
-import { FormControl, UntypedFormBuilder, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
-import { ImportLinksDialog } from '../../dialogs/import-links-dialog/import-links.dialog';
-import { LinkService } from '../../services/link.service';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormControl, Validators } from '@angular/forms';
 
 const linkRegex =
   /^ *(?:(https?:\/\/(?:www\.)?[-\w@:%._\+~#=]{1,256}\.[\w()]{1,6}(?:[-\w()@:%_\+.~#?&/=]*)) *([-_@$!%^&*() \w]*)((?: *#[-\w_]+)*) *)*$/;
+const reg = new RegExp(linkRegex);
+type Link = { url: string; text: string; tags?: string[] };
 
 @Component({
   selector: 'app-link-form',
@@ -13,80 +12,45 @@ const linkRegex =
   templateUrl: './link.form.component.html',
 })
 export class LinkFormComponent implements OnInit {
-  ngOnInit(): void {}
+  @Input('roundedLeft') roundedLeft = 10;
 
-  @Input() showDescription?: boolean;
+  @Input('roundedRight') roundedRight = 10;
 
-  @Input() directory: { value: number; label: string }[] | null = null;
+  @Input('height') height = 38;
 
-  @Input() hide = false;
+  @Output() onSubmit: EventEmitter<Link[]> = new EventEmitter();
 
-  @Input() showImportButton: boolean = false;
+  formControl: FormControl<string | null>;
 
-  constructor(
-    private formBuilder: UntypedFormBuilder,
-    private linkService: LinkService,
-    private dialog: MatDialog
-  ) {}
-
-  newLinkForm = this.formBuilder.group({
-    link: new FormControl('', [Validators.pattern(linkRegex)]),
-    directory: null,
-  });
-
-  ngOnChanges(changes: SimpleChanges) {
-    let newValue = changes['directory'].currentValue;
-    if (newValue && newValue.length === 1) newValue = newValue[0].value;
-    if (typeof newValue === 'number') {
-      this.newLinkForm.controls['directory'].reset(newValue);
-    }
+  ngOnInit(): void {
+    this.formControl = new FormControl<string>('', {
+      validators: [Validators.pattern(reg)],
+    });
   }
 
-  openImportDialog() {
-    this.dialog.open(ImportLinksDialog, {
-      data: {
-        dir: this.newLinkForm.value.directory,
-      },
-    });
+  get errors() {
+    return Object.entries(this.formControl.errors ?? {});
   }
 
   onCreateLink(): void {
-    if (!this.newLinkForm.valid) return;
-    const directory = this.newLinkForm.value.directory;
-    const link: string = this.newLinkForm.value.link;
+    const link = this.formControl.value;
+    if (!this.formControl.valid || !link) return;
 
-    if (!directory || !link) return;
-
-    const reg = new RegExp(linkRegex);
-
-    const links: { url: string; text: string; tags?: string[] }[] = [];
-    link
+    const links = link
       .split('http')
       .filter((el) => el.trim() !== '')
-      .forEach((el) => {
-        const str = 'http' + el;
-        const match = reg.exec(str);
-        if (!match) return;
-        const url = match[1];
-        const text = match[2]?.trim();
-        const tags = match[3]
-          ?.trim()
-          .split('#')
-          .filter((el) => el !== '')
-          .map((el) => el.trim());
-        links.push({ url, text: text || url, tags });
-      });
+      .reduce((acc: Link[], el) => {
+        const match = reg.exec('http' + el);
+        if (!match) return acc;
+        const url = match[1].trim();
+        const text = match[2]?.trim() ?? url;
+        acc.push({ url, text });
+        return acc;
+      }, []);
 
-    this.linkService.addLinks(directory, links).subscribe((res) => {
-      if (res) {
-        this.newLinkForm.controls['link'].reset('');
-        this.newLinkForm.controls['link'].setErrors(null);
-      }
-    });
-  }
+    this.formControl.reset('');
+    this.formControl.setErrors(null);
 
-  get lino() {
-    const lin = this.newLinkForm.get('link');
-    return lin;
+    this.onSubmit.emit(links);
   }
 }

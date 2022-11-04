@@ -12,23 +12,37 @@
   }
 }
 :root {
-  --default-100: #111;
+  --default-100: #111; // default body
   --default-70: #444;
+  --default-60: #565656; // title in dialog,
   --default-50: #666;
   --default-30: #888;
   --default-10: #aaa;
+
   --bg-default: #fff;
-  --primary-100: #fff;
-  --bg-primary-100: #5227cc;
-  --bg-primary-80: #9274e5;
-  --height-header: 50px;
-  --accent-100: #5227cc;
+  --bg-primary-100: #5227cc; // button, header
+  --bg-primary-80: #9274e5; // button on hover and focus
+  --bg-primary-40: #b39fed; //
+  --bg-input: #fefefe;
+  --bg-input-with-error: #fbb;
+  --bg-dialog: #fefefe;
   --bg-accent-100: #5227cc;
+  --bg-danger-100: #721c24;
+  --bg-danger-80: #72454b;
+
+  --b-default: #ccc;
+  --b-primary-focus: #5227cc;
+  --b-primary-hover: #9274e5;
+
+  --bs-default-100: 0 0 10px 2px #999;
+  --primary-100: #fff;
+  --danger-100: #fff;
+  --accent-100: #5227cc;
   --lightbulb: #fff;
-  --bg-input: #eee;
-  --bg-input-with-error: #Fbb;
-  --bg-dialog: #eee;
   --dialog: #333;
+
+  --height-header: 50px;
+  --height-body: calc(100vh - 50px);
 }
 
 html.dark {
@@ -39,9 +53,9 @@ html.dark {
   --lightbulb: yellow;
 }
 
-.mat-menu-item{
-  line-height:35px;
-  height:35px;
+.mat-menu-item {
+  line-height: 35px;
+  height: 35px;
 }
 
 .success {
@@ -56,14 +70,15 @@ html.dark {
     padding: 0;
     border-radius: 0;
     margin: 0;
+    overflow: visible;
   }
 }
 
 :focus {
-    outline: 0;
+  outline: 0;
 }
 
 ::-moz-focus-inner {
-    border: 0;
-    padding: 0;
+  border: 0;
+  padding: 0;
 }

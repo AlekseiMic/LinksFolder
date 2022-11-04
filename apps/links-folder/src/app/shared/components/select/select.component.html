@@ -6,13 +6,15 @@
   [roundedLeft]="roundedLeft"
   [roundedRight]="roundedRight"
 >
-  <input
-    [autocomplete]="autocomplete"
-    class="w-full border-0 focus:outline-0 focus-visible:outline-0 focus-visible:shadow-none px-3 text-base bg-transparent"
+  <select
+    class="w-full overflow-hidden border-0 focus:outline-0 focus-visible:outline-0 focus-visible:shadow-none px-3 text-base bg-transparent"
     [style.height.px]="height"
     [required]="required"
-    [type]="type"
     [formControl]="control"
     [id]="id ?? formControlName"
-  />
+  >
+    <option *ngFor="let option of options" [value]="option.value">
+      {{ option.label }}
+    </option>
+  </select>
 </app-field-wrapper>

@@ -1,4 +1,10 @@
-<form [formGroup]="createSubdirForm" (ngSubmit)='submit()' class="form">
-  <input autocomplete="off" type="text" formControlName="name" id="name" />
-  <button type="submit">Save</button>
+<form [formGroup]="createSubdirForm" (ngSubmit)="submit()" class="form">
+  <app-textfield
+    label="Directory name"
+    autocomplete="off"
+    type="text"
+    formControlName="name"
+    id="name"
+  ></app-textfield>
+  <button btn primary full rounded class="h-8" type="submit">Create</button>
 </form>

@@ -6,19 +6,13 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CdkAccordionModule } from '@angular/cdk/accordion';
 import { ReactiveFormsModule } from '@angular/forms';
 import { LinkFormComponent } from './components/link-form/link.form.component';
-import { LinkListService } from './services/link-list.service';
-import {
-  DragNDropManagerDirective,
-  DragNDropManagerRootDirective,
-} from './directives/drag-n-drop-manager.directive';
-import { DragNDropManagerService } from './services/drag-n-drop-manager.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { LinkService } from './services/link.service';
 import { LinkSimpleList } from './components/link-simple-list/link.simple.list.component';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { EditLinkFormComponent } from './components/edit-link-form/edit-link-form.component';
-import { ChangeLinkDialog } from './dialogs/change-link.dialog';
+import { ChangeLinkDialog } from './dialogs/change-link.dialog/change-link.dialog';
 import { MatDialogModule } from '@angular/material/dialog';
 import { SharedModule } from '../../shared/shared.module';
 import { ChangeAccessCodeDialog } from './dialogs/change-access-code.dialog';
@@ -33,6 +27,8 @@ import { DirAccessForm } from './components/dir-access-form/dir-access-form.comp
 import { DirAccessDialog } from './dialogs/dir-access.dialog/dir-access.dialog';
 import { ImportLinksDialog } from './dialogs/import-links-dialog/import-links.dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { SimpleLinkFormComponent } from './components/simple-link-form/simple-link-form.component';
+import { NotSimpleLinkFormComponent } from './components/not-simple-link-form/not-simple-link-form.component';
 
 @NgModule({
   declarations: [
@@ -43,8 +39,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     LinkFormComponent,
     LinkSimpleList,
     LinkNotSimpleList,
-    DragNDropManagerDirective,
-    DragNDropManagerRootDirective,
     ChangeLinkDialog,
     MergeGuestListDialog,
     ChangeAccessCodeDialog,
@@ -54,6 +48,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     DirAccessForm,
     DirAccessDialog,
     ImportLinksDialog,
+    SimpleLinkFormComponent,
+    NotSimpleLinkFormComponent,
   ],
   imports: [
     AngularSvgIconModule,
@@ -68,6 +64,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatSnackBarModule,
     MatProgressSpinnerModule,
   ],
-  providers: [LinkListService, LinkService, DragNDropManagerService],
+  providers: [LinkService],
 })
 export class LinkListModule {}

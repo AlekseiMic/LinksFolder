@@ -3,7 +3,6 @@ import { UntypedFormBuilder } from '@angular/forms';
 
 @Component({
   selector: 'app-edit-link-form',
-  styleUrls: ['./edit-link-form.component.scss'],
   templateUrl: './edit-link-form.component.html',
 })
 export class EditLinkFormComponent implements OnInit {

@@ -64,7 +64,7 @@ export class LinkService {
   }
 
   async find(code?: string, user?: AuthUser, token?: string) {
-    if (code) return { guest: this.getLinksByCode(code, token) };
+    if (code) return { guest: await this.getLinksByCode(code, token) };
     if (!(code || user || token)) return this.shouldInit();
 
     const [userList, guest] = await Promise.all([
@@ -95,18 +95,18 @@ export class LinkService {
     return list;
   }
 
-  async getLinksByCode(code: string, token?: string) {
+  getLinksByCode(code: string, token?: string) {
     const expiresIn = { [Op.gte]: Date.now() };
     return this.getListByAccess({ code, expiresIn }, token);
   }
 
-  async getLinksByToken(token: string) {
+  getLinksByToken(token: string) {
     return this.getListByAccess({ token }, token);
   }
 
   async getUserLinks(user?: AuthUser) {
     if (!user) return null;
-    const { root, received } = await this.directory.getAvaliable(user.id);
+    const { root, received } = await this.directory.getAvailable(user.id);
     if (!root) return null;
 
     const dirConditions = received.map((dir) => ({
@@ -173,7 +173,7 @@ export class LinkService {
   }
 
   async delete(id: number[], user?: AuthUser, token?: string) {
-    const { ids, dirs } = await this.filterAvaliableLinks(id, user, token);
+    const { ids, dirs } = await this.filterAvailableLinks(id, user, token);
     if (ids.length === 0) return 0;
     const result = await this.repo.removeAll({ where: { id: ids } });
     if (!result) return 0;
@@ -182,7 +182,7 @@ export class LinkService {
   }
 
   async move(id: number[], dir: number, user: AuthUser | undefined) {
-    const { ids, dirs } = await this.filterAvaliableLinks(id, user);
+    const { ids, dirs } = await this.filterAvailableLinks(id, user);
     if (ids.length === 0) return 0;
     const result = await this.repo.updateAttributes(
       { directoryId: dir },
@@ -195,7 +195,7 @@ export class LinkService {
     return ids;
   }
 
-  private async filterAvaliableLinks(
+  private async filterAvailableLinks(
     id: number[],
     user?: AuthUser,
     token?: string

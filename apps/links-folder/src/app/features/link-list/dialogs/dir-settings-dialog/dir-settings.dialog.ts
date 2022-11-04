@@ -1,13 +1,14 @@
 import { Component, Inject } from '@angular/core';
-import { FormControl, UntypedFormBuilder } from '@angular/forms';
+import { FormControl, UntypedFormBuilder, Validators } from '@angular/forms';
 import {
   MatDialog,
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
-import { LinkService, List } from '../../services/link.service';
+import { LinkService } from '../../services/link.service';
 import { DirAccessDialog } from '../dir-access.dialog/dir-access.dialog';
 import * as dayjs from 'dayjs';
+import { List, Option } from '../../types';
 
 @Component({
   selector: 'dir-settings-dialog',
@@ -17,10 +18,12 @@ import * as dayjs from 'dayjs';
 export class DirSettingsDialog {
   public dir: List;
 
-  public avaliableParents: List[] = [];
+  public availableParents: Option[] = [];
 
   editForm = this.formBuilder.group({
-    name: new FormControl(''),
+    name: new FormControl('', {
+      validators: [Validators.required, Validators.minLength(4)],
+    }),
     parent: new FormControl(),
   });
 
@@ -46,8 +49,13 @@ export class DirSettingsDialog {
     }
     this.dir = { ...dir };
     const allDirs = this.linkService.list$.getValue();
-    this.avaliableParents = allDirs
-      ? Object.values(allDirs).filter((d) => d.owned)
+    this.availableParents = allDirs
+      ? Object.values(allDirs).reduce((acc: Option[], d) => {
+          if (d.owned && !d.isGuest && d.id !== data.dir) {
+            acc.push({ value: d.id, label: `${d.name ?? d.id}` });
+          }
+          return acc;
+        }, [])
       : [];
     this.editForm.controls['name'].reset(dir.name);
     this.editForm.controls['parent'].reset(dir.parent);
@@ -95,7 +103,9 @@ export class DirSettingsDialog {
   }
 
   onDeleteAccess(id: number) {
-    this.linkService.deleteAccess(this.dir.id, id).subscribe(() => {});
+    this.linkService.deleteAccess(this.dir.id, id).subscribe(() => {
+      this.dir.codes = this.dir.codes.filter((c) => c.id !== id);
+    });
   }
 
   onAddAccessRule() {

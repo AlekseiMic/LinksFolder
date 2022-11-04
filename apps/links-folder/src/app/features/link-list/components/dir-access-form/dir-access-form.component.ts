@@ -1,9 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { UntypedFormBuilder } from '@angular/forms';
+import { FormControl, UntypedFormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-dir-access-form',
-  styleUrls: ['./dir-access-form.component.scss'],
   templateUrl: './dir-access-form.component.html',
 })
 export class DirAccessForm implements OnInit {
@@ -22,9 +21,11 @@ export class DirAccessForm implements OnInit {
   constructor(private formBuilder: UntypedFormBuilder) {}
 
   dirAccessForm = this.formBuilder.group({
-    code: '',
+    code: new FormControl('', { validators: [Validators.minLength(5)] }),
     username: '',
-    expiresIn: new Date(),
+    expiresIn: new FormControl(new Date(), {
+      validators: [Validators.required],
+    }),
   });
 
   submit(): void {

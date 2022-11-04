@@ -7,7 +7,7 @@
 ></app-link-simple-list>
 
 <app-link-not-simple-list
-  *ngIf="!root?.isGuest && isAuthorized"
+  *ngIf="isAuthorized && !root?.isGuest"
   [lists]="list"
   [directory]="baseDir"
 ></app-link-not-simple-list>

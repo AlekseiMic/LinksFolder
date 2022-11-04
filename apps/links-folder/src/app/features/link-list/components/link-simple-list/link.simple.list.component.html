@@ -1,33 +1,52 @@
-<app-link-form
-  [directory]="[{ value: directory, label: '' }]"
-  [showDescription]="!hasLinks()"
-></app-link-form>
+<app-simple-link-form
+  *ngIf="canEdit"
+  [hasLinks]="hasLinks"
+  (onSubmit)="onCreateLinks($event)"
+></app-simple-link-form>
 
-<section *ngIf="canEdit && directory">
-  <div *ngIf="hasLinks()">
-    <div *ngFor="let code of codes ?? []" class="link">
-      <span>Your link: </span>
-      <a target="_blank" href="{{ getLink(code.code) }}">
-        {{ getLink(code.code) }}
-      </a>
-      <div class="actions">
-        <button (click)="copyLink(code.code)">
-          <svg-icon name="copy-icon"></svg-icon>
-        </button>
-        <button (click)="editAccess(directory, code.id)">
-          <svg-icon name="pen-icon"></svg-icon>
-        </button>
-        <button (click)="extendLinkLifetime(directory, code.id)">
-          <svg-icon name="clock-icon"></svg-icon>
-        </button>
-      </div>
+<section *ngIf="directory && hasLinks && codes.length">
+  <div *ngFor="let code of codes" rounded btn primary class="link">
+    <span>Your link: </span>
+    <a target="_blank" href="{{ getLink(code.code) }}">
+      {{ getLink(code.code) }}
+    </a>
+    <div class="absolute ml-[5px] flex top-0 left-full gap-x-[5px]">
+      <button
+        btn
+        primary
+        rounded
+        class="w-[45px] h-[45px] p-1"
+        (click)="copyLink(code.code)"
+      >
+        <svg-icon class="w-[25px]" name="copy-icon"></svg-icon>
+      </button>
+      <button
+        btn
+        primary
+        rounded
+        class="w-[45px] h-[45px] p-1"
+        *ngIf="canEdit"
+        (click)="editAccess(directory, code.id)"
+      >
+        <svg-icon class="w-[25px]" name="pen-icon"></svg-icon>
+      </button>
+      <button
+        btn
+        primary
+        rounded
+        class="w-[45px] h-[45px] p-1"
+        *ngIf="canEdit"
+        (click)="extendLinkLifetime(directory, code.id)"
+      >
+        <svg-icon class="w-[25px]" name="clock-icon"></svg-icon>
+      </button>
     </div>
   </div>
 </section>
 
-<div *ngIf="hasLinks() || canEdit" class="list">
+<div *ngIf="hasLinks" class="list">
   <div class="item" *ngFor="let link of links">
-    <a href="{{ link.url }}" target="_blank">{{ link.text ?? link.url }}</a>
+    <a href="{{ link.url }}" target="_blank">{{ link.text }}</a>
     <div *ngIf="canEdit" class="actions">
       <button class="edit" btn (click)="edit(link.id)">
         <svg-icon name="gear-icon"></svg-icon>
@@ -37,8 +56,4 @@
       </button>
     </div>
   </div>
-</div>
-<div *ngIf="!hasLinks() && !canEdit" class="no-data">
-  <h2>OOPS! nothing found</h2>
-  <a [routerLink]="['/']"> Go Home </a>
 </div>

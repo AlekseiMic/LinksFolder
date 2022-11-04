@@ -1,66 +1,7 @@
-:root {
-  display: block;
-}
-
 form {
   display: flex;
   flex-direction: column;
 
-  p {
-    color: #444;
-    font-weight: 700;
-    span {
-      color: #5527cc;
-    }
-  }
-
-  &:not(.small) {
-    height: calc(100vh - 112px);
-    justify-content: center;
-    p {
-      font-size: 40px;
-      line-height: 40px;
-    }
-  }
-
-  &:not(.hide).small p {
-    margin: 30px 0 15px 0;
-    font-size: 20px;
-    line-height: 20px;
-  }
-
-  &.hide p {
-    display: none;
-  }
-
-  .wrapper {
-    display: flex;
-  }
-
-  select {
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    color: #444;
-    border-right: 0;
-    border-radius: 6px 0px 0px 6px;
-    padding-left: 10px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  select + input {
-    border-radius: 0px 6px 6px 0px;
-  }
-
-  input {
-    box-sizing: border-box;
-    padding: 0 20px;
-    line-height: 40px;
-    font-size: 24px;
-    color: #444;
-    height: 40px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
 
   .import-btn {
     flex-shrink: 0;
@@ -89,9 +30,4 @@ form {
       height: 70%;
     }
   }
-}
-.error-block {
-  height: 20px;
-  color: red;
-  line-height: 20px;
 }

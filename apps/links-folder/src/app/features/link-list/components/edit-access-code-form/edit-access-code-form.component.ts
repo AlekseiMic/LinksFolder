@@ -1,9 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { UntypedFormBuilder } from '@angular/forms';
+import { FormControl, UntypedFormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-edit-access-code-form',
-  styleUrls: ['./edit-access-code-form.component.scss'],
   templateUrl: './edit-access-code-form.component.html',
 })
 export class EditAccessCodeFormComponent implements OnInit {
@@ -14,7 +13,7 @@ export class EditAccessCodeFormComponent implements OnInit {
   constructor(private formBuilder: UntypedFormBuilder) {}
 
   editAccessCodeForm = this.formBuilder.group({
-    code: '',
+    code: new FormControl('', {validators: [Validators.required, Validators.minLength(5)]}),
   });
 
   submit(): void {

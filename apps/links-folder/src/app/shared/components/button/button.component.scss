@@ -1,20 +1,23 @@
 :host {
-  height: 32px;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 15px;
-  border-radius: 0.25rem;
+  transition: all ease-in-out 0.15s;
+  color: var(--default-100);
+  border: 1px solid var(--b-default);
 
-  background-color: var(--bg-primary-100);
-  color: var(--primary-100);
-
-  &:hover {
-    opacity: .8;
+  &[rounded] {
+    border-radius: 0.25rem;
   }
 
+  &[icon] {
+    border: none;
+    color: var(--default-60);
+  }
+
+  &:hover,
   &:focus {
-  background-color: var(--bg-primary-80);
+    color: var(--bg-primary-100);
   }
 
   &[full] {
@@ -22,4 +25,36 @@
     display: flex;
   }
 
+  &[primary] {
+    color: var(--primary-100);
+    border: none;
+    background-color: var(--bg-primary-100);
+    box-shadow: var(--bs-default-100);
+    svg {
+      height: 100%;
+    }
+  }
+
+  &[danger] {
+    color: var(--danger-100);
+    border: none;
+    box-shadow: var(--bs-default-100);
+    background: var(--bg-danger-100);
+  }
+
+  &button[danger] {
+    &:focus,
+    &:hover {
+      background: var(--bg-danger-80);
+    }
+  }
+
+  &button[primary],
+  &a[primary] {
+    cursor: pointer;
+    &:focus,
+    &:hover {
+      background: var(--bg-primary-80);
+    }
+  }
 }
