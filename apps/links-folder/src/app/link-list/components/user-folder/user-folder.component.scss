@@ -1,0 +1,19 @@
+:host {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+
+  .left-panel {
+    padding: 20px 10px 10px 10px;
+    min-width: 320px;
+    border-right: 1px grey solid;
+    box-sizing: border-box;
+  }
+
+  .right-panel {
+    padding: 20px;
+    h1 {
+      font-size: 18px;
+    }
+  }
+}

@@ -86,6 +86,7 @@ export class LinkService {
     });
 
     if (!access || !access.directory) return null;
+    if (!token && access.expiresIn < new Date()) return null;
 
     const list = DirectoryPresenter.from(access.directory);
     list.links = access.directory.links?.map(LinkPresenter.from) ?? [];
@@ -96,8 +97,7 @@ export class LinkService {
   }
 
   getLinksByCode(code: string, token?: string) {
-    const expiresIn = { [Op.gte]: Date.now() };
-    return this.getListByAccess({ code, expiresIn }, token);
+    return this.getListByAccess({ code }, token);
   }
 
   getLinksByToken(token: string) {

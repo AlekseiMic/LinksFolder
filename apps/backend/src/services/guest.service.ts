@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Response } from 'express';
 
+const maxAge = 1000 * 3600 * 24 * 365 * 5;
 @Injectable()
 export class GuestService {
   get cookieSettings() {
@@ -8,7 +9,7 @@ export class GuestService {
       path: '/',
       secure: false,
       httpOnly: true,
-      maxAge: 1000 * 3600 * 60,
+      maxAge,
     };
   }
 

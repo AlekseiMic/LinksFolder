@@ -1,0 +1,31 @@
+<ng-container *ngIf="vm$ | async as vm">
+  <app-folder-tree
+    class="left-panel"
+    [root]="vm.root"
+    [selected]="vm.openned"
+    [lists]="vm.lists"
+    (onToggle)="onSelect($event)"
+    (onAction)="onAction($event)"
+  ></app-folder-tree>
+
+  <div class="right-panel">
+    <h1>{{ vm.title || 'Your links' }}</h1>
+
+    <app-not-simple-link-form
+      *ngIf="vm.variants.length > 0"
+      (onSubmit)="onCreateLinks($event)"
+      (onImport)="onImport($event)"
+      [directories]="vm.variants"
+    ></app-not-simple-link-form>
+
+    <app-link-list
+      *ngIf="vm.links.length"
+      [links]="vm.links"
+      [selectable]="true"
+      class="list"
+      (onEdit)="edit($event)"
+      (onDelete)="delete($event)"
+      (onMove)="move($event)"
+    ></app-link-list>
+  </div>
+</ng-container>

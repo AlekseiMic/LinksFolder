@@ -1,0 +1,31 @@
+<div class="bar border-t shadow rounded">
+  <span class="checkbox">
+    <input type="checkbox" [checked]="isAllSelected" (change)="toggleAll()" />
+  </span>
+  <span class="count"> {{ selectedCount }} selected </span>
+  <div *ngIf="selectedCount > 0" class="actions">
+    <button btn icon (click)="deleteSelected()">
+      <svg-icon name="trash-icon"></svg-icon>
+      <span>Delete</span>
+    </button>
+    <button btn icon (click)="moveSelected()">
+      <svg-icon name="gear-icon"></svg-icon>
+      <span>Move</span>
+    </button>
+  </div>
+</div>
+<div *ngIf="links.length" class="links">
+  <app-link
+    class="border-t h-8 shadow rounded hover:shadow-inner transition duration-100 hover:bg-bgPrimary20 mt-1"
+    *ngFor="let link of links"
+    [link]="link"
+    [selectable]="selectable"
+    [selected]="isSelected(link)"
+    [editable]="true"
+    (onEdit)="onEdit.emit($event)"
+    (onDelete)="onDelete.emit([$event])"
+    (onSelect)="onToggle($event, true)"
+    (onUnselect)="onToggle($event, false)"
+  >
+  </app-link>
+</div>

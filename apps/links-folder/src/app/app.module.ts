@@ -16,7 +16,7 @@ const routes: Routes = [
   {
     path: '',
     loadChildren: () =>
-      import('./features/link-list/link-list.module').then(
+      import('./link-list/link-list.module').then(
         (m) => m.LinkListModule
       ),
   },

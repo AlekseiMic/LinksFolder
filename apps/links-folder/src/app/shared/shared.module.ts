@@ -17,6 +17,7 @@ import { FieldWrapperComponent } from './components/field-wrapper/field-wrapper.
 import { TextfieldComponent } from './components/textfield/textfield.component';
 import { FieldErrorsPipe } from './pipes/field-errors.pipe';
 import { SelectComponent } from './components/select/select.component';
+import { SelectDialog } from './components/select-dialog/select.dialog';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { SelectComponent } from './components/select/select.component';
     TextfieldComponent,
     FieldErrorsPipe,
     SelectComponent,
+    SelectDialog,
   ],
   imports: [
     AngularSvgIconModule,
@@ -42,6 +44,7 @@ import { SelectComponent } from './components/select/select.component';
   ],
   providers: [JwtService, { provide: MatDialog, useClass: CustomMatDialog }],
   exports: [
+    SelectDialog,
     SelectComponent,
     FieldWrapperComponent,
     AppButton,

@@ -55,6 +55,10 @@
     {
       "iconName": "logout-icon",
       "iconPath": "http://localhost:4200/assets/svg/logout.svg"
+    },
+    {
+      "iconName": "arrow-icon",
+      "iconPath": "http://localhost:4200/assets/svg/arrow.svg"
     }
   ],
   "customIcons": []

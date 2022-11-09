@@ -9,7 +9,8 @@ type JwtData = {
 
 Injectable();
 export class JwtService {
-  parse(token: string): { data?: JwtData; isValid: boolean } {
+  parse(token?: string): { data?: JwtData; isValid: boolean } {
+    if (!token) return { isValid: false };
     try {
       const data = jwt_decode<JwtData>(token);
       const isValid =

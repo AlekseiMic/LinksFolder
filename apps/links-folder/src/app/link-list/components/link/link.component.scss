@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  padding: 0 10px 0 0;
+  .checkbox {
+    cursor: pointer;
+    padding: 0 10px;
+    border-right: 1px solid var(--b-default);
+    height: 100%;
+    input {
+      height: 100%;
+    }
+  }
+}

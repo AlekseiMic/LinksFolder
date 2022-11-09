@@ -23,7 +23,7 @@ export class HeaderComponent implements OnInit {
     private themeService: ThemeService,
     public dialog: MatDialog
   ) {
-    this.authSub = this.auth.subscribeToAuthChange((v) => {
+    this.authSub = this.auth.isAuth$.subscribe((v) => {
       this.isLogged = v;
     });
     this.themeSub = this.themeService.theme$.subscribe((v) => {

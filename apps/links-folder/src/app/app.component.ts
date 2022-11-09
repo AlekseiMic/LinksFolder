@@ -14,7 +14,7 @@ export class AppComponent implements OnInit {
   private authSub: Subscription;
 
   constructor(private auth: AuthService, public dialog: MatDialog) {
-    this.authSub = this.auth.subscribeToAuthChange((v) => {
+    this.authSub = this.auth.isAuth$.subscribe((v) => {
       this.isLogged = v;
     });
   }

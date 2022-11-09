@@ -1,0 +1,59 @@
+<ng-template
+  *ngIf="root && lists"
+  [ngTemplateOutlet]="folderList"
+  [ngTemplateOutletContext]="{
+    $implicit: root,
+    depth: 0
+  }"
+>
+</ng-template>
+
+<ng-template #folderList let-dir let-depth="depth">
+  <div class="folder" [style.padding-left.px]="depth * 16">
+    <button
+      btn
+      icon
+      *ngIf="hasChilds(dir)"
+      [ngClass]="{ 'expand-chevron': true, expanded: isOpen(dir) }"
+      (click)="toggleTree(dir)"
+    ></button>
+    <button
+      class="name"
+      (click)="onToggle.emit({ clear: true, dir })"
+      [title]="getName(dir)"
+    >
+      {{ getName(dir) }}
+    </button>
+    <div class="folder-bar">
+      <button btn icon title="Create" (click)="onAction.emit([dir, 'create'])">
+        <svg-icon name="create-folder-icon"></svg-icon>
+      </button>
+      <button btn icon title="Edit" (click)="onAction.emit([dir, 'update'])">
+        <svg-icon name="gear-icon"></svg-icon>
+      </button>
+      <button btn icon title="Import" (click)="onAction.emit([dir, 'import'])">
+        <svg-icon name="import-icon"></svg-icon>
+      </button>
+      <button btn icon title="Delete" (click)="onAction.emit([dir, 'delete'])">
+        <svg-icon name="trash-icon"></svg-icon>
+      </button>
+    </div>
+    <input
+      type="checkbox"
+      [name]="dir"
+      [checked]="selected.includes(dir)"
+      (change)="onToggle.emit({ clear: false, dir })"
+    />
+  </div>
+  <ng-container *ngIf="isOpen(dir)">
+    <ng-template
+      *ngFor="let d of getChilds(dir)"
+      [ngTemplateOutlet]="folderList"
+      [ngTemplateOutletContext]="{
+        $implicit: d,
+        depth: depth + 1
+      }"
+    >
+    </ng-template>
+  </ng-container>
+</ng-template>

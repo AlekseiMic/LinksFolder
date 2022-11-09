@@ -34,6 +34,9 @@
       height: 100%;
     }
   }
+  &[primary][disabled] {
+    background-color: var(--default-30);
+  }
 
   &[danger] {
     color: var(--danger-100);

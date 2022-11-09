@@ -1,0 +1,34 @@
+<app-field-wrapper
+  class="flex-grow"
+  [errors]="errors"
+  [roundedLeft]="roundedLeft"
+  [roundedRight]="0"
+>
+  <input
+    class="w-full border-0 focus:outline-0 focus-visible:outline-0 focus-visible:shadow-none px-3 text-lg bg-transparent"
+    [style.height.px]="height"
+    autocomplete="off"
+    [formControl]="formControl"
+    placeholder="https://..."
+    (keyup.enter)="onCreateLink()"
+    id="link"
+  />
+</app-field-wrapper>
+<button
+  class="submit mt-[-1px] flex justify-center !ring-0"
+  btn
+  primary
+  rounded
+  [disabled]="!formControl.value || !formControl.valid"
+  [style.borderTopLeftRadius.px]="0"
+  [style.borderBottomLeftRadius.px]="0"
+  [style.height.px]="height + 2"
+  [style.width.px]="50"
+  (click)="onCreateLink()"
+>
+  <svg-icon
+    svgClass="h-full p-1"
+    class="block h-full"
+    name="arrow-icon"
+  ></svg-icon>
+</button>

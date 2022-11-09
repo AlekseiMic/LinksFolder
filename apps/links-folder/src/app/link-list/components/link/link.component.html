@@ -1,0 +1,33 @@
+<label *ngIf="selectable" class="checkbox">
+  <input
+    type="checkbox"
+    [checked]="selected"
+    (change)="checkboxHandler($event)"
+  />
+</label>
+<a
+  class="ml-[10px] h-full flex items-center flex-grow overflow-hidden overflow-ellipsis"
+  [title]="link.url"
+  [href]="link.url"
+  target="_blank"
+>
+  <span class="whitespace-nowrap text-lg overflow-hidden overflow-ellipsis">
+    {{ link.text }}
+  </span>
+</a>
+<div *ngIf="editable" class="flex items-center gap-x-[10px]">
+  <button class="w-4 h-4" btn icon (click)="edit()">
+    <svg-icon
+      svgClass="h-full"
+      class="block w-full h-full"
+      name="gear-icon"
+    ></svg-icon>
+  </button>
+  <button class="w-4 h-4" btn icon (click)="delete()">
+    <svg-icon
+      svgClass="h-full"
+      class="block w-full h-full"
+      name="trash-icon"
+    ></svg-icon>
+  </button>
+</div>

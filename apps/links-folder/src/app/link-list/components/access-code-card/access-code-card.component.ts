@@ -1,0 +1,48 @@
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Code } from '../../types';
+import { Location } from '@angular/common';
+import { Clipboard } from '@angular/cdk/clipboard';
+
+type EventPayload = { dir: number; code: Code };
+
+@Component({
+  selector: 'app-access-code-card',
+  templateUrl: './access-code-card.component.html',
+  styleUrls: ['./access-code-card.component.scss'],
+})
+export class AccessCodeCard implements OnInit {
+  @Input('code') code: Code;
+
+  @Input('editable') editable: boolean = false;
+
+  @Input('directory') dir: number;
+
+  @Output() onEdit = new EventEmitter<EventPayload>();
+
+  @Output() onCopy = new EventEmitter<EventPayload>();
+
+  @Output() onProlong = new EventEmitter<EventPayload>();
+
+  constructor(private clipboard: Clipboard, readonly location: Location) {}
+
+  ngOnInit(): void {}
+
+  edit() {
+    this.onEdit.emit({ dir: this.dir, code: this.code });
+  }
+
+  prolong() {
+    this.onProlong.emit({ dir: this.dir, code: this.code });
+  }
+
+  copy(code: string) {
+    if (this.clipboard.copy(this.makeUrl(code))) {
+      this.onCopy.emit({ dir: this.dir, code: this.code });
+    }
+  }
+
+  makeUrl(code: string) {
+    const origin = document.location.origin;
+    return origin + this.location.prepareExternalUrl(code);
+  }
+}

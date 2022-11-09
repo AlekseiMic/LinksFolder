@@ -61,4 +61,7 @@ h2 {
   &::before {
     transform: translate(-50%, -50%) rotate(45deg);
   }
+  &:hover {
+    color: var(--accent-100);
+  }
 }

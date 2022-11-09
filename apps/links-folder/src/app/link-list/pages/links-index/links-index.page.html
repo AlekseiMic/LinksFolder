@@ -1,0 +1,7 @@
+<ng-container *ngIf="{ auth: isAuth$ | async, list: guest$ | async } as data">
+  <app-guest-folder *ngIf="!data.auth || !data.list?.owned"></app-guest-folder>
+  <app-user-folder
+    [hasGuestFolder]="!!data.list"
+    *ngIf="data.auth && (!data.list || data.list.owned)"
+  ></app-user-folder>
+</ng-container>

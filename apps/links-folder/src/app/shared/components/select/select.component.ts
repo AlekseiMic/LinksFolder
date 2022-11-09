@@ -37,7 +37,7 @@ export class SelectComponent implements ControlValueAccessor {
 
   @Input('height') height = 32;
 
-  @Input('options') options?: { value: string | number; label: string }[] = [];
+  @Input('options') options?: { value: any; label: string }[] = [];
 
   constructor(private controlContainer: ControlContainer) {}
 

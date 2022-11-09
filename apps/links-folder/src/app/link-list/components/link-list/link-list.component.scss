@@ -1,0 +1,44 @@
+.bar {
+  display: flex;
+  font-size: 16px;
+  align-items: center;
+  background: var(--bg-default);
+  padding: 0px;
+  height: 32px;
+  .checkbox {
+    padding: 0 10px;
+    border-right: 1px solid var(--b-default);
+    height: 100%;
+    input {
+      height: 100%;
+    }
+  }
+
+  .count {
+    margin-left: 10px;
+    margin-right: 10px;
+    display: block;
+  }
+  .actions {
+    display: flex;
+    align-items: center;
+    button {
+      // &:not(:hover) {
+      //   color: var(--default);
+      // }
+      margin-left: 10px;
+      display: flex;
+      column-gap: 5px;
+      background: transparent;
+      svg-icon {
+        display: block;
+        margin-bottom: 2px;
+      }
+      svg-icon,
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+}

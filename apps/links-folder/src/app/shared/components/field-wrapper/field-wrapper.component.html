@@ -1,4 +1,5 @@
 <label
+  *ngIf="label"
   [ngClass]="{
     'text-red-800 ': errors.length > 0,
     'block text-sm leading-none mb-[2px]': true
@@ -23,8 +24,15 @@
 >
   <ng-content></ng-content>
 </div>
-<div class="{{ !errors.length ? 'mt-4 transform scale-y-0 opacity-0' : 'mb-2' }} duration-300 opacity-100 overflow-hidden transition text-red-800 ">
-  <span class="block text-sm leading-none mt-1" *ngFor="let error of errors">
+<div
+  class="{{
+    !errors.length ? 'max-h-4 opacity-0' : 'max-h-16 opacity-100'
+  }} duration-300 min-h-[20px] overflow-hidden transition-all text-red-800 "
+>
+  <span
+    class="block text-sm min-h-5 mt-[3px] leading-none"
+    *ngFor="let error of errors"
+  >
     {{ error | fieldError }}
   </span>
 </div>

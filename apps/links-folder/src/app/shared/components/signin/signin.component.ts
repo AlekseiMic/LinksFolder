@@ -5,7 +5,6 @@ import {
   UntypedFormGroup,
   Validators,
 } from '@angular/forms';
-import { AuthEmitter } from '../../emitters/AuthEmitter';
 import { AuthService } from '../../services/auth.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SignupComponent } from '../signup/signup.component';
@@ -42,7 +41,6 @@ export class SigninComponent implements OnInit {
 
   async submit() {
     if (!this.loginForm.valid) return;
-    AuthEmitter.emit(false);
     const username = this.loginForm.value.login;
     const password = this.loginForm.value.password;
     if (!username || !password) return;

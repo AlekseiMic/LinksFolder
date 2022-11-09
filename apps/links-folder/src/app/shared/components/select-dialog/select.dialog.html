@@ -1,0 +1,12 @@
+<app-default-dialog [title]="data.title || 'Select value'">
+  <form [formGroup]="formControl" (submit)="onSubmit()">
+    <app-select
+      [label]="data.label || ''"
+      [options]="data.variants"
+      formControlName="variant"
+    ></app-select>
+    <button class="h-10" rounded btn full primary type="submit">
+      {{ data.submit || 'Submit' }}
+    </button>
+  </form>
+</app-default-dialog>

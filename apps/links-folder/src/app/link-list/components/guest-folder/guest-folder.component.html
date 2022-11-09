@@ -1,0 +1,41 @@
+<ng-container *ngIf="guest$ | async as list">
+  <h2 *ngIf="!list.editable" class="text-center text-default60">
+    {{ list.name }}
+  </h2>
+  <app-simple-link-form
+    class="block"
+    *ngIf="list.editable"
+    [hasLinks]="list.links.length > 0"
+    [directory]="list.id"
+    (onSubmit)="onCreateLinks($event)"
+  ></app-simple-link-form>
+
+  <ng-container *ngIf="list.editable && list.links.length && list.codes.length">
+    <app-access-code-card
+      *ngFor="let code of list.codes"
+      [code]="code"
+      class="my-[10px] mx-auto block w-[340px]"
+      [directory]="list.id"
+      (onCopy)="onCopyCodeUrl()"
+      (onEdit)="onEditAccess($event)"
+      (onProlong)="onProlongAccess($event)"
+      [editable]="list.editable"
+    >
+    </app-access-code-card>
+  </ng-container>
+
+  <div
+    *ngIf="list.links.length"
+    class="container max-w-[1200px] mt-[30px] mx-auto"
+  >
+    <app-link
+      class="border-t shadow rounded hover:shadow-inner transition duration-100 hover:bg-bgPrimary20 mt-1"
+      *ngFor="let link of list.links"
+      [link]="link"
+      [editable]="list.editable"
+      (onEdit)="onEditLink($event)"
+      (onDelete)="onDeleteLink($event)"
+    >
+    </app-link>
+  </div>
+</ng-container>

@@ -1,31 +1,46 @@
 import {
-  HttpEvent,
   HttpHandler,
   HttpInterceptor,
   HttpRequest,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { from, lastValueFrom } from 'rxjs';
 import { AuthService } from '../../shared/services/auth.service';
+import { environment } from '../../../environments/environment';
 
-@Injectable({ providedIn: 'root'})
+const API = environment.api;
+
+@Injectable({ providedIn: 'root' })
 export class ApiInterceptor implements HttpInterceptor {
   constructor(private auth: AuthService) {}
 
-  intercept(
-    req: HttpRequest<any>,
-    next: HttpHandler
-  ): Observable<HttpEvent<any>> {
-    let requestUrl = req.url;
-    if (requestUrl.startsWith('http')) return next.handle(req);
-    return next.handle(
-      req.clone({
-        url: `http://localhost:3333${requestUrl}`,
-        withCredentials: true,
-        setHeaders: {
-          Authorization: this.auth.bearer,
-        },
-      })
-    );
+  intercept(req: HttpRequest<any>, next: HttpHandler) {
+    let url = req.url;
+
+    if (url.startsWith('http')) {
+      return next.handle(req);
+    }
+
+    if (url !== '/auth/refresh' && this.auth.shouldRefresh) {
+      return from(
+        this.auth
+          .dRefreshToken()
+          .then(() =>
+            lastValueFrom(next.handle(req.clone(this.getConfig(url))))
+          )
+      );
+    }
+
+    return next.handle(req.clone(this.getConfig(url)));
+  }
+
+  private getConfig(url: string) {
+    return {
+      url: `${API}${url}`,
+      withCredentials: true,
+      setHeaders: {
+        Authorization: this.auth.bearer,
+      },
+    };
   }
 }
