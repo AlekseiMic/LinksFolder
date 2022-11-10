@@ -20,10 +20,10 @@ export class LinkFormComponent implements OnInit {
 
   @Output() onSubmit: EventEmitter<Link[]> = new EventEmitter();
 
-  formControl: FormControl<string | null>;
+  formControl: FormControl;
 
   ngOnInit(): void {
-    this.formControl = new FormControl<string>('', {
+    this.formControl = new FormControl('', {
       validators: [Validators.pattern(reg)],
     });
   }
@@ -33,7 +33,7 @@ export class LinkFormComponent implements OnInit {
   }
 
   onCreateLink(): void {
-    const link = this.formControl.value;
+    const link = this.formControl.value as string;
     if (!this.formControl.valid || !link) return;
 
     const links = link

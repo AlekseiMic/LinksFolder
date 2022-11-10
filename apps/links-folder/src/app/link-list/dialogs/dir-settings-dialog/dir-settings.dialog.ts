@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { FormControl, UntypedFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormBuilder, Validators } from '@angular/forms';
 import {
   MatDialog,
   MatDialogRef,
@@ -34,7 +34,7 @@ export class DirSettingsDialog {
   constructor(
     public dialogRef: MatDialogRef<DirSettingsDialog>,
     private linkService: LinkService,
-    private formBuilder: UntypedFormBuilder,
+    private formBuilder: FormBuilder,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       dir: number;

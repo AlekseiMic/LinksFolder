@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { UntypedFormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-edit-access-code-form',
@@ -10,7 +10,7 @@ export class EditAccessCodeForm implements OnInit {
 
   @Output() onSubmit: EventEmitter<{ code: string }> = new EventEmitter();
 
-  constructor(private formBuilder: UntypedFormBuilder) {}
+  constructor(private formBuilder: FormBuilder) {}
 
   editAccessCodeForm = this.formBuilder.group({
     code: ['', [Validators.required, Validators.minLength(5)]],

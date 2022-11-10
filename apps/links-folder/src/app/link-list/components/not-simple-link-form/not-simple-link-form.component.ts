@@ -29,7 +29,7 @@ export class NotSimpleLinkForm implements OnInit {
   }
 
   directoryForm = this.formBuilder.group({
-    directory: new FormControl<number | null>(null, {
+    directory: new FormControl(null, {
       validators: [Validators.required],
     }),
   });

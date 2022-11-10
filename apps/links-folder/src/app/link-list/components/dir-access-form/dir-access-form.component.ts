@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormControl, UntypedFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-dir-access-form',
@@ -18,7 +18,7 @@ export class DirAccessForm implements OnInit {
     expiresIn: Date;
   }> = new EventEmitter();
 
-  constructor(private formBuilder: UntypedFormBuilder) {}
+  constructor(private formBuilder: FormBuilder) {}
 
   dirAccessForm = this.formBuilder.group({
     code: new FormControl('', { validators: [Validators.minLength(5)] }),

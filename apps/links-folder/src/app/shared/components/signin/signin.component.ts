@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import {
   FormControl,
-  UntypedFormBuilder,
-  UntypedFormGroup,
+  FormBuilder,
+  FormGroup,
   Validators,
 } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
@@ -14,11 +14,11 @@ import { SignupComponent } from '../signup/signup.component';
   templateUrl: './signin.component.html',
 })
 export class SigninComponent implements OnInit {
-  public loginForm: UntypedFormGroup;
+  public loginForm: FormGroup;
 
   constructor(
     public dialogRef: MatDialogRef<SigninComponent>,
-    private formBuilder: UntypedFormBuilder,
+    private formBuilder: FormBuilder,
     private auth: AuthService,
     private dialog: MatDialog
   ) {

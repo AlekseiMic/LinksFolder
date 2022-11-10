@@ -6,8 +6,20 @@
   .left-panel {
     padding: 20px 10px 10px 10px;
     min-width: 320px;
-    border-right: 1px grey solid;
     box-sizing: border-box;
+    position: relative;
+    &::after {
+      position: absolute;
+      content: '';
+      top: 50%;
+      right: 0;
+      width: 1px;
+      height: 98%;
+      border: 3px;
+      box-shadow: 0 0 5px 0px var(--bg-primary-100);
+      transform: translate(0, -50%);
+      background: var(--bg-primary-100);
+    }
   }
 
   .right-panel {

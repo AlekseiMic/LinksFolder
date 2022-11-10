@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { UntypedFormBuilder } from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { SimpleLink } from '../../types';
 
 @Component({
@@ -11,7 +11,7 @@ export class EditLinkForm implements OnInit {
 
   @Output() onSubmit: EventEmitter<SimpleLink> = new EventEmitter();
 
-  constructor(private formBuilder: UntypedFormBuilder) {}
+  constructor(private formBuilder: FormBuilder) {}
 
   editLinkForm = this.formBuilder.group({
     url: '',

@@ -19,7 +19,7 @@
         "index": "apps/links-folder/src/index.html",
         "main": "apps/links-folder/src/main.ts",
         "polyfills": "apps/links-folder/src/polyfills.ts",
-        "tsConfig": "apps/links-folder/tsconfig.app.json",
+        "tsConfig": "apps/links-folder/tsconfig.json",
         "inlineStyleLanguage": "scss",
         "assets": [
           "apps/links-folder/src/favicon.ico",

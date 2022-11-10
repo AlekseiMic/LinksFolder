@@ -10,6 +10,9 @@ module.exports = {
       padding: {
         header: 'var(--height-header)',
       },
+      margin: {
+        header: 'var(--height-header)',
+      },
       colors: {
         primary100: 'var(--primary-100)',
         bgPrimary100: 'var(--bg-primary-100)',

@@ -101,13 +101,13 @@ export class UserFolder implements OnInit {
     const variants = Object.values(this.linkService.list$.getValue() || {}).map(
       (d) => ({ label: d.name || d.id, value: d.id })
     );
-    const ref = this.dialog.open(SelectDialog<number>, {
+    const ref = this.dialog.open(SelectDialog, {
       data: { variants },
     });
     ref.componentInstance.onChange
       .pipe(
         take(1),
-        switchMap((dir) => this.linkService.moveLinks(links, dir))
+        switchMap((dir) => this.linkService.moveLinks(links, Number(dir)))
       )
       .subscribe(() => {
         ref.close();

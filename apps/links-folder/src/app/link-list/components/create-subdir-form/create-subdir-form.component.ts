@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { FormControl, UntypedFormBuilder, Validators } from '@angular/forms';
+import { FormControl, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-create-subdir-form',
@@ -8,7 +8,7 @@ import { FormControl, UntypedFormBuilder, Validators } from '@angular/forms';
 export class CreateSubdirForm implements OnInit {
   @Output() onSubmit: EventEmitter<{ name: string }> = new EventEmitter();
 
-  constructor(private formBuilder: UntypedFormBuilder) {}
+  constructor(private formBuilder: FormBuilder) {}
 
   createSubdirForm = this.formBuilder.group({
     name: new FormControl('', {
