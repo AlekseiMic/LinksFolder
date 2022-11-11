@@ -9,7 +9,7 @@ type ActionPayload = [number, 'create' | 'update' | 'delete' | 'import'];
   styleUrls: ['folder-tree.component.scss'],
 })
 export class FolderTree {
-  @Input() root?: number;
+  @Input() root: number | null;
 
   @Input() selected: number[] = [];
 

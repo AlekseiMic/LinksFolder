@@ -1,25 +1,25 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, combineLatest, map, of, throwError } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, of, tap, throwError } from 'rxjs';
 import { Code, Link, List, SimpleLink } from '../types';
 
 export type AllLists = null | Record<number | string, List>;
 
 @Injectable()
 export class LinkService {
-  private lastFetch: number;
+  private lastFetch: number | null = null;
 
-  private lastCode: string | undefined;
+  private lastCode: string | null = null;
 
   public list$ = new BehaviorSubject<AllLists>(null);
 
-  public root$ = new BehaviorSubject<number | undefined>(undefined);
+  public root$ = new BehaviorSubject<number | null>(null);
 
-  public guest$ = new BehaviorSubject<number | undefined>(undefined);
+  public guest$ = new BehaviorSubject<number | null>(null);
 
   public guestDir$ = combineLatest([this.list$, this.guest$]).pipe(
     map(([list, guest]) => {
-      if (!guest || !list) return undefined;
+      if (!guest || !list) return null;
       return list[guest];
     })
   );
@@ -27,15 +27,21 @@ export class LinkService {
   constructor(private readonly http: HttpClient) {}
 
   clear() {
+    this.lastCode = null;
+    this.lastFetch = null;
     this.list$.next(null);
+    this.guest$.next(null);
+    this.root$.next(null);
   }
 
   extendLifetime(id: number, accessId: number, minutes: number = 60) {
     return this.editAccess(id, accessId, { extend: minutes });
   }
 
-  public getListById(id: number) {
+  public getListById(id: number): List;
+  public getListById(id: number, optional = false) {
     const list = this.list$.getValue()?.[id];
+    if (!list && optional) return undefined;
     if (!list || !list.owned) {
       throw new Error(!list ? 'not_found' : 'forbidden');
     }
@@ -156,8 +162,7 @@ export class LinkService {
     this.http.post<List>(`/v1/init`, {}).subscribe({
       next: (value) => {
         if (value) {
-          this.root$.next(value.id);
-          value.isGuest = true;
+          this.guest$.next(value.id);
           this.list$.next({ [value.id]: value });
         }
       },
@@ -193,7 +198,7 @@ export class LinkService {
 
   fetchList(code?: string) {
     if (!this.canFetch(code)) return;
-    this.lastCode = code;
+    this.lastCode = code ?? null;
     this.http
       .get<{
         user: null | { rootDir: number; data: Record<number, List> };
@@ -204,8 +209,8 @@ export class LinkService {
           this.lastFetch = Date.now();
           const data = user?.data ?? {};
           if (guest) data[guest.id] = guest;
-          this.root$.next(user?.rootDir);
-          this.guest$.next(guest?.id);
+          this.root$.next(user?.rootDir ?? null);
+          this.guest$.next(guest?.id ?? null);
           this.list$.next(data);
         },
         error: (error) => {
@@ -225,35 +230,35 @@ export class LinkService {
     });
   }
 
-  deleteLink(dirId: number, id: number) {
-    const list = this.getListById(dirId);
-    return this.http.delete<number[]>(`/v1/link/${id}`).subscribe((res) => {
-      if (!res.includes(id)) return;
-      list.links = list.links.filter((l) => l.id !== id);
-      this.list$.next({ ...this.list$.getValue() });
-    });
-  }
-
   deleteLinks(links: Link[]) {
     return this.http
-      .delete<number[]>(`/v1/link/${links.map(({ id }) => id).join(',')}`)
-      .subscribe((res) => {
-        const linksPerDir: Record<number, Record<number, true>> = {};
-        links.forEach(({ id, directory }) => {
-          if (!res.includes(id)) return;
-          if (!linksPerDir[directory]) linksPerDir[directory] = {};
-          linksPerDir[directory][id] = true;
-        });
-        const list = this.list$.getValue();
-        if (!list) return;
-        Object.entries(linksPerDir).forEach(([key, value]) => {
-          if (!list[key]) return;
-          list[key].links = list[key].links.filter(
-            (l) => value[l.id] === undefined
+      .delete<{ result: false | number[] }>(
+        `/v1/link/${links.map(({ id }) => id).join(',')}`
+      )
+      .pipe(
+        map(({ result }) => {
+          const lists = this.list$.getValue();
+          if (!result || !lists) return 0;
+
+          const removedPerDir = links.reduce(
+            (acc: Record<number, Record<number, true>>, { id, directory }) => {
+              if (!result.includes(id)) return acc;
+              if (!acc[directory]) acc[directory] = {};
+              acc[directory][id] = true;
+              return acc;
+            },
+            {}
           );
-        });
-        this.list$.next({ ...list });
-      });
+
+          Object.entries(removedPerDir).forEach(([key, value]) => {
+            if (!lists[key]) return;
+            lists[key].links = lists[key].links.filter((l) => !value[l.id]);
+          });
+
+          this.list$.next({ ...lists });
+          return result.length;
+        })
+      );
   }
 
   moveLinks(links: Link[], dir: number) {
@@ -303,9 +308,22 @@ export class LinkService {
     );
   }
 
-  mergeDirs(src: number, target: number) {
-    const url = `/v1/directory/${target}/merge/${src}`;
-    return this.http.patch<boolean>(url, {}).pipe();
+  mergeDirs(src: number, tgt: number) {
+    const url = `/v1/directory/${tgt}/merge/${src}`;
+    return this.http.patch<boolean>(url, {}).pipe(
+      map((r) => {
+        const lists = this.list$.value;
+        if (!r || !lists) return false;
+        if (this.guest$.value === src) this.guest$.next(null);
+        const source = lists[src];
+        const target = lists[tgt];
+        if (!source || !target) return false;
+        lists[src] = { ...source, parent: tgt, isGuest: false };
+        lists[tgt] = { ...target, sublists: [...(target.sublists ?? []), src] };
+        this.list$.next({ ...lists });
+        return true;
+      })
+    );
   }
 
   removeDir(id: number) {
@@ -318,7 +336,7 @@ export class LinkService {
             if (!list) return;
 
             if (this.guest$.value === id) {
-              this.guest$.next(undefined);
+              this.guest$.next(null);
             }
 
             const parent = list[id].parent;
@@ -328,7 +346,7 @@ export class LinkService {
               );
             }
             delete list[id];
-            this.list$.next(list);
+            this.list$.next({ ...list });
           }
           return val[id];
         })

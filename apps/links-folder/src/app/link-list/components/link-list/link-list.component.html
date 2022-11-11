@@ -1,4 +1,7 @@
-<div class="bar border-t shadow rounded">
+<div
+  *ngIf="showBar"
+  class="bar bg-default110Inv transition duration-100 shadow-default rounded"
+>
   <span class="checkbox">
     <input type="checkbox" [checked]="isAllSelected" (change)="toggleAll()" />
   </span>
@@ -16,7 +19,7 @@
 </div>
 <div *ngIf="links.length" class="links">
   <app-link
-    class="border-t h-8 shadow rounded hover:shadow-inner transition duration-100 hover:bg-bgPrimary20 mt-1"
+    class="h-8 shadow-default rounded hover:shadow-primary transition duration-100 bg-default110Inv mt-[6px]"
     *ngFor="let link of links"
     [link]="link"
     [selectable]="selectable"

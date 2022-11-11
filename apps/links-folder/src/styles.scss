@@ -5,54 +5,126 @@
 @layer base {
   html {
     font-family: Roboto, 'Helvetica Neue', sans-serif;
-    color: var(--default-100);
-    background-color: var(--bg-default);
+    color: var(--default);
+    background-color: var(--default-inv);
   }
   body {
     min-height: 100vh;
   }
 }
 :root {
-  --default-100: #111; // default body
-  --default-70: #444;
-  --default-60: #565656; // title in dialog,
-  --default-50: #666;
-  --default-30: #888;
-  --default-10: #aaa;
+  --default-30: #ccc;
+  --default-60: #565656;
+  --default-80: #333;
+  --default-90: #222;
+  --default: #111;
+  --default-inv: #eee;
+  --default-110: #000;
+  --default-110-inv: #fff;
 
-  --bg-default: #fff;
-  --bg-primary-100: #5227cc; // button, header
-  --bg-primary-80: #9274e5; // button on hover and focus
-  --bg-primary-40: #b39fed; //
-  --bg-primary-20: #e6e0f9; //
-  --bg-input: #fefefe;
-  --bg-input-with-error: #fbb;
-  --bg-dialog: #fefefe;
-  --bg-accent-100: #5227cc;
-  --bg-danger-100: #721c24;
-  --bg-danger-80: #72454b;
+  --dialog-bg: #eee;
 
-  --b-default: #ccc;
-  --b-primary-focus: #5227cc;
-  --b-primary-hover: #9274e5;
+  --primary-90: #9274e5;
+  --primary: #5227cc;
+  --primary-inv: #fff;
+  --primary-110: #381b8d;
 
-  --bs-default-100: 0 0 10px 2px #999;
-  --primary-100: #fff;
-  --danger-100: #fff;
-  --accent-100: #5227cc;
-  --lightbulb: #fff;
-  --dialog: #333;
+  --danger-90: #ff2a2a;
+  --danger: #850000;
+  --danger-inv: #fff;
+  --danger-110: #550000;
 
-  --height-header: 50px;
-  --height-body: calc(100vh - 50px);
+  --warning: #ffb805;
+  --warning-inv: #342525;
+
+  --header: #fff;
+  --header-bg: #5227cc;
+
+  --sidebar: #333;
+  --sidebar-bg: transparent;
+  --sidebar-lim: #5227cc;
+  --sidebar-item: #333;
+  --sidebar-item-bg: #f7f7fd;
+  --sidebar-item-selected: #111;
+  --sidebar-item-selected-bg: #e6e0f9;
+
+  --main-height: calc(100vh - var(--header-height));
+  --sidebar-width: 280px;
+  --header-height: 50px;
+
+  --shadow: 0 1px 3px 0 #66666655, 0 1px 2px -1px #66666655;
+  --shadow-primary: 0 0 3px 0 #5227cc, 0 1px 2px -1px #5227cc;
+
+  --login: #fff;
+  --login-hover: #c19c00;
+  --login-focus: #c3a81b;
+  --logout: #fff;
+  --logout-hover: #c19c00;
+  --logout-focus: #c3a81b;
+  --theme-switch: #fff;
+  --theme-switch-hover: #c19c00;
+  --theme-switch-focus: #c3a81b;
 }
 
 html.dark {
-  --default-100: #fff;
-  --bg-default: #333;
-  --primary-100: #fff;
-  --bg-primary-100: #999;
-  --lightbulb: yellow;
+  --theme-switch: #c19c00;
+  --theme-switch-hover: #fff;
+  --theme-switch-focus: #fff;
+  --default-30: #666;
+  --default-60: #969696;
+  --default-80: #aaa;
+  --default-90: #ccc;
+  --default: #eee;
+  --default-inv: #171717;
+  --default-110: #fff;
+  --default-110-inv: #333;
+
+  --primary-90: #9274e5;
+  --primary: #734ddd;
+  --primary-inv: #fff;
+  --primary-110: #5227cc;
+
+  --danger-90: #ff2a2a;
+  --danger: #850000;
+  --danger-inv: #fff;
+  --danger-110: #550000;
+
+  --dialog-bg: #303030;
+
+  --header: #fff;
+  --header-bg: #444;
+
+  --sidebar: #fff;
+  --sidebar-bg: #404040;
+  --sidebar-lim: transparent;
+  --sidebar-item: #fff;
+  --sidebar-item-bg: #3d3d3d;
+  --sidebar-item-selected: #fff;
+  --sidebar-item-selected-bg: #333;
+
+  --shadow: 0 1px 3px 1px #555, 0 1px 2px -1px #444;
+  --shadow-primary: 0 1px 3px 1px #5227cc, 0 1px 2px -1px #5227cc;
+
+  // --default-100: #fff;
+  //
+  // --bg-default-100: #222;
+  // --bg-primary-10: #333;
+  // --bg-primary-5: #3d3d3d;
+  //
+  // --bg-primary-100: #444; // button, header
+  //
+  // --bg-sidebar: #404040;
+  // --bg-sidebar-lim: transparent;
+  //
+  // --lightbulb: yellow;
+  //
+  // --b-default: #777;
+  // --bg-input: #555;
+  // --accent-100: #9274e5;
+  //
+  // --bg-dialog: #434343;
+  // --default-60: #888; // title in dialog,
+  // --dialog: #fff;
 }
 
 .mat-menu-item {
@@ -67,10 +139,12 @@ html.dark {
 .custom-dialog-component {
   .mat-dialog-container {
     padding: 0;
+    background: transparent;
   }
   .mat-dialog-content {
     padding: 0;
     border-radius: 0;
+    background: transparent;
     margin: 0;
     overflow: visible;
   }
@@ -83,4 +157,14 @@ html.dark {
 ::-moz-focus-inner {
   border: 0;
   padding: 0;
+}
+
+svg-icon {
+  display: block;
+  height: 100%;
+}
+
+svg {
+  height: 100%;
+  width: 100%;
 }

@@ -174,11 +174,11 @@ export class LinkService {
 
   async delete(id: number[], user?: AuthUser, token?: string) {
     const { ids, dirs } = await this.filterAvailableLinks(id, user, token);
-    if (ids.length === 0) return 0;
+    if (ids.length === 0) return { result: false };
     const result = await this.repo.removeAll({ where: { id: ids } });
-    if (!result) return 0;
+    if (!result) return { result: false };
     await Promise.all(dirs.map((d) => this.repo.sortLinksInDirectory(d)));
-    return ids;
+    return { result: ids };
   }
 
   async move(id: number[], dir: number, user: AuthUser | undefined) {

@@ -3,21 +3,21 @@
   align-items: center;
   justify-content: center;
   transition: all ease-in-out 0.15s;
-  color: var(--default-100);
-  border: 1px solid var(--b-default);
+  color: var(--default-60);
+  border: 1px solid var(--default-30);
+  background-color: var(--default-inc);
+  cursor: pointer;
+  box-shadow: var(--shadow);
 
-  &[rounded] {
-    border-radius: 0.25rem;
-  }
-
-  &[icon] {
-    border: none;
-    color: var(--default-60);
-  }
-
-  &:hover,
-  &:focus {
-    color: var(--bg-primary-100);
+  &:not([non-interactive]) {
+    &:hover {
+      color: var(--default-90);
+    }
+    &:focus {
+      color: var(--default);
+      outline: 2px solid currentColor;
+      outline-offset: 2px;
+    }
   }
 
   &[full] {
@@ -25,39 +25,57 @@
     display: flex;
   }
 
-  &[primary] {
-    color: var(--primary-100);
-    border: none;
-    background-color: var(--bg-primary-100);
-    box-shadow: var(--bs-default-100);
-    svg {
-      height: 100%;
+  &[rounded] {
+    border-radius: 0.25rem;
+  }
+
+  &[icon] {
+    border-radius: 0.25rem;
+    border: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  &[disabled] {
+    background-color: var(--default-30) !important;
+  }
+
+  &[icon][primary] {
+    color: var(--primary);
+    &:focus {
+      color: var(--primary-110);
+      outline-color: var(--primary-110);
+    }
+    &:hover {
+      color: var(--primary-90);
     }
   }
-  &[primary][disabled] {
-    background-color: var(--default-30);
+
+  &[primary] {
+    border: none;
+    color: var(--primary-inv);
+    background-color: var(--primary);
+    &:not([non-interactive]) {
+      &:focus {
+        background-color: var(--primary-110);
+        outline-color: var(--primary-110);
+      }
+      &:hover {
+        background-color: var(--primary-90);
+      }
+    }
   }
 
   &[danger] {
-    color: var(--danger-100);
     border: none;
-    box-shadow: var(--bs-default-100);
-    background: var(--bg-danger-100);
-  }
-
-  &button[danger] {
-    &:focus,
-    &:hover {
-      background: var(--bg-danger-80);
+    color: var(--danger-inv);
+    background: var(--danger);
+    &:focus {
+      background-color: var(--danger-110);
+      outline-color: var(--danger-110);
     }
-  }
-
-  &button[primary],
-  &a[primary] {
-    cursor: pointer;
-    &:focus,
     &:hover {
-      background: var(--bg-primary-80);
+      background-color: var(--danger-90);
     }
   }
 }

@@ -16,6 +16,8 @@ let hasRefreshToken: undefined | boolean;
 export class AuthService {
   isAuth$ = new BehaviorSubject<boolean | undefined>(undefined);
 
+  onLogout$ = new BehaviorSubject<boolean>(true);
+
   constructor(private http: HttpClient, private jwtService: JwtService) {}
 
   subscribeToAuthChange(callback: (v: boolean | undefined) => void) {
@@ -69,6 +71,7 @@ export class AuthService {
     const req = this.http.post<boolean>(`/auth/logout`, {});
     await lastValueFrom(req);
     this.clear();
+    this.onLogout$.next(true);
     return false;
   }
 

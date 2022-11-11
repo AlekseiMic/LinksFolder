@@ -1,8 +1,8 @@
 <label
   *ngIf="label"
   [ngClass]="{
-    'text-red-800 ': errors.length > 0,
-    'block text-sm leading-none mb-[2px]': true
+    'text-danger ': errors.length > 0,
+    'block text-sm text-default60 leading-none mb-[2px]': true
   }"
   [for]="name"
 >
@@ -17,9 +17,9 @@
   [style.borderTopRightRadius.px]="roundedRight ?? 4"
   [style.borderBottomRightRadius.px]="roundedRight ?? 4"
   [ngClass]="{
-    'ring-red-700': errors.length > 0,
-    'ring-bDefault bg-bgInput': errors.length === 0,
-    'ring-1 overflow-hidden relative focus-within:!ring-bPrimaryFocus focus-within:z-10 hover:z-10 hover:ring-bPrimaryHover ': true
+    'ring-danger': errors.length > 0,
+    'ring-default30': errors.length === 0,
+    'text-default110 bg-default110Inv ring-1 overflow-hidden relative focus-within:!ring-primary focus-within:z-10 hover:z-10 hover:ring-primary90 ': true
   }"
 >
   <ng-content></ng-content>
@@ -27,7 +27,7 @@
 <div
   class="{{
     !errors.length ? 'max-h-4 opacity-0' : 'max-h-16 opacity-100'
-  }} duration-300 min-h-[20px] overflow-hidden transition-all text-red-800 "
+  }} duration-300 min-h-[20px] overflow-hidden transition-all text-danger "
 >
   <span
     class="block text-sm min-h-5 mt-[3px] leading-none"

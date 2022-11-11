@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { Link, Directory, DirectoryAccess, AuthUser, User } from 'models';
+import { Link, Directory, DirectoryAccess, AuthUser } from 'models';
 import * as dayjs from 'dayjs';
 import { DestroyOptions, Op } from 'sequelize';
 import { Response } from 'express';
@@ -24,6 +24,7 @@ import {
 import { List } from './link.service';
 import { NestedSetsSequelizeHelper } from './nested-sets-sequelize.service';
 import { GuestService } from './guest.service';
+import { LinkPresenter } from 'presenters/LinkPresenter';
 
 @Injectable()
 export class DirectoryService {
@@ -177,7 +178,7 @@ export class DirectoryService {
           id: l.id,
           url: l.url,
           text: l.text,
-          userId: l.createdBy,
+          userId: l.createdBy ?? null,
           directory: l.directoryId,
         });
       }
@@ -202,21 +203,21 @@ export class DirectoryService {
 
     const maxOrder = maxOrderLink?.sort ?? 0;
 
-    const result = await Promise.all(
-      links.map(({ url, text }, idx) =>
-        this.linkModel.save(
-          new Link({
+    const result = await this.linkModel.saveMultiple(
+      links.map(
+        ({ url, text }, idx) =>
+          ({
             url,
             text: text || url,
             createdBy: user?.id,
             directoryId: dirId,
             sort: maxOrder + idx + 1,
-          } as any)
-        )
-      )
+          } as Link)
+      ),
+      {}
     );
 
-    return result;
+    return result.map(LinkPresenter.from);
   }
 
   async addAccessRule(
@@ -462,7 +463,7 @@ export class DirectoryService {
   async delete(id: number, res?: Response, token?: string, user?: AuthUser) {
     if (!id || !user) return false;
     const condition: DestroyOptions = {
-      where: { id, createdBy: user?.id || 0 },
+      where: { id, createdBy: user?.id || 0, depth: { [Op.gt]: 0 } },
     };
     if (res && user && token) {
       const directory = await this.access.findOne({

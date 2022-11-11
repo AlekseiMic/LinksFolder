@@ -2,6 +2,7 @@ $paddingY: 10px;
 $paddingX: 15px;
 
 :host {
+  display: flex;
   &.large .dialog-wrapper {
     width: 640px;
   }
@@ -11,11 +12,12 @@ $paddingX: 15px;
 }
 
 .dialog-wrapper {
+  overflow: hidden;
   position: relative;
   box-sizing: border-box;
   border-radius: 5px;
-  background-color: var(--bg-dialog);
-  color: var(--dialog);
+  background-color: var(--dialog-bg);
+  color: var(--default);
   &__inner {
     position: relative;
     padding: $paddingY $paddingX;
@@ -28,12 +30,12 @@ h2 {
   line-height: 20px;
   font-size: 20px;
   padding: 2px 30px;
-  color: var(--default-60);
+  color: var(--default-80);
   display: flex;
   margin: 0;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid var(--b-default);
+  border-bottom: 1px solid var(--default-30);
   text-align: center;
 }
 
@@ -44,7 +46,6 @@ h2 {
   width: 20px;
   height: 20px;
   cursor: pointer;
-  color: var(--default-50);
   &::after,
   &::before {
     position: absolute;
@@ -60,8 +61,5 @@ h2 {
   }
   &::before {
     transform: translate(-50%, -50%) rotate(45deg);
-  }
-  &:hover {
-    color: var(--accent-100);
   }
 }

@@ -24,18 +24,12 @@
     </app-access-code-card>
   </ng-container>
 
-  <div
+  <app-link-list
     *ngIf="list.links.length"
-    class="container max-w-[1200px] mt-[30px] mx-auto"
-  >
-    <app-link
-      class="border-t shadow rounded hover:shadow-inner transition duration-100 hover:bg-bgPrimary20 mt-1"
-      *ngFor="let link of list.links"
-      [link]="link"
-      [editable]="list.editable"
-      (onEdit)="onEditLink($event)"
-      (onDelete)="onDeleteLink($event)"
-    >
-    </app-link>
-  </div>
+    [links]="list.links"
+    [selectable]="false"
+    class="block container max-w-[1200px] mt-[30px] mx-auto"
+    (onEdit)="onEditLink($event)"
+    (onDelete)="onDeleteLinks($event)"
+  ></app-link-list>
 </ng-container>

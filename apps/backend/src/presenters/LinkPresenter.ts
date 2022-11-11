@@ -1,7 +1,7 @@
 import { Link } from 'models/link.entity';
 
 export type LinkObj = {
-  userId: null | number;
+  userId: undefined | null | number;
   directory: number;
   id: number;
   url: string;

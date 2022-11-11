@@ -9,7 +9,11 @@
 </ng-template>
 
 <ng-template #folderList let-dir let-depth="depth">
-  <div class="folder" [style.padding-left.px]="depth * 16">
+  <div
+    *ngIf="{ selected: selected.includes(dir) } as s"
+    class="folder {{ s.selected ? 'selected' : '' }}"
+    [style.padding-left.px]="8 + depth * 16"
+  >
     <button
       btn
       icon
@@ -41,7 +45,7 @@
     <input
       type="checkbox"
       [name]="dir"
-      [checked]="selected.includes(dir)"
+      [checked]="s.selected"
       (change)="onToggle.emit({ clear: false, dir })"
     />
   </div>

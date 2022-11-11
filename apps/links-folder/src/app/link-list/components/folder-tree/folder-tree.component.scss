@@ -1,7 +1,15 @@
 .folder {
+  margin-bottom: 2px;
   display: flex;
   align-items: center;
-
+  padding-right: 4px;
+  border-radius: 0 4px 4px 0;
+  color: var(--sidebar-item);
+  background: var(--sidebar-item-bg);
+  &.selected {
+    color: var(--sidebar-item-selected);
+    background: var(--sidebar-item-selected-bg);
+  }
   .name {
     flex-shrink: 1;
     flex-grow: 1;
@@ -10,7 +18,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     &:hover {
-      color: var(--accent-100);
+      color: var(--primary);
     }
   }
 }

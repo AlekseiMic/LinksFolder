@@ -1,4 +1,6 @@
-<app-header></app-header>
-<main class="h-body mt-header">
+<app-header
+  class="block h-header fixed z-50 text-header w-screen top-0 fixed bg-headerBg text-header"
+></app-header>
+<main class="h-main relative top-[var(--header-height)] overflow-auto">
   <ng-content></ng-content>
 </main>

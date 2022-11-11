@@ -1,9 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
+import { linkRegexComplex } from '../../linkRegex';
 
-const linkRegex =
-  /^ *(?:(https?:\/\/(?:www\.)?[-\w@:%._\+~#=]{1,256}\.[\w()]{1,6}(?:[-\w()@:%_\+.~#?&/=]*)) *([-_@$!%^&*() \w]*)((?: *#[-\w_]+)*) *)*$/;
-const reg = new RegExp(linkRegex);
 type Link = { url: string; text: string; tags?: string[] };
 
 @Component({
@@ -24,7 +22,7 @@ export class LinkFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.formControl = new FormControl('', {
-      validators: [Validators.pattern(reg)],
+      validators: [Validators.pattern(linkRegexComplex)],
     });
   }
 
@@ -40,7 +38,7 @@ export class LinkFormComponent implements OnInit {
       .split('http')
       .filter((el) => el.trim() !== '')
       .reduce((acc: Link[], el) => {
-        const match = reg.exec('http' + el);
+        const match = linkRegexComplex.exec('http' + el);
         if (!match) return acc;
         const url = match[1].trim();
         const text = match[2]?.trim() ?? url;

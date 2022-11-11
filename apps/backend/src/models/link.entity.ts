@@ -7,9 +7,17 @@ import {
 } from 'sequelize-typescript';
 import { User } from './user.entity';
 import { Directory } from './directory.entity';
+import {
+  NonAttribute,
+  InferAttributes,
+  InferCreationAttributes,
+} from 'sequelize';
 
 @Table
-export class Link extends Model<Link> {
+export class Link extends Model<
+  InferAttributes<Link>,
+  InferCreationAttributes<Link>
+> {
   @Column
   url: string;
 
@@ -24,11 +32,11 @@ export class Link extends Model<Link> {
 
   @ForeignKey(() => User)
   @Column
-  createdBy: number;
+  createdBy?: number;
 
   @BelongsTo(() => User, 'createdBy')
-  user: User;
+  user: NonAttribute<User>;
 
   @BelongsTo(() => User, 'directoryId')
-  directory: Directory;
+  directory: NonAttribute<Directory>;
 }

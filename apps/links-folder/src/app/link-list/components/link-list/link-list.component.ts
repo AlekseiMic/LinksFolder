@@ -17,6 +17,8 @@ export class LinkList {
 
   @Input() selectable: boolean;
 
+  @Input() showBar: boolean;
+
   @Output() onEdit = new EventEmitter<Link>();
 
   @Output() onDelete = new EventEmitter<Link[]>();
@@ -33,16 +35,16 @@ export class LinkList {
 
   ngOnChanges(changes: SimpleChanges) {
     if (this.selected.size === 0 || !changes['links']) return;
-    const newSelected = (changes['links'].currentValue as Link[]).reduce(
-      (acc: number[], link) => {
-        if (this.selected.has(link.id)) acc.push(link.id);
-        return acc;
-      },
-      []
-    );
+    const newLinks = changes['links'].currentValue as Link[];
+    const newSelected = newLinks.reduce((acc: number[], link) => {
+      if (this.selected.has(link.id)) acc.push(link.id);
+      return acc;
+    }, []);
     if (newSelected.length !== this.selected.size) {
       this.selected = new Set(newSelected);
     }
+    const linksCount = newLinks.length;
+    this.isAllSelected = this.selected.size === linksCount && linksCount > 0;
   }
 
   deleteSelected() {

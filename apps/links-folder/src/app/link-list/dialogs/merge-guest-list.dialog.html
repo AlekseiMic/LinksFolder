@@ -1,5 +1,13 @@
-<app-default-dialog>
-  Do you want to add guest list to your account as separate folder?
-  <button (click)="accept()">Accept</button>
-  <button (click)="decline()">Decline</button>
+<app-default-dialog title="Move folder">
+  <p class="text-lg text-center">
+    Do you want to move guest folder into your base folder?
+  </p>
+  <div class="flex gap-x-4 mt-6 justify-around text-lg">
+    <button btn primary rounded class="w-24 h-10" (click)="onAccept.emit()">
+      Accept
+    </button>
+    <button btn danger rounded class="w-24 h-10" (click)="onDecline.emit()">
+      Decline
+    </button>
+  </div>
 </app-default-dialog>

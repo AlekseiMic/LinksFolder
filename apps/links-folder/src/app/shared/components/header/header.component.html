@@ -1,42 +1,36 @@
-<header class="w-screen top-0 fixed bg-bgPrimary100 text-primary100 z-50">
-  <div
-    class="container mx-auto flex justify-between items-center h-header z-50"
+<header class="ml-4 mr-8 flex justify-between items-center h-header z-50">
+  <a [routerLink]="['/']" class="text-2xl font-bold no-underline">LinkFolder</a>
+  <div class="flex-grow"></div>
+  <button
+    class="mr-3 text-themeSwitch hover:text-themeSwitchHover focus:text-themeSwitchFocus transition"
+    (click)="onToggleTheme()"
   >
-    <a [routerLink]="['/']" class="text-2xl font-bold no-underline"
-      >LinkFolder</a
-    >
-    <div class="flex-grow"></div>
-    <button
-      class="mr-3 text-lightbulb hover:opacity-60 focus:text-default60 transition"
-      (click)="onToggleTheme()"
-    >
-      <svg-icon
-        name="lightbulb-icon"
-        [svgStyle]="{ height: '18px' }"
-        class="block"
-      ></svg-icon>
-    </button>
-    <button
-      *ngIf="!isLogged"
-      class="hover:opacity-60 transition focus:text-default60"
-      (click)="onSignin()"
-    >
-      <svg-icon
-        name="login-icon"
-        [svgStyle]="{ height: '18px' }"
-        class="block"
-      ></svg-icon>
-    </button>
-    <button
-      *ngIf="isLogged"
-      (click)="onLogout()"
-      class="text-black hover:opacity-60 transition focus:text-default60"
-    >
-      <svg-icon
-        name="logout-icon"
-        [svgStyle]="{ height: '18px' }"
-        class="block"
-      ></svg-icon>
-    </button>
-  </div>
+    <svg-icon
+      name="lightbulb-icon"
+      [svgStyle]="{ height: '18px' }"
+      class="block"
+    ></svg-icon>
+  </button>
+  <button
+    *ngIf="!isLogged"
+    class="hover:text-loginHover text-login transition focus:text-loginFocus"
+    (click)="onSignin()"
+  >
+    <svg-icon
+      name="login-icon"
+      [svgStyle]="{ height: '18px' }"
+      class="block"
+    ></svg-icon>
+  </button>
+  <button
+    *ngIf="isLogged"
+    (click)="onLogout()"
+    class="text-logout hover:logoutHover transition focus:logoutFocus"
+  >
+    <svg-icon
+      name="logout-icon"
+      [svgStyle]="{ height: '18px' }"
+      class="block"
+    ></svg-icon>
+  </button>
 </header>

@@ -14,7 +14,7 @@ import { ChangeLinkDialog } from '../../dialogs/change-link.dialog/change-link.d
   styleUrls: ['./guest-folder.component.scss'],
 })
 export class GuestFolder {
-  public guest$: Observable<List | undefined>;
+  public guest$: Observable<List | null>;
 
   constructor(
     private dialog: MatDialog,
@@ -30,14 +30,15 @@ export class GuestFolder {
     this.service.addLinks(dir, links);
   }
 
-  onDeleteLink(link: Link) {
-    this.service.deleteLink(link.directory, link.id);
+  onDeleteLinks(links: Link[]) {
+    this.service.deleteLinks(links).subscribe({
+      next: (r) => this.notify(r > 0 ? `Link removed` : 'Error', r > 0),
+      error: () => this.notify('Something went wrong!', false),
+    });
   }
 
   onEditLink(link: Link) {
-    this.dialog.open(ChangeLinkDialog, {
-      data: link,
-    });
+    this.dialog.open(ChangeLinkDialog, { data: link });
   }
 
   onEditAccess({ dir, code }: { dir: number; code: Code }) {
@@ -57,13 +58,17 @@ export class GuestFolder {
     this.service.extendLifetime(dir, code.id).subscribe({
       next: (value) => {
         const text = value ? 'Access granted for the next hour!' : 'Error!';
-        this.snackBar.open(text, undefined, getSnackbarProps(value));
+        this.notify(text, value);
       },
       error: () => {},
     });
   }
 
   onCopyCodeUrl() {
-    this.snackBar.open('Link copied!', undefined, getSnackbarProps(true));
+    this.notify('Link copied!', true);
+  }
+
+  private notify(text: string, success: boolean) {
+    this.snackBar.open(text, undefined, getSnackbarProps(success));
   }
 }

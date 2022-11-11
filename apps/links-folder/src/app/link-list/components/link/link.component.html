@@ -16,18 +16,10 @@
   </span>
 </a>
 <div *ngIf="editable" class="flex items-center gap-x-[10px]">
-  <button class="w-4 h-4" btn icon (click)="edit()">
-    <svg-icon
-      svgClass="h-full"
-      class="block w-full h-full"
-      name="gear-icon"
-    ></svg-icon>
+  <button class="w-4 h-4" btn primary icon (click)="edit()">
+    <svg-icon name="gear-icon"></svg-icon>
   </button>
-  <button class="w-4 h-4" btn icon (click)="delete()">
-    <svg-icon
-      svgClass="h-full"
-      class="block w-full h-full"
-      name="trash-icon"
-    ></svg-icon>
+  <button class="w-4 h-4" btn primary icon (click)="delete()">
+    <svg-icon name="trash-icon"></svg-icon>
   </button>
 </div>

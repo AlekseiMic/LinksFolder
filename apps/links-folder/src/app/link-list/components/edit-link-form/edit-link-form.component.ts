@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
+import { linkRegex } from '../../linkRegex';
 import { SimpleLink } from '../../types';
 
 @Component({
@@ -14,8 +15,8 @@ export class EditLinkForm implements OnInit {
   constructor(private formBuilder: FormBuilder) {}
 
   editLinkForm = this.formBuilder.group({
-    url: '',
-    text: '',
+    url: ['', [Validators.required, Validators.pattern(linkRegex)]],
+    text: ['', [Validators.required, Validators.minLength(4)]],
   });
 
   submit(): void {

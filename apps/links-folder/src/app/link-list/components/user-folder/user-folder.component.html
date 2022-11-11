@@ -9,20 +9,23 @@
   ></app-folder-tree>
 
   <div class="right-panel">
-    <h1>{{ vm.title || 'Your links' }}</h1>
+    <div class="block">
+      <h1 class="!text-lg !leading-none">{{ vm.title || 'Your links' }}</h1>
 
-    <app-not-simple-link-form
-      *ngIf="vm.variants.length > 0"
-      (onSubmit)="onCreateLinks($event)"
-      (onImport)="onImport($event)"
-      [directories]="vm.variants"
-    ></app-not-simple-link-form>
+      <app-not-simple-link-form
+        *ngIf="vm.variants.length > 0"
+        (onSubmit)="onCreateLinks($event)"
+        (onImport)="onImport($event)"
+        [directories]="vm.variants"
+      ></app-not-simple-link-form>
+    </div>
 
     <app-link-list
       *ngIf="vm.links.length"
       [links]="vm.links"
       [selectable]="true"
-      class="list"
+      [showBar]="true"
+      class=""
       (onEdit)="edit($event)"
       (onDelete)="delete($event)"
       (onMove)="move($event)"
