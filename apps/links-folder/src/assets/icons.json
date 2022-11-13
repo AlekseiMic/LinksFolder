@@ -2,63 +2,63 @@
   "iconImageFiles": [
     {
       "iconName": "copy-icon",
-      "iconPath": "http://localhost:4200/assets/svg/copy.svg"
+      "iconPath": "/assets/svg/copy.svg"
     },
     {
       "iconName": "trash-icon",
-      "iconPath": "http://localhost:4200/assets/svg/trash.svg"
+      "iconPath": "/assets/svg/trash.svg"
     },
     {
       "iconName": "gear-icon",
-      "iconPath": "http://localhost:4200/assets/svg/gear.svg"
+      "iconPath": "/assets/svg/gear.svg"
     },
     {
       "iconName": "close-icon",
-      "iconPath": "http://localhost:4200/assets/svg/close.svg"
+      "iconPath": "/assets/svg/close.svg"
     },
     {
       "iconName": "clock-icon",
-      "iconPath": "http://localhost:4200/assets/svg/clock.svg"
+      "iconPath": "/assets/svg/clock.svg"
     },
     {
       "iconName": "down-chevron-icon",
-      "iconPath": "http://localhost:4200/assets/svg/down-chevron.svg"
+      "iconPath": "/assets/svg/down-chevron.svg"
     },
     {
       "iconName": "create-folder-icon",
-      "iconPath": "http://localhost:4200/assets/svg/create-folder.svg"
+      "iconPath": "/assets/svg/create-folder.svg"
     },
     {
       "iconName": "import-icon",
-      "iconPath": "http://localhost:4200/assets/svg/import.svg"
+      "iconPath": "/assets/svg/import.svg"
     },
     {
       "iconName": "pen-icon",
-      "iconPath": "http://localhost:4200/assets/svg/pen.svg"
+      "iconPath": "/assets/svg/pen.svg"
     },
     {
       "iconName": "download-icon",
-      "iconPath": "http://localhost:4200/assets/svg/download.svg"
+      "iconPath": "/assets/svg/download.svg"
     },
     {
       "iconName": "download-icon",
-      "iconPath": "http://localhost:4200/assets/svg/download.svg"
+      "iconPath": "/assets/svg/download.svg"
     },
     {
       "iconName": "lightbulb-icon",
-      "iconPath": "http://localhost:4200/assets/svg/lightbulb.svg"
+      "iconPath": "/assets/svg/lightbulb.svg"
     },
     {
       "iconName": "login-icon",
-      "iconPath": "http://localhost:4200/assets/svg/login.svg"
+      "iconPath": "/assets/svg/login.svg"
     },
     {
       "iconName": "logout-icon",
-      "iconPath": "http://localhost:4200/assets/svg/logout.svg"
+      "iconPath": "/assets/svg/logout.svg"
     },
     {
       "iconName": "arrow-icon",
-      "iconPath": "http://localhost:4200/assets/svg/arrow.svg"
+      "iconPath": "/assets/svg/arrow.svg"
     }
   ],
   "customIcons": []

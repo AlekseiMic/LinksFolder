@@ -17,9 +17,10 @@ export class ApiInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler) {
     let url = req.url;
 
-    if (url.startsWith('http')) {
+    if (url.startsWith('/assets') || url.startsWith('http')) {
       return next.handle(req);
     }
+
 
     if (url !== '/auth/refresh' && this.auth.shouldRefresh) {
       return from(

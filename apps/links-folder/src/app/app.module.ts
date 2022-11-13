@@ -11,6 +11,7 @@ import { AngularSvgIconPreloaderModule } from 'angular-svg-icon-preloader';
 import { AuthService } from './shared/services/auth.service';
 import { ApiInterceptor } from './core/interceptors/api.interceptor';
 import { ThemeService } from './shared/services/theme.service';
+import { environment } from '../environments/environment';
 
 const routes: Routes = [
   {
@@ -27,7 +28,7 @@ const routes: Routes = [
   imports: [
     AngularSvgIconModule.forRoot(),
     AngularSvgIconPreloaderModule.forRoot({
-      configUrl: 'http://localhost:4200/assets/icons.json',
+      configUrl: environment.assets + '/icons.json',
     }),
     CoreModule,
     BrowserModule,
