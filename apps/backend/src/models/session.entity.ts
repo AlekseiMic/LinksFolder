@@ -7,7 +7,7 @@ import {
 } from 'sequelize-typescript';
 import { User } from './user.entity';
 
-@Table({tableName: 'Sessions'})
+@Table({ tableName: 'Sessions' })
 export class Session extends Model<Session> {
   @ForeignKey(() => User)
   @Column
@@ -18,10 +18,4 @@ export class Session extends Model<Session> {
 
   @Column({ unique: 'idx_refresh-token', type: 'varchar(100)' })
   token: string;
-
-  @Column
-  ip: string;
-
-  @Column
-  ua: string;
 }

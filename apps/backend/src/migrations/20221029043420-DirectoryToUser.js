@@ -15,14 +15,17 @@ module.exports = {
         directoryId: {
           type: Sequelize.DataTypes.INTEGER,
           references: { model: 'Directories', key: 'id' },
+          onDelete: 'CASCADE',
         },
         userId: {
           type: Sequelize.DataTypes.INTEGER,
           references: { model: 'Users', key: 'id' },
+          onDelete: 'CASCADE',
         },
         createdBy: {
           type: Sequelize.DataTypes.INTEGER,
           references: { model: 'Users', key: 'id' },
+          onDelete: 'CASCADE',
         },
         expiresIn: {
           type: 'timestamp',

@@ -17,6 +17,7 @@ module.exports = {
         createdBy: {
           type: Sequelize.DataTypes.INTEGER,
           references: { model: 'Users', key: 'id' },
+          onDelete: 'CASCADE'
         },
         createdAt: {
           type: 'timestamp',

@@ -9,7 +9,10 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.DataTypes.INTEGER,
       },
-      username: Sequelize.DataTypes.STRING(50),
+      username: {
+        type: Sequelize.DataTypes.STRING(50),
+        unique: true,
+      },
       password_hash: Sequelize.DataTypes.STRING(72),
       createdAt: {
         type: 'timestamp',

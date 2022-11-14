@@ -13,11 +13,10 @@ module.exports = {
         type: Sequelize.DataTypes.STRING(255),
         unique: 'idx_refresh-token',
       },
-      ip: Sequelize.DataTypes.STRING(255),
-      ua: Sequelize.DataTypes.STRING(255),
       createdBy: {
         type: Sequelize.DataTypes.INTEGER,
         references: { model: 'Users', key: 'id' },
+        onDelete: 'CASCADE',
       },
       createdAt: {
         type: 'timestamp',

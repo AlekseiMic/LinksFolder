@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { AuthUser, User, Session } from 'models';
 import { JwtService } from './jwt.service';
 import { SessionService } from './session.service';
@@ -18,12 +18,19 @@ export class AuthService {
     username: string,
     password: string
   ): Promise<{ user: User; session: Session; token: string }> {
-    const user = await this.userService.create(username, password);
-    const session = await this.sessionService.create(user);
-    const authUser: AuthUser = { name: user.username, id: user.id };
-    const token = this.jwtService.create(authUser);
-    await this.dirService.create('Base', null, authUser);
-    return { user, session, token };
+    try {
+      const user = await this.userService.create(username, password);
+      const session = await this.sessionService.create(user);
+      const authUser: AuthUser = { name: user.username, id: user.id };
+      const token = this.jwtService.create(authUser);
+      await this.dirService.create('Base', null, authUser);
+      return { user, session, token };
+    } catch (error: any) {
+      if (error.name === 'SequelizeUniqueConstraintError') {
+        throw new BadRequestException({ code: 'NOT_UNIQUE_LOGIN' });
+      }
+      throw error;
+    }
   }
 
   async signin(
