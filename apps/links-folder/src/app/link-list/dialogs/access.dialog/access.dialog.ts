@@ -2,12 +2,12 @@ import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 @Component({
-  selector: 'dir-access-dialog',
-  templateUrl: 'dir-access.dialog.html',
+  selector: 'app-access-dialog',
+  templateUrl: 'access.dialog.html',
 })
-export class DirAccessDialog {
+export class AccessDialog {
   constructor(
-    public dialogRef: MatDialogRef<DirAccessDialog>,
+    public dialogRef: MatDialogRef<AccessDialog>,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       code?: string;

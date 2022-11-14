@@ -2,10 +2,10 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
-  selector: 'app-dir-access-form',
-  templateUrl: './dir-access-form.component.html',
+  selector: 'app-access-form',
+  templateUrl: './access-form.component.html',
 })
-export class DirAccessForm implements OnInit {
+export class AccessForm implements OnInit {
   @Input() code?: string;
 
   @Input() username?: string;

@@ -12,12 +12,12 @@
     <div class="block">
       <h1 class="!text-lg !leading-none">{{ vm.title || 'Your links' }}</h1>
 
-      <app-not-simple-link-form
+      <app-user-link-form
         *ngIf="vm.variants.length > 0"
         (onSubmit)="onCreateLinks($event)"
         (onImport)="onImport($event)"
         [directories]="vm.variants"
-      ></app-not-simple-link-form>
+      ></app-user-link-form>
     </div>
 
     <app-link-list

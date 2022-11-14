@@ -6,7 +6,7 @@
   />
 </label>
 <a
-  class="ml-[10px] h-full flex items-center flex-grow overflow-hidden overflow-ellipsis"
+  class="h-full w-full flex items-center flex-grow overflow-hidden overflow-ellipsis"
   [title]="link.url"
   [href]="link.url"
   target="_blank"
@@ -15,7 +15,7 @@
     {{ link.text }}
   </span>
 </a>
-<div *ngIf="editable" class="flex items-center gap-x-[10px]">
+<div *ngIf="editable" class="actions flex items-center gap-x-[10px]">
   <button class="w-4 h-4" btn primary icon (click)="edit()">
     <svg-icon name="gear-icon"></svg-icon>
   </button>

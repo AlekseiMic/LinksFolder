@@ -1,6 +1,6 @@
 <div
   class="w-6/12 {{
-    hasLinks ? 'pt-4' : 'h-main pb-header max-h-[640px]'
+    hasLinks ? 'pt-4' : 'h-main pb-header max-h-[800px]'
   }} mx-auto flex flex-col justify-center items-center "
 >
   <p
@@ -11,6 +11,7 @@
     insert link and press <span class="text-primary">enter</span>
   </p>
   <app-link-form
+    [showExample]="!hasLinks"
     class="w-full"
     [height]="40"
     (onSubmit)="raiseOnSubmit($event)"

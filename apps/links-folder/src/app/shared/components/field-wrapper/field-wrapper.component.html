@@ -18,12 +18,14 @@
   [style.borderBottomRightRadius.px]="roundedRight ?? 4"
   [ngClass]="{
     'ring-danger': errors.length > 0,
-    'ring-default30': errors.length === 0,
-    'text-default110 bg-default110Inv ring-1 overflow-hidden relative focus-within:!ring-primary focus-within:z-10 hover:z-10 hover:ring-primary90 ': true
+    'ring-default30 focus-within:!ring-primary hover:ring-primary90':
+      errors.length === 0,
+    'text-default110 bg-default110Inv ring-1 overflow-hidden relative focus-within:z-10 hover:z-10': true
   }"
 >
   <ng-content></ng-content>
 </div>
+<div *ngIf="errors.length === 0 && faq" class="whitespace-nowrap overflow-ellipsis fixed pl-3 mt-[2px] text-default60 text-xs italic">{{ faq }}</div>
 <div
   class="{{
     !errors.length ? 'max-h-4 opacity-0' : 'max-h-16 opacity-100'
@@ -33,6 +35,6 @@
     class="block text-sm min-h-5 mt-[3px] leading-none"
     *ngFor="let error of errors"
   >
-    {{ error | fieldError }}
+    {{ error | fieldError:mapper }}
   </span>
 </div>

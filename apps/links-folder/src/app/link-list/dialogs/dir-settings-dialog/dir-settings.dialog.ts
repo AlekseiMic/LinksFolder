@@ -6,9 +6,9 @@ import {
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
 import { LinkService } from '../../services/link.service';
-import { DirAccessDialog } from '../dir-access.dialog/dir-access.dialog';
 import * as dayjs from 'dayjs';
 import { List, Variant } from '../../types';
+import { AccessDialog } from '../access.dialog/access.dialog';
 
 @Component({
   selector: 'dir-settings-dialog',
@@ -77,7 +77,7 @@ export class DirSettingsDialog {
   onEditAccess(id: number) {
     const code = this.codes.find((c) => c.id === id);
     if (!code) return;
-    const dialogRef = this.dialog.open(DirAccessDialog, {
+    const dialogRef = this.dialog.open(AccessDialog, {
       data: {
         code: code.code,
         username: code.username,
@@ -109,7 +109,7 @@ export class DirSettingsDialog {
   }
 
   onAddAccessRule() {
-    const dialogRef = this.dialog.open(DirAccessDialog, {
+    const dialogRef = this.dialog.open(AccessDialog, {
       data: {
         onSubmit: (values: {
           code?: string;

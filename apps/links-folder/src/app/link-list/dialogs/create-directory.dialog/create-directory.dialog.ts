@@ -2,11 +2,11 @@ import { Component, EventEmitter } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
-  selector: 'create-subdir-dialog',
-  templateUrl: 'create-subdir.dialog.html',
+  selector: 'create-directory-dialog',
+  templateUrl: 'create-directory.dialog.html',
 })
-export class CreateSubdirDialog {
-  constructor(public dialogRef: MatDialogRef<CreateSubdirDialog>) {}
+export class CreateDirectoryDialog {
+  constructor(public dialogRef: MatDialogRef<CreateDirectoryDialog>) {}
 
   onChange = new EventEmitter<string>();
 

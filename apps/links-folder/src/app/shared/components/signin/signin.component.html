@@ -6,10 +6,20 @@
       type="password"
       formControlName="password"
     ></app-textfield>
-    <button rounded primary btn full class="h-10 text-lg" type="submit">Sign in</button>
+    <button
+      [disabled]="loginForm.invalid || isSubmitting"
+      rounded
+      primary
+      btn
+      full
+      class="h-10 text-lg"
+      type="submit"
+    >
+      Sign in
+    </button>
   </form>
   <div class="mt-4 text-center">
     Don’t have an account?
-    <button class="p-0 m-0 text-accent100" (click)="onSignup()">Sign up</button>
+    <button class="p-0 m-0 text-primary" (click)="onSignup()">Sign up</button>
   </div>
 </app-default-dialog>

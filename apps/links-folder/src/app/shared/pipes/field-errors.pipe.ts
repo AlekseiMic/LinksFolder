@@ -9,7 +9,12 @@ const errors: Record<string, (error?: any) => string> = {
   name: 'fieldError',
 })
 export class FieldErrorsPipe implements PipeTransform {
-  transform([name, error]: [string, any], ...args: any[]) {
+  transform(
+    [name, error]: [string, any],
+    customMapper?: Record<string, string>
+  ) {
+    const errorStr = customMapper?.[name];
+    if (errorStr) return errorStr;
     if (!errors[name]) return name;
     return errors[name](error);
   }

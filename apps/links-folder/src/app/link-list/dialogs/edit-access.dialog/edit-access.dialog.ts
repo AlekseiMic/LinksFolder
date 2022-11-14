@@ -1,18 +1,18 @@
 import { Component, EventEmitter, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Code } from '../types';
+import { Code } from '../../types';
 
 @Component({
-  selector: 'change-access-code-dialog',
-  templateUrl: 'change-access-code.dialog.html',
+  selector: 'edit-access-dialog',
+  templateUrl: 'edit-access.dialog.html',
 })
-export class ChangeAccessCodeDialog {
+export class EditAccessDialog {
   public code: string;
 
   onChange = new EventEmitter<{ code: string }>();
 
   constructor(
-    public dialogRef: MatDialogRef<ChangeAccessCodeDialog>,
+    public dialogRef: MatDialogRef<EditAccessDialog>,
     @Inject(MAT_DIALOG_DATA) public data: Code
   ) {
     this.code = data.code;

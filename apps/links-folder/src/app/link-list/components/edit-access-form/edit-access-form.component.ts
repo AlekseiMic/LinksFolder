@@ -2,10 +2,10 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
 @Component({
-  selector: 'app-edit-access-code-form',
-  templateUrl: './edit-access-code-form.component.html',
+  selector: 'app-edit-access-form',
+  templateUrl: './edit-access-form.component.html',
 })
-export class EditAccessCodeForm implements OnInit {
+export class EditAccessForm implements OnInit {
   @Input() code?: string;
 
   @Output() onSubmit: EventEmitter<{ code: string }> = new EventEmitter();

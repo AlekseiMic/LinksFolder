@@ -2,10 +2,10 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SimpleLink } from '../../types';
 
 @Component({
-  selector: 'app-simple-link-form',
-  templateUrl: 'simple-link-form.component.html',
+  selector: 'app-guest-link-form',
+  templateUrl: 'guest-link-form.component.html',
 })
-export class SimpleLinkForm {
+export class GuestLinkForm {
   @Input('hasLinks') hasLinks: boolean;
 
   @Input('directory') directory: number;

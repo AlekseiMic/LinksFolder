@@ -10,10 +10,10 @@ import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import { Variant, SimpleLink } from '../../types';
 
 @Component({
-  selector: 'app-not-simple-link-form',
-  templateUrl: 'not-simple-link-form.component.html',
+  selector: 'app-user-link-form',
+  templateUrl: 'user-link-form.component.html',
 })
-export class NotSimpleLinkForm implements OnInit {
+export class UserLinkForm implements OnInit {
   @Input('directories') directories: Variant[] = [];
 
   @Output() onSubmit = new EventEmitter<{ dir: number; links: SimpleLink[] }>();

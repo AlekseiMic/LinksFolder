@@ -21,7 +21,6 @@ export class ApiInterceptor implements HttpInterceptor {
       return next.handle(req);
     }
 
-
     if (url !== '/auth/refresh' && this.auth.shouldRefresh) {
       return from(
         this.auth

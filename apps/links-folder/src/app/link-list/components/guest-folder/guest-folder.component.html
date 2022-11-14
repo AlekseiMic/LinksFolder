@@ -2,16 +2,16 @@
   <h2 *ngIf="!list.editable" class="text-center text-default60">
     {{ list.name }}
   </h2>
-  <app-simple-link-form
+  <app-guest-link-form
     class="block"
     *ngIf="list.editable"
     [hasLinks]="list.links.length > 0"
     [directory]="list.id"
     (onSubmit)="onCreateLinks($event)"
-  ></app-simple-link-form>
+  ></app-guest-link-form>
 
   <ng-container *ngIf="list.editable && list.links.length && list.codes.length">
-    <app-access-code-card
+    <app-access-code
       *ngFor="let code of list.codes"
       [code]="code"
       class="my-[10px] mx-auto block w-[340px]"
@@ -21,7 +21,7 @@
       (onProlong)="onProlongAccess($event)"
       [editable]="list.editable"
     >
-    </app-access-code-card>
+    </app-access-code>
   </ng-container>
 
   <app-link-list

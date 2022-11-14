@@ -2,10 +2,10 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormControl, FormBuilder, Validators } from '@angular/forms';
 
 @Component({
-  selector: 'app-create-subdir-form',
-  templateUrl: './create-subdir-form.component.html',
+  selector: 'app-create-directory-form',
+  templateUrl: './create-directory-form.component.html',
 })
-export class CreateSubdirForm implements OnInit {
+export class CreateDirectoryForm implements OnInit {
   @Output() onSubmit: EventEmitter<{ name: string }> = new EventEmitter();
 
   constructor(private formBuilder: FormBuilder) {}

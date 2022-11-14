@@ -1,10 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  FormControl,
-  FormBuilder,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SignupComponent } from '../signup/signup.component';
@@ -15,6 +10,7 @@ import { SignupComponent } from '../signup/signup.component';
 })
 export class SigninComponent implements OnInit {
   public loginForm: FormGroup;
+  public isSubmitting = false;
 
   constructor(
     public dialogRef: MatDialogRef<SigninComponent>,
@@ -23,12 +19,8 @@ export class SigninComponent implements OnInit {
     private dialog: MatDialog
   ) {
     this.loginForm = this.formBuilder.group({
-      login: new FormControl('', {
-        validators: [Validators.required],
-      }),
-      password: new FormControl('', {
-        validators: [Validators.required, Validators.minLength(8)],
-      }),
+      login: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
     });
   }
 
@@ -44,7 +36,9 @@ export class SigninComponent implements OnInit {
     const username = this.loginForm.value.login;
     const password = this.loginForm.value.password;
     if (!username || !password) return;
+    this.isSubmitting = true;
     if (await this.auth.login(username, password)) {
+      this.isSubmitting = false;
       this.dialogRef.close();
     }
   }

@@ -105,12 +105,15 @@ export class ImportLinksDialog {
   onUpload(event: Event) {
     const target = event.currentTarget as HTMLInputElement;
     let file = target.files?.[0];
+
     if (!file) return;
     if (file.type !== 'application/json') {
       target.value = null as any;
       return;
     }
+
     this.fileInProcess = true;
+
     this.linkService.importFile(this.data.dir, file).subscribe({
       next: (res) => {
         this.ids = res.ids;

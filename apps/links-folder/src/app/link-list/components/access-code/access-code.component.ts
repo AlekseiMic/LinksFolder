@@ -6,11 +6,11 @@ import { Clipboard } from '@angular/cdk/clipboard';
 type EventPayload = { dir: number; code: Code };
 
 @Component({
-  selector: 'app-access-code-card',
-  templateUrl: './access-code-card.component.html',
-  styleUrls: ['./access-code-card.component.scss'],
+  selector: 'app-access-code',
+  templateUrl: './access-code.component.html',
+  styleUrls: ['./access-code.component.scss'],
 })
-export class AccessCodeCard implements OnInit {
+export class AccessCode implements OnInit {
   @Input('code') code: Code;
 
   @Input('editable') editable: boolean = false;

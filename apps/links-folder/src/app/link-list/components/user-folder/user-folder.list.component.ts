@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ChangeLinkDialog } from '../../dialogs/change-link.dialog/change-link.dialog';
-import { CreateSubdirDialog } from '../../dialogs/create-subdir-dialog/create-subdir.dialog';
 import { AllLists, LinkService } from '../../services/link.service';
 import { DirSettingsDialog } from '../../dialogs/dir-settings-dialog/dir-settings.dialog';
 import { ImportLinksDialog } from '../../dialogs/import-links-dialog/import-links.dialog';
@@ -20,7 +19,8 @@ import {
   throttleTime,
 } from 'rxjs';
 import { SelectDialog } from '../../../shared/components/select-dialog/select.dialog';
-import { MergeGuestListDialog } from '../../dialogs/merge-guest-list.dialog';
+import { MergeListDialog } from '../../dialogs/merge-list.dialog/merge-list.dialog';
+import { CreateDirectoryDialog } from '../../dialogs/create-directory.dialog/create-directory.dialog';
 
 @Component({
   selector: 'app-user-folder',
@@ -83,7 +83,7 @@ export class UserFolder implements OnInit {
       .pipe(
         switchMap(([guest, root]) => {
           if (!guest || !root || guest.links.length === 0) return of(false);
-          const ref = this.dialog.open(MergeGuestListDialog);
+          const ref = this.dialog.open(MergeListDialog);
           return merge(
             ref.componentInstance.onAccept.pipe(
               switchMap(() => this.linkService.mergeDirs(guest.id, root))
@@ -155,7 +155,7 @@ export class UserFolder implements OnInit {
   }
 
   createDir(parent: number) {
-    const ref = this.dialog.open(CreateSubdirDialog);
+    const ref = this.dialog.open(CreateDirectoryDialog);
     ref.componentInstance.onChange
       .pipe(
         take(1),

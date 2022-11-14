@@ -1,15 +1,18 @@
 <app-field-wrapper
   class="flex-grow"
   [errors]="errors"
+  [faq]="showExample ? 'Example: http://example.com Example Link' : ''"
   [roundedLeft]="roundedLeft"
+  [errorMapper]="errorMapper"
   [roundedRight]="0"
+  [formGroup]="formGroup"
 >
   <input
     class="w-full border-0 focus:outline-0 focus-visible:outline-0 focus-visible:shadow-none px-3 text-lg bg-transparent"
     [style.height.px]="height"
     autocomplete="off"
-    [formControl]="formControl"
-    placeholder="https://..."
+    formControlName="field"
+    placeholder="https:// ..."
     (keyup.enter)="onCreateLink()"
     id="link"
   />
@@ -19,7 +22,7 @@
   btn
   primary
   rounded
-  [disabled]="!formControl.value || !formControl.valid"
+  [disabled]="!formGroup.controls['field'].dirty || !formGroup.valid"
   [style.borderTopLeftRadius.px]="0"
   [style.borderBottomLeftRadius.px]="0"
   [style.height.px]="height + 2"

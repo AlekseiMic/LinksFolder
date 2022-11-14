@@ -18,7 +18,12 @@ export class AuthService {
 
   onLogout$ = new BehaviorSubject<boolean>(true);
 
-  constructor(private http: HttpClient, private jwtService: JwtService) {}
+  constructor(private http: HttpClient, private jwtService: JwtService) {
+    const hasRefresh = window.localStorage.getItem('hasRefresh');
+    if (hasRefresh === null) return;
+    hasRefreshToken = !!hasRefresh;
+    if (!hasRefreshToken) this.isAuth$.next(false);
+  }
 
   subscribeToAuthChange(callback: (v: boolean | undefined) => void) {
     return this.isAuth$.subscribe(callback);
@@ -35,15 +40,22 @@ export class AuthService {
     return false;
   }
 
-  async signup(username: string, password: string): Promise<boolean> {
+  async signup(
+    username: string,
+    password: string
+  ): Promise<{ success: boolean; code?: string }> {
     const req = this.http.post<{ token: string }>(`/auth/signup`, {
       username,
       password,
     });
 
-    const { token } = await lastValueFrom(req);
-    if (token) return this.processAccessToken(token);
-    return false;
+    try {
+      const result = await lastValueFrom(req);
+      this.processAccessToken(result.token);
+      return { success: true };
+    } catch (error: any) {
+      return { success: false, code: error.error?.code };
+    }
   }
 
   clear() {
@@ -51,6 +63,7 @@ export class AuthService {
     this.user = null;
     accessToken = null;
     hasRefreshToken = false;
+    window.localStorage.setItem('hasRefresh', '');
   }
 
   processAccessToken(token: string) {
@@ -60,6 +73,7 @@ export class AuthService {
       return false;
     }
 
+    window.localStorage.setItem('hasRefresh', '1');
     hasRefreshToken = true;
     expires = data.exp;
     accessToken = token;
@@ -100,6 +114,7 @@ export class AuthService {
   }, 500);
 
   get shouldRefresh() {
+    if (hasRefreshToken === false) return false;
     if (hasRefreshToken === undefined) return true;
     return !(expires && expires > new Date().getTime() / 1000);
   }

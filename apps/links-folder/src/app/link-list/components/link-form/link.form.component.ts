@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
 import { linkRegexComplex } from '../../linkRegex';
 
 type Link = { url: string; text: string; tags?: string[] };
@@ -9,30 +9,34 @@ type Link = { url: string; text: string; tags?: string[] };
   styleUrls: ['link.form.component.scss'],
   templateUrl: 'link.form.component.html',
 })
-export class LinkFormComponent implements OnInit {
+export class LinkFormComponent {
   @Input('roundedLeft') roundedLeft = 10;
 
   @Input('roundedRight') roundedRight = 10;
 
   @Input('height') height = 38;
 
+  @Input('showExample') showExample = false;
+
   @Output() onSubmit: EventEmitter<Link[]> = new EventEmitter();
 
-  formControl: FormControl;
+  constructor(private formBuilder: FormBuilder) {}
 
-  ngOnInit(): void {
-    this.formControl = new FormControl('', {
-      validators: [Validators.pattern(linkRegexComplex)],
-    });
-  }
+  formGroup = this.formBuilder.group({
+    field: ['', [Validators.pattern(linkRegexComplex)]],
+  });
 
   get errors() {
-    return Object.entries(this.formControl.errors ?? {});
+    return Object.entries(this.formGroup.controls['field'].errors ?? {});
+  }
+
+  get errorMapper() {
+    return { pattern: 'Wrong url, example: "http://example.com Example Link"' };
   }
 
   onCreateLink(): void {
-    const link = this.formControl.value as string;
-    if (!this.formControl.valid || !link) return;
+    const link = this.formGroup.controls['field'].value as string;
+    if (!this.formGroup.valid || !link) return;
 
     const links = link
       .split('http')
@@ -46,8 +50,8 @@ export class LinkFormComponent implements OnInit {
         return acc;
       }, []);
 
-    this.formControl.reset('');
-    this.formControl.setErrors(null);
+    this.formGroup.controls['field'].reset('');
+    this.formGroup.controls['field'].setErrors(null);
 
     this.onSubmit.emit(links);
   }

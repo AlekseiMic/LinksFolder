@@ -9,6 +9,8 @@ export class FieldWrapperComponent {
 
   @Input('label') label: string;
 
+  @Input('faq') faq: string;
+
   @Input('required') required: boolean;
 
   @Input('roundedLeft') roundedLeft?: number = 4;
@@ -16,4 +18,6 @@ export class FieldWrapperComponent {
   @Input('roundedRight') roundedRight?: number = 4;
 
   @Input('errors') errors: [string, any][] = [];
+
+  @Input('errorMapper') mapper: Record<string, string>;
 }

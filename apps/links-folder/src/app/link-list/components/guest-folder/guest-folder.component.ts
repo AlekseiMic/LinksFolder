@@ -4,9 +4,9 @@ import { LinkService } from '../../services/link.service';
 import { Code, Link, List, SimpleLink } from '../../types';
 import { Observable } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { ChangeAccessCodeDialog } from '../../dialogs/change-access-code.dialog';
 import { getSnackbarProps } from '../../../shared/helpers/getSnackbarProps';
 import { ChangeLinkDialog } from '../../dialogs/change-link.dialog/change-link.dialog';
+import { EditAccessDialog } from '../../dialogs/edit-access.dialog/edit-access.dialog';
 
 @Component({
   selector: 'app-guest-folder',
@@ -42,7 +42,7 @@ export class GuestFolder {
   }
 
   onEditAccess({ dir, code }: { dir: number; code: Code }) {
-    const dialog = this.dialog.open(ChangeAccessCodeDialog, { data: code });
+    const dialog = this.dialog.open(EditAccessDialog, { data: code });
     const sub = dialog.componentInstance.onChange.subscribe((changes) => {
       this.service.editAccess(dir, code.id, changes).subscribe({
         next: () => dialog.close(),
