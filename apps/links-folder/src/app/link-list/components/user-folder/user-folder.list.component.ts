@@ -52,7 +52,9 @@ export class UserFolder implements OnInit {
           const label = `${dir?.name ?? id}`;
           acc[0].push(...dir.links);
           acc[1].push(label);
-          acc[2].push({ value: id, label });
+          if (dir.editable) {
+            acc[2].push({ value: id, label });
+          }
         }
         return acc;
       },

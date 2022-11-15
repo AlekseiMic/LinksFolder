@@ -183,6 +183,7 @@ export class LinkService {
           nextList[value.id] = {
             name: value.name,
             id: value.id,
+            parent,
             editable: true,
             sublists: [],
             codes: [],
@@ -332,21 +333,22 @@ export class LinkService {
       .pipe(
         map((val) => {
           if (val[id]) {
-            const list = this.list$.getValue();
-            if (!list) return;
+            const lists = this.list$.getValue();
+            if (!lists) return;
 
             if (this.guest$.value === id) {
               this.guest$.next(null);
             }
 
-            const parent = list[id].parent;
-            if (parent && list[parent]) {
-              list[parent].sublists = list[parent].sublists?.filter(
+            const parent = lists[id].parent;
+            console.log(lists, id, parent);
+            if (parent && lists[parent]) {
+              lists[parent].sublists = lists[parent].sublists?.filter(
                 (d) => d !== id
               );
             }
-            delete list[id];
-            this.list$.next({ ...list });
+            delete lists[id];
+            this.list$.next({ ...lists });
           }
           return val[id];
         })
