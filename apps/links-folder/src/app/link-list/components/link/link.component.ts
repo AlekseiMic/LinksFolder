@@ -9,13 +9,15 @@ type EventPayload = LinkType;
   styleUrls: ['link.component.scss'],
 })
 export class Link {
-  @Input('editable') editable: boolean;
+  @Input() editable: boolean;
 
-  @Input('selectable') selectable: boolean;
+  @Input() owned: boolean;
 
-  @Input('selected') selected: boolean;
+  @Input() selectable: boolean;
 
-  @Input('link') link: LinkType;
+  @Input() selected: boolean;
+
+  @Input() link: LinkType;
 
   @Output() onEdit = new EventEmitter<EventPayload>();
 

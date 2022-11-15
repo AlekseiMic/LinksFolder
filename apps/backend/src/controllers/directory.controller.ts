@@ -123,13 +123,14 @@ export class DirectoryController {
     );
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('/:id/merge/:dir')
   async mergeDirs(
     @GuestToken() token: string,
     @Param('id') id: string,
     @Res({ passthrough: true }) res: Response,
     @Param('dir') dir: string,
-    @ReqUser() user?: AuthUser
+    @ReqUser() user: AuthUser
   ): Promise<boolean> {
     return this.service.merge(res, Number(dir), Number(id), token, user);
   }

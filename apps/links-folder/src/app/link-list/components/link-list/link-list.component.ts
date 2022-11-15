@@ -5,6 +5,8 @@ import {
   Output,
   SimpleChanges,
 } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { AllLists } from '../../services/link.service';
 import { Link } from '../../types';
 
 @Component({
@@ -14,6 +16,8 @@ import { Link } from '../../types';
 })
 export class LinkList {
   @Input() links: Link[];
+
+  @Input() dirsInfo?: AllLists;
 
   @Input() selectable: boolean;
 
@@ -27,10 +31,18 @@ export class LinkList {
 
   private selected: Set<number> = new Set();
 
-  public isAllSelected: boolean = false;
+  allCheckboxControl = new FormControl();
 
   isSelected(link: Link) {
     return this.selected.has(link.id);
+  }
+
+  get isAllSelected() {
+    return this.allCheckboxControl.value;
+  }
+
+  set isAllSelected(value: boolean) {
+    this.allCheckboxControl.setValue(value);
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -43,7 +55,7 @@ export class LinkList {
     if (newSelected.length !== this.selected.size) {
       this.selected = new Set(newSelected);
     }
-    const linksCount = newLinks.length;
+    const linksCount = this.getEditableLinks().length;
     this.isAllSelected = this.selected.size === linksCount && linksCount > 0;
   }
 
@@ -59,14 +71,25 @@ export class LinkList {
     this.onMove.emit(links);
   }
 
+  isEditable(dir: number) {
+    return this.dirsInfo?.[dir]?.editable ?? false;
+  }
+
   toggleAll() {
-    if (this.isAllSelected) {
+    if (!this.isAllSelected) {
       this.selected.clear();
       this.isAllSelected = false;
       return;
     }
-    this.selected = new Set([...this.links.map((link) => link.id)]);
-    this.isAllSelected = true;
+    this.selected = new Set(this.getEditableLinks());
+    this.isAllSelected = this.selected.size > 0;
+  }
+
+  getEditableLinks() {
+    return this.links.reduce((acc: number[], link) => {
+      if (this.isEditable(link.directory)) acc.push(link.id);
+      return acc;
+    }, []);
   }
 
   get selectedCount() {
@@ -76,7 +99,7 @@ export class LinkList {
   onToggle(link: Link, select: boolean) {
     if (select) this.selected.add(link.id);
     if (!select) this.selected.delete(link.id);
-    const linksCount = this.links.length;
+    const linksCount = this.getEditableLinks().length;
     this.isAllSelected = this.selected.size === linksCount && linksCount > 0;
   }
 }

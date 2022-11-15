@@ -183,6 +183,7 @@ export class DirectoryService {
     token?: string
   ) {
     await this.hasAccess(dirId, user, token);
+    // await this.exists({ id: dirId, createdBy: user.id});
 
     const maxOrderLink = await this.linkModel.findOne({
       where: { directoryId: dirId },
@@ -217,6 +218,7 @@ export class DirectoryService {
     },
     user: AuthUser
   ) {
+    await this.exists({ id: dir, createdBy: user.id });
     const expiresIn = dayjs(values.expiresIn).toDate();
 
     let code = values.code;
@@ -263,11 +265,12 @@ export class DirectoryService {
         ? { [Op.or]: [{ [Op.eq]: user.id }, { [Op.eq]: null }] }
         : { [Op.eq]: null },
     };
-    const expireCond = {
-      ...(!user && token
-        ? { [Op.or]: [{ expiresIn: { [Op.gte]: Date.now() } }, { token }] }
-        : { expiresIn: { [Op.gte]: Date.now() } }),
-    };
+    // const expireCond = {
+    //   ...(!user && token
+    //     ? { [Op.or]: [{ expiresIn: { [Op.gte]: Date.now() } }, { token }] }
+    //     : { expiresIn: { [Op.gte]: Date.now() } }),
+    // };
+    const expireCond = token ? { token } : {};
     const dir = await this.repo.findOne({
       include: [
         {
@@ -283,15 +286,13 @@ export class DirectoryService {
     });
 
     if (!dir) throw new NotFoundException();
-    let hasAccess = dir.createdBy === user?.id;
-    if (!hasAccess) {
-      hasAccess = !!dir.access.find(
-        (a) => a.userId === user?.id || a.token === token
-      );
-    }
-    if (!hasAccess) {
-      throw new ForbiddenException();
-    }
+    const hasAccess = dir.createdBy === user?.id;
+    // if (!hasAccess) {
+    //   hasAccess = !!dir.access.find(
+    //     (a) => a.userId === user?.id || a.token === token
+    //   );
+    // }
+    if (!hasAccess) throw new ForbiddenException();
     return hasAccess;
   }
 
@@ -300,17 +301,15 @@ export class DirectoryService {
     dir: number,
     id: number,
     token: string,
-    user?: AuthUser
+    user: AuthUser
   ): Promise<boolean> {
-    if (!user) throw new ForbiddenException();
-
     const [item, target] = await Promise.all([
       this.repo.findOne({
         where: { id: dir },
         include: [
           {
             model: DirectoryAccess,
-            required: false,
+            required: true,
             where: { token },
           },
         ],
@@ -381,9 +380,7 @@ export class DirectoryService {
     dir.name = name;
     if (user) dir.createdBy = user.id;
     if (!parent) return this.nsHelper.makeRoot(this.repo, dir);
-
     await this.hasAccess(parent, user);
-
     return this.nsHelper.append(this.repo, dir, parent);
   }
 

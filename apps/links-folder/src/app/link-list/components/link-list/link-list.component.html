@@ -3,7 +3,12 @@
   class="bar bg-default110Inv transition duration-100 shadow-default rounded"
 >
   <span class="checkbox">
-    <input type="checkbox" [checked]="isAllSelected" (change)="toggleAll()" />
+    <input
+      type="checkbox"
+      name="isAllSelected"
+      [formControl]="allCheckboxControl"
+      (change)="toggleAll()"
+    />
   </span>
   <span class="count"> {{ selectedCount }} selected </span>
   <div *ngIf="selectedCount > 0" class="actions">
@@ -24,7 +29,8 @@
     [link]="link"
     [selectable]="selectable"
     [selected]="isSelected(link)"
-    [editable]="true"
+    [editable]="isEditable(link.directory)"
+    [owned]="dirsInfo?.[link.directory]?.owned ?? false"
     (onEdit)="onEdit.emit($event)"
     (onDelete)="onDelete.emit([$event])"
     (onSelect)="onToggle($event, true)"

@@ -147,7 +147,7 @@ export class LinkService {
           prev.pop();
         }
 
-        parentId = prev[prev.length - 1].id;
+        parentId = prev[prev.length - 1]?.id ?? root.id;
       }
 
       const hasSubdir = dir.rht - dir.lft > 1;
@@ -214,15 +214,15 @@ export class LinkService {
       } else toCheck.push(link.directoryId);
     });
 
-    if (toCheck.length > 0) {
-      const checkResults = await this.hasAccess(toCheck, user, token);
-      links.forEach(({ id, directoryId }) => {
-        if (checkResults[directoryId]) {
-          valid.push(id);
-          dirs.add(directoryId);
-        }
-      });
-    }
+    // if (toCheck.length > 0) {
+    //   const checkResults = await this.hasAccess(toCheck, user, token);
+    //   links.forEach(({ id, directoryId }) => {
+    //     if (checkResults[directoryId]) {
+    //       valid.push(id);
+    //       dirs.add(directoryId);
+    //     }
+    //   });
+    // }
 
     return { ids: valid, dirs: [...dirs] };
   }

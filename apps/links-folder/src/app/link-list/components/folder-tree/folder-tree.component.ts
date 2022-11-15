@@ -21,6 +21,10 @@ export class FolderTree {
 
   expanded: Record<number, boolean> = {};
 
+  isOwned = (dir: number) => this.lists?.[dir]?.owned || false;
+
+  isEditable = (dir: number) => this.lists?.[dir]?.editable || false;
+
   toggleTree = (dir: number) => (this.expanded[dir] = !this.expanded[dir]);
 
   isOpen = (dir: number) => !!this.expanded[dir];

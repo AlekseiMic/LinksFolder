@@ -37,7 +37,7 @@
     box-shadow: none !important;
   }
 
-  &[disabled] {
+  &[disabled]:not([icon]) {
     background-color: var(--default-30) !important;
   }
 
@@ -50,6 +50,11 @@
     &:hover {
       color: var(--primary-90);
     }
+  }
+
+  &[icon][disabled] {
+    color: var(--default-30) !important;
+    pointer-events: none;
   }
 
   &[primary] {

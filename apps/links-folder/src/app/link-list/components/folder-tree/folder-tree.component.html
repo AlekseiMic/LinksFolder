@@ -10,8 +10,17 @@
 
 <ng-template #folderList let-dir let-depth="depth">
   <div
-    *ngIf="{ selected: selected.includes(dir) } as s"
-    class="folder {{ s.selected ? 'selected' : '' }}"
+    *ngIf="{
+      owned: isOwned(dir),
+      editable: isEditable(dir),
+      selected: selected.includes(dir)
+    } as s"
+    [ngClass]="{
+      folder: true,
+      selected: s.selected,
+      owned: s.owned,
+      editable: s.editable
+    }"
     [style.padding-left.px]="8 + depth * 16"
   >
     <button
@@ -28,7 +37,7 @@
     >
       {{ getName(dir) }}
     </button>
-    <div class="folder-bar">
+    <div *ngIf="s.editable" class="folder-bar">
       <button btn icon title="Create" (click)="onAction.emit([dir, 'create'])">
         <svg-icon name="create-folder-icon"></svg-icon>
       </button>

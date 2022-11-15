@@ -1,12 +1,16 @@
 <label *ngIf="selectable" class="checkbox">
   <input
     type="checkbox"
+    [disabled]="!editable"
     [checked]="selected"
     (change)="checkboxHandler($event)"
   />
 </label>
 <a
-  class="h-full w-full flex items-center flex-grow overflow-hidden overflow-ellipsis"
+  [ngClass]="{
+    'h-full w-full flex items-center flex-grow overflow-hidden overflow-ellipsis': true,
+    owned: owned
+  }"
   [title]="link.url"
   [href]="link.url"
   target="_blank"
@@ -15,11 +19,25 @@
     {{ link.text }}
   </span>
 </a>
-<div *ngIf="editable" class="actions flex items-center gap-x-[10px]">
-  <button class="w-4 h-4" btn primary icon (click)="edit()">
+<div class="actions flex items-center gap-x-[10px]">
+  <button
+    [disabled]="!editable"
+    class="w-4 h-4"
+    btn
+    primary
+    icon
+    (click)="edit()"
+  >
     <svg-icon name="gear-icon"></svg-icon>
   </button>
-  <button class="w-4 h-4" btn primary icon (click)="delete()">
+  <button
+    [disabled]="!editable"
+    class="w-4 h-4"
+    btn
+    primary
+    icon
+    (click)="delete()"
+  >
     <svg-icon name="trash-icon"></svg-icon>
   </button>
 </div>
