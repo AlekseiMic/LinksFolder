@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { AuthUser, User, Session } from 'models';
 import { JwtService } from './jwt.service';
 import { SessionService } from './session.service';
@@ -39,7 +43,7 @@ export class AuthService {
   ): Promise<{ user: User; session: Session; token: string }> {
     const user = await this.userService.findByUsername(login);
     const isValidUser = user && (await user.checkPassword(password));
-    if (!isValidUser) throw new Error('User not found');
+    if (!isValidUser) throw new ForbiddenException({ code: 'USER_NOT_FOUND' });
     const session = await this.sessionService.create(user);
     const token = this.jwtService.create({ name: user.username, id: user.id });
     return { user, session, token };

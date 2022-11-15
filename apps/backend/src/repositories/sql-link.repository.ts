@@ -13,7 +13,6 @@ export class SqlLinkRepository
   }
 
   async sortLinksInDirectory(dir: number): Promise<[unknown[], unknown]> {
-    console.log('here');
     return this.connection.query(
       'SET @i=0; UPDATE Links SET sort=@i:=@i+1 WHERE `directoryId`= ? order by sort ASC;',
       { replacements: [dir] }

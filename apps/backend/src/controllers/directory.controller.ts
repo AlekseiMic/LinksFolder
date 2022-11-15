@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   ParseFilePipe,
@@ -13,9 +14,9 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { Directory, AuthUser,  } from 'models';
+import { Directory, AuthUser } from 'models';
 import { DirectoryService } from 'services';
-import { OptionalJwtAuthGuard } from 'utils/guards/';
+import { JwtAuthGuard, OptionalJwtAuthGuard } from 'utils/guards/';
 import { Response } from 'express';
 import { LinkDto } from 'dto';
 import { ReqUser, GuestToken } from 'utils/decorators/';
@@ -46,6 +47,7 @@ export class DirectoryController {
     files?: Express.Multer.File[]
   ) {
     if (files && files.length > 0) {
+      if (!user) throw new ForbiddenException('Not authorized');
       return this.service.importFiles(Number(dir), files, user);
     }
     return this.service.createLinks(Number(dir), links, user, token);
@@ -59,24 +61,27 @@ export class DirectoryController {
     return this.service.create(name, parent, user);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('/:id')
   async editDir(
     @Body() { name, parent }: { name?: string; parent?: number },
     @Param('id') id: string,
-    @ReqUser() user?: AuthUser
+    @ReqUser() user: AuthUser
   ): Promise<boolean> {
     return this.service.edit(Number(id), { name, parent }, user);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete('/:dir/access/:id')
   async deleteAccess(
     @Param('dir') dir: string,
     @Param('id') id: string,
-    @ReqUser() user?: AuthUser
+    @ReqUser() user: AuthUser
   ) {
     return this.service.deleteAccess(Number(dir), Number(id), user);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('/:id/access')
   async addAccess(
     @Param('id') dir: string,
@@ -86,7 +91,7 @@ export class DirectoryController {
       username,
       expiresIn,
     }: { code?: string; username?: string; expiresIn: Date },
-    @ReqUser() user?: AuthUser
+    @ReqUser() user: AuthUser
   ) {
     return this.service.addAccessRule(
       Number(dir),

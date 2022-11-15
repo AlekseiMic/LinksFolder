@@ -21,16 +21,25 @@ import {
   LINK_REPOSITORY,
   USER_REPOSITORY,
 } from 'repositories';
-import { List } from './link.service';
 import { NestedSetsSequelizeHelper } from './nested-sets-sequelize.service';
 import { GuestService } from './guest.service';
 import { LinkPresenter } from 'presenters/LinkPresenter';
+import { validate } from 'utils/validator';
+import { getParser } from 'utils/parsers/Parser';
+import {
+  DirectoryObj,
+  DirectoryPresenter,
+} from 'presenters/DirectoryPresenter';
+import { Li } from 'utils/parsers/AbstractParser';
 
 @Injectable()
 export class DirectoryService {
   @Inject(DIRECTORY_REPOSITORY) private repo: IDirectoryRepository;
+
   @Inject(LINK_REPOSITORY) private readonly linkModel: ILinkRepository;
+
   @Inject(USER_REPOSITORY) private readonly userModel: IUserRepository;
+
   @Inject(DIRECTORY_ACCESS_REPOSITORY)
   private readonly access: IDirectoryAccessRepository;
 
@@ -39,151 +48,132 @@ export class DirectoryService {
     private readonly guestService: GuestService
   ) {}
 
+  private async getDirectory(condition: Record<string, unknown>) {
+    const dir = await this.repo.findOne({ where: condition });
+    if (!dir) throw new NotFoundException();
+    return dir;
+  }
+
+  private async exists(condition: Record<string, unknown>) {
+    const dir = await this.repo.exists({
+      where: condition,
+    });
+    if (!dir) throw new NotFoundException();
+    return dir;
+  }
+
   async edit(
     id: number,
     data: { name?: string; parent?: number },
-    user?: AuthUser
+    user: AuthUser
   ): Promise<boolean> {
-    if (!user) throw new ForbiddenException();
-    if (!data.parent && !data.name) return true;
-    const dir = await this.repo.findOne({ where: { createdBy: user.id, id } });
-    if (!dir) throw new NotFoundException();
+    validate(data, 'editDirectory');
+
+    const dir = await this.getDirectory({ createdBy: user.id, id });
+
     if (data.name) {
       dir.name = data.name;
       await dir.save();
     }
-    if (data.parent) {
-      const parent = await this.repo.findOne({
-        where: { id: data.parent, createdBy: user.id },
-      });
-      if (!parent) return false;
-      return this.nsHelper.moveTo(this.repo, dir, parent);
-    }
-    return true;
+
+    if (!data.parent) return true;
+
+    const parent = await this.getDirectory({
+      id: data.parent,
+      createdBy: user.id,
+    });
+
+    return this.nsHelper.moveTo(this.repo, dir, parent);
   }
 
-  async deleteAccess(dir: number, access: number, user?: AuthUser) {
-    if (!user) throw new ForbiddenException();
-    const result = await this.access.removeAll({
-      where: { directoryId: dir, id: access, createdBy: user.id },
-    });
+  async deleteAccess(dir: number, access: number, user: AuthUser) {
+    const where = { directoryId: dir, id: access, createdBy: user.id };
+    const result = await this.access.removeAll({ where });
     return { result: result >= 1 };
   }
 
-  async importFiles(
-    dirId: number,
-    files: Express.Multer.File[],
-    user?: AuthUser
+  private async addDirs(
+    dirs: Li[],
+    parent: number,
+    parentList: DirectoryObj | null,
+    user: AuthUser
   ) {
-    if (!user) throw new ForbiddenException('Not authorized');
+    let result: Record<number, DirectoryObj> = {};
+    for (const d of dirs) {
+      const newDir = new Directory();
+      newDir.name = d.name;
+      newDir.createdBy = user.id;
 
-    const dir = await this.repo.findOne({
-      where: { id: dirId, createdBy: user.id },
-    });
+      const res = await this.nsHelper.append(this.repo, newDir, parent);
 
-    if (!dir) throw new ForbiddenException();
-    const result: Record<number, List> = {};
+      if (parentList) parentList.sublists?.push(res.id);
+      result[res.id] = DirectoryPresenter.from(res, parent, user.id);
+      d.id = res.id;
 
-    type Li = {
-      id?: number;
-      name: string;
-      subdirs: Li[];
-      links: {
-        userId: number;
-        text: string;
-        url: string;
-      }[];
-    };
-
-    const getLinksRecursive = (obj: any) => {
-      const result: Li = {
-        name: obj.title,
-        subdirs: [],
-        links: [],
-      };
-
-      if (obj.children) {
-        obj.children.forEach((c: any) => {
-          if (c.typeCode === 2) {
-            const res = getLinksRecursive(c);
-            if (res) result.subdirs.push(res);
-          }
-          if (c.typeCode === 1) {
-            result.links.push({ userId: user.id, text: c.title, url: c.uri });
-          }
-        });
-      }
-
-      if (result.subdirs.length === 0 && result.links.length === 0) return null;
-      return result;
-    };
-
-    const toImport: Li[] = [];
-    files.forEach((file) => {
-      const jsn = JSON.parse(file.buffer.toString());
-      const res = getLinksRecursive(jsn);
-      if (res) toImport.push(...res.subdirs);
-    });
-
-    const addDirs = async (dirs: Li[], parentDir: number) => {
-      for (const d of dirs) {
-        const newDir = new Directory({
-          name: d.name,
-          createdBy: user.id,
-        } as any);
-        const res = await this.nsHelper.append(this.repo, newDir, parentDir);
-        if (result[parentDir]) result[parentDir].sublists?.push(res.id);
-        result[res.id] = {
-          ...d,
-          parent: parentDir,
-          codes: [],
-          id: res.id,
-          sublists: [],
-          owned: true,
-          editable: true,
-          links: [],
+      if (d.directories) {
+        result = {
+          ...result,
+          ...(await this.addDirs(d.directories, res.id, result[res.id], user)),
         };
-        d.id = res.id;
-        if (d.subdirs) {
-          await addDirs(d.subdirs, res.id);
-        }
       }
-    };
+    }
+    return result;
+  }
 
-    await addDirs(toImport, dirId);
+  private getLinksFromParsedDirs(dirs: Li[], user: AuthUser) {
+    return dirs.reduce((acc: Link[], d) => {
+      if (d.directories) {
+        acc.push(...this.getLinksFromParsedDirs(d.directories, user));
+      }
+      const id = d.id;
+      if (!d.links || id === null) return acc;
 
-    const addLinks = (dirs: Li[]) => {
-      const res: any = [];
-      dirs.forEach((d: any) => {
-        if (d.links) {
-          d.links.forEach((l: any, i: number) => {
-            if (!d.id) return;
-            l.directoryId = d.id;
-            l.sort = i + 1;
-            res.push(l);
-          });
+      d.links.forEach(({ url, text }, i) =>
+        acc.push({
+          url,
+          text,
+          sort: i + 1,
+          directoryId: id,
+          createdBy: user.id,
+        } as Link)
+      );
+
+      return acc;
+    }, []);
+  }
+
+  async importFiles(id: number, files: Express.Multer.File[], user: AuthUser) {
+    const errors: Record<number, string> = {};
+    await this.exists({ id, createdBy: user.id });
+
+    const toImport = files.reduce((acc: Li[], file, idx) => {
+      try {
+        const json = JSON.parse(file.buffer.toString());
+        const parser = getParser(json);
+        if (parser) {
+          const res = parser.parse(json);
+          if (res) acc.push(...res);
+        } else {
+          errors[idx] = 'NO_PARSER';
         }
-        if (d.subdirs) {
-          res.push(...addLinks(d.subdirs));
-        }
-      });
-      return res;
-    };
+      } catch (err) {
+        console.error('WRONG_FILE_TYPE');
+      }
+      return acc;
+    }, []);
 
-    const links = await this.linkModel.saveMultiple(addLinks(toImport), {});
+    const result = await this.addDirs(toImport, id, null, user);
+    const links = await this.linkModel.saveMultiple(
+      this.getLinksFromParsedDirs(toImport, user),
+      {}
+    );
 
     links.forEach((l) => {
-      if (result[l.directoryId]) {
-        result[l.directoryId].links.push({
-          id: l.id,
-          url: l.url,
-          text: l.text,
-          userId: l.createdBy ?? null,
-          directory: l.directoryId,
-        });
-      }
+      if (!result[l.directoryId]) return;
+      result[l.directoryId].links.push(LinkPresenter.from(l));
     });
-    return { ids: toImport.map(({ id }) => id), lists: result };
+
+    return { errors, ids: toImport.map(({ id }) => id), lists: result };
   }
 
   async createLinks(
@@ -192,9 +182,7 @@ export class DirectoryService {
     user?: AuthUser,
     token?: string
   ) {
-    if (!(await this.hasAccess(dirId, user, token))) {
-      throw new ForbiddenException();
-    }
+    await this.hasAccess(dirId, user, token);
 
     const maxOrderLink = await this.linkModel.findOne({
       where: { directoryId: dirId },
@@ -227,12 +215,13 @@ export class DirectoryService {
       username: string | undefined;
       expiresIn: Date;
     },
-    user?: AuthUser
+    user: AuthUser
   ) {
-    if (!user) throw new ForbiddenException();
     const expiresIn = dayjs(values.expiresIn).toDate();
+
     let code = values.code;
     let userId: number | undefined;
+
     if (values.username) {
       code = undefined;
       userId = (
@@ -240,7 +229,9 @@ export class DirectoryService {
       )?.id;
       if (!userId) throw new NotFoundException();
     }
+
     if (userId && userId === user.id) return false;
+
     const access = new DirectoryAccess({
       createdBy: user.id,
       directoryId: dir,
@@ -248,8 +239,11 @@ export class DirectoryService {
       code,
       expiresIn,
     } as any);
+
     const result = await access.save();
+
     if (!result) throw new InternalServerErrorException();
+
     return {
       result: true,
       code: {
@@ -266,21 +260,13 @@ export class DirectoryService {
   async hasAccess(dirId: number, user?: AuthUser, token?: string) {
     const userCond = {
       userId: user
-        ? {
-            [Op.or]: [{ [Op.eq]: user.id }, { [Op.eq]: null }],
-          }
-        : {
-            [Op.eq]: null,
-          },
+        ? { [Op.or]: [{ [Op.eq]: user.id }, { [Op.eq]: null }] }
+        : { [Op.eq]: null },
     };
     const expireCond = {
       ...(!user && token
-        ? {
-            [Op.or]: [{ expiresIn: { [Op.gte]: Date.now() } }, { token }],
-          }
-        : {
-            expiresIn: { [Op.gte]: Date.now() },
-          }),
+        ? { [Op.or]: [{ expiresIn: { [Op.gte]: Date.now() } }, { token }] }
+        : { expiresIn: { [Op.gte]: Date.now() } }),
     };
     const dir = await this.repo.findOne({
       include: [
@@ -302,6 +288,9 @@ export class DirectoryService {
       hasAccess = !!dir.access.find(
         (a) => a.userId === user?.id || a.token === token
       );
+    }
+    if (!hasAccess) {
+      throw new ForbiddenException();
     }
     return hasAccess;
   }
@@ -392,7 +381,9 @@ export class DirectoryService {
     dir.name = name;
     if (user) dir.createdBy = user.id;
     if (!parent) return this.nsHelper.makeRoot(this.repo, dir);
-    if (!(await this.hasAccess(parent, user))) throw new NotFoundException();
+
+    await this.hasAccess(parent, user);
+
     return this.nsHelper.append(this.repo, dir, parent);
   }
 
@@ -456,7 +447,6 @@ export class DirectoryService {
     for (const id of ids) {
       result[id] = await this.delete(id, undefined, undefined, user);
     }
-    console.log(result);
     return result;
   }
 
@@ -478,7 +468,6 @@ export class DirectoryService {
     try {
       return await this.nsHelper.delete(this.repo, condition);
     } catch (err) {
-      console.log(err);
       return false;
     }
   }
