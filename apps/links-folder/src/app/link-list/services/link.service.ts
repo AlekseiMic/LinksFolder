@@ -51,11 +51,11 @@ export class LinkService {
   importFile(dir: number, file: File) {
     const form = new FormData();
     form.append('file[]', file);
-    return this.http.post<{ ids: number[]; lists: Record<number, List> }>(
-      `/v1/directory/${dir}/link`,
-      form,
-      {}
-    );
+    return this.http.post<{
+      errors: Record<number, string>;
+      ids: number[];
+      lists: Record<number, List>;
+    }>(`/v1/directory/${dir}/link`, form, {});
   }
 
   editDir(id: number, name?: string, parent?: number) {

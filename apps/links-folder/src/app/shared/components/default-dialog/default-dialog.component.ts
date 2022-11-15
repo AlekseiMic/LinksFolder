@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, TemplateRef } from '@angular/core';
 
 @Component({
   selector: 'app-default-dialog',
@@ -7,4 +7,7 @@ import { Component, Input } from '@angular/core';
 })
 export class DefaultDialogComponent {
   @Input() title: false | string = 'Title';
+
+  @Input()
+  actions: TemplateRef<any> | undefined;
 }

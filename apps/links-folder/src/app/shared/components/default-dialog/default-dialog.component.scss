@@ -3,26 +3,28 @@ $paddingX: 15px;
 
 :host {
   display: flex;
-  &.large .dialog-wrapper {
-    width: 640px;
-  }
-  .dialog-wrapper {
-    width: 320px;
-  }
+  flex-direction: column;
+  position: relative;
+  width: 320px;
+  max-height: 100vh;
 }
 
-.dialog-wrapper {
-  overflow: hidden;
-  position: relative;
-  box-sizing: border-box;
-  border-radius: 5px;
-  background-color: var(--dialog-bg);
-  color: var(--default);
-  &__inner {
-    position: relative;
-    padding: $paddingY $paddingX;
-    overflow: auto;
-  }
+:host[large] {
+  width: 640px;
+}
+
+.content-wrapper {
+  padding: $paddingY $paddingX;
+  overflow: auto;
+}
+
+.actions {
+  width: 100%;
+  padding: 0 $paddingX;
+  display: flex;
+  align-items: center;
+  height: 50px;
+  align-self: flex-start;
 }
 
 h2 {

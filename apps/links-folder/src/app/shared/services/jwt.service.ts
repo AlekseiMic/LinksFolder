@@ -16,9 +16,7 @@ export class JwtService {
       const isValid =
         data.exp === undefined ? true : data.exp > new Date().getTime() / 1000;
       return { data, isValid };
-    } catch (error: any) {
-      console.log(error);
-    }
+    } catch (error: any) {}
     return { isValid: false };
   }
 }

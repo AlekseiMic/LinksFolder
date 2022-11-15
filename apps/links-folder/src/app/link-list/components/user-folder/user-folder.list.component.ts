@@ -21,6 +21,8 @@ import {
 import { SelectDialog } from '../../../shared/components/select-dialog/select.dialog';
 import { MergeListDialog } from '../../dialogs/merge-list.dialog/merge-list.dialog';
 import { CreateDirectoryDialog } from '../../dialogs/create-directory.dialog/create-directory.dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { getSnackbarProps } from 'src/app/shared/helpers/getSnackbarProps';
 
 @Component({
   selector: 'app-user-folder',
@@ -32,8 +34,8 @@ export class UserFolder implements OnInit {
 
   vm$ = combineLatest([
     this.openned$,
-    this.linkService.root$,
-    this.linkService.list$,
+    this.service.root$,
+    this.service.list$,
   ]).pipe(
     throttleTime(200, undefined, { leading: true, trailing: true }),
     map(([openned, root, lists]) => {
@@ -58,10 +60,14 @@ export class UserFolder implements OnInit {
     );
   }
 
-  constructor(private dialog: MatDialog, private linkService: LinkService) {}
+  constructor(
+    private dialog: MatDialog,
+    private service: LinkService,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit() {
-    this.linkService.root$
+    this.service.root$
       .pipe(
         filter((v) => v !== null),
         take(1)
@@ -69,13 +75,13 @@ export class UserFolder implements OnInit {
       .subscribe((root) => this.openned$.next([root!]));
 
     combineLatest([
-      this.linkService.guestDir$.pipe(
+      this.service.guestDir$.pipe(
         filter((a) => a !== null),
         distinctUntilChanged((a, b) => {
           return a?.id === b?.id;
         })
       ),
-      this.linkService.root$.pipe(
+      this.service.root$.pipe(
         filter((a) => a !== null),
         distinctUntilChanged()
       ),
@@ -86,10 +92,10 @@ export class UserFolder implements OnInit {
           const ref = this.dialog.open(MergeListDialog);
           return merge(
             ref.componentInstance.onAccept.pipe(
-              switchMap(() => this.linkService.mergeDirs(guest.id, root))
+              switchMap(() => this.service.mergeDirs(guest.id, root))
             ),
             ref.componentInstance.onDecline.pipe(
-              switchMap(() => this.linkService.removeDir(guest.id))
+              switchMap(() => this.service.removeDir(guest.id))
             )
           ).pipe(tap(() => ref.close()));
         }),
@@ -99,7 +105,7 @@ export class UserFolder implements OnInit {
   }
 
   onCreateLinks(data: { dir: number; links: SimpleLink[] }) {
-    this.linkService.addLinks(data.dir, data.links);
+    this.service.addLinks(data.dir, data.links);
   }
 
   onSelect({ dir, clear }: { dir: number; clear: boolean }) {
@@ -115,8 +121,11 @@ export class UserFolder implements OnInit {
     this.openned$.next(next);
   }
 
-  delete(link: Link[]) {
-    this.linkService.deleteLinks(link);
+  delete(links: Link[]) {
+    this.service.deleteLinks(links).subscribe({
+      next: (r) => this.notify(r > 0 ? `Removed ${r} links` : 'Error', r > 0),
+      error: () => this.notify('Something went wrong!', false),
+    });
   }
 
   edit(link: Link) {
@@ -124,7 +133,7 @@ export class UserFolder implements OnInit {
   }
 
   move(links: Link[]) {
-    const variants = Object.values(this.linkService.list$.getValue() || {}).map(
+    const variants = Object.values(this.service.list$.getValue() || {}).map(
       (d) => ({ label: d.name || d.id, value: d.id })
     );
     const ref = this.dialog.open(SelectDialog, { data: { variants } });
@@ -132,7 +141,7 @@ export class UserFolder implements OnInit {
     ref.componentInstance.onChange
       .pipe(
         take(1),
-        switchMap((dir) => this.linkService.moveLinks(links, Number(dir)))
+        switchMap((dir) => this.service.moveLinks(links, Number(dir)))
       )
       .subscribe(() => {
         ref.close();
@@ -159,7 +168,7 @@ export class UserFolder implements OnInit {
     ref.componentInstance.onChange
       .pipe(
         take(1),
-        switchMap((name) => this.linkService.createDir(parent, name))
+        switchMap((name) => this.service.createDir(parent, name))
       )
       .subscribe(() => {
         ref.close();
@@ -171,7 +180,7 @@ export class UserFolder implements OnInit {
   }
 
   deleteDir(id: number) {
-    this.linkService.removeDir(id).subscribe(() => {
+    this.service.removeDir(id).subscribe(() => {
       const prev = this.openned$.value;
       if (prev.includes(id)) return;
       this.openned$.next(prev.filter((d) => d !== id));
@@ -180,5 +189,9 @@ export class UserFolder implements OnInit {
 
   onImport(dir: number) {
     this.dialog.open(ImportLinksDialog, { data: { dir } });
+  }
+
+  private notify(text: string, success: boolean) {
+    this.snackBar.open(text, undefined, getSnackbarProps(success));
   }
 }

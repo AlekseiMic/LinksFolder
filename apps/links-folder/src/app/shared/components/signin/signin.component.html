@@ -1,5 +1,11 @@
 <app-default-dialog title="Sign in">
   <form [formGroup]="loginForm" (submit)="submit()">
+    <div
+      *ngIf="error"
+      class="flex mb-2 flex-col rounded p-2 bg-danger items-center text-dangerInv"
+    >
+      {{ error }}
+    </div>
     <app-textfield label="Login" formControlName="login"></app-textfield>
     <app-textfield
       label="Password"

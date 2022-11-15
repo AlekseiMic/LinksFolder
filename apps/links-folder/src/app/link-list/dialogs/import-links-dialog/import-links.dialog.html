@@ -1,61 +1,71 @@
 <app-default-dialog
   title="Import links"
-  class="large block min-h-[300px] overflow-auto"
+  [actions]="fileProcessed && ids.length > 0?actions:undefined"
+  large
 >
-  <label class="block">
+  <div class="min-h-[300px] flex flex-col">
+    <div
+      *ngIf="errors.length"
+      class="flex flex-col rounded p-2 bg-danger items-center text-dangerInv"
+    >
+      <span *ngFor="let error of errors">{{ formatError(error) }}</span>
+    </div>
     <input
       [style.display]="'none'"
       #fileInput
+      id="fileInput"
       type="file"
       (change)="onUpload($event)"
     />
-    <div
-      *ngIf="!fileProcessed && !fileInProcess"
-      btn
-      full
-      rounded
-      class="cursor-pointer h-16 text-xl mt-20"
+    <label
+      for="fileInput"
+      class="text-xl h-1 p-4 flex-grow"
+      *ngIf="(!fileProcessed || ids.length === 0) && !fileInProcess"
     >
-      Select file...
-    </div>
-  </label>
+      <div class="h-full" btn full primary rounded>Select file...</div>
+    </label>
 
-  <mat-spinner
-    *ngIf="fileInProcess"
-    class="loading-indicator"
-    [diameter]="150"
-  ></mat-spinner>
+    <mat-spinner
+      *ngIf="fileInProcess"
+      class="loading-indicator"
+      [diameter]="150"
+    ></mat-spinner>
 
-  <div *ngIf="fileProcessed">
-    <p class="p-4 bg-warning text-center text-warningInv">
-      You can select directories to remove
-    </p>
-    <ng-template
-      *ngFor="let d of ids ?? []"
-      [ngTemplateOutlet]="folderList"
-      [ngTemplateOutletContext]="{
-        $implicit: d,
-        depth: 0
-      }"
-    >
-    </ng-template>
-    <div class="actions">
-      <button btn primary rounded (click)="onClose()" class="h-8 w-[150px]">
-        OK
-      </button>
-      <button
-        *ngIf="hasDirsToRemove()"
-        btn
-        danger
-        rounded
-        class="h-8 w-[200px] ml-auto"
-        (click)="onDirsRemove()"
-      >
-        Remove selected
-      </button>
-    </div>
+    <ng-container *ngIf="fileProcessed && ids.length">
+      <p class="p-4 !m-0 bg-warning text-center text-warningInv">
+        You can select directories to remove
+      </p>
+
+      <div class="flex-grow mt-4">
+        <ng-template
+          *ngFor="let d of ids ?? []"
+          [ngTemplateOutlet]="folderList"
+          [ngTemplateOutletContext]="{
+            $implicit: d,
+            depth: 0
+          }"
+        >
+        </ng-template>
+      </div>
+    </ng-container>
   </div>
 </app-default-dialog>
+
+<ng-template #actions>
+  <button btn primary rounded (click)="onClose()" class="h-8 w-[150px]">
+    OK
+  </button>
+  <button
+    *ngIf="hasDirsToRemove()"
+    btn
+    danger
+    rounded
+    class="h-8 w-[200px] ml-10"
+    (click)="onDirsRemove()"
+  >
+    Remove selected
+  </button>
+</ng-template>
 
 <ng-template #folderList let-dir let-depth="depth">
   <div class="folder" [style.margin-left.px]="depth * 8">

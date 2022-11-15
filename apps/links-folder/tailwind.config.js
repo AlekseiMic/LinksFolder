@@ -38,6 +38,7 @@ module.exports = {
         default110: 'var(--default-110)',
         default110Inv: 'var(--default-110-inv)',
         danger: 'var(--danger)',
+        dangerInv: 'var(--danger-inv)',
         danger90: 'var(--danger-90)',
         danger110: 'var(--danger-110)',
         warning: 'var(--warning)',

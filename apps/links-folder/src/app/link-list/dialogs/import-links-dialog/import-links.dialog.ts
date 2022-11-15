@@ -19,6 +19,8 @@ export class ImportLinksDialog {
 
   lists: Record<string, List>;
 
+  errors: [string, string][] = [];
+
   dirsToRemove: Record<number, boolean> = {};
 
   constructor(
@@ -28,7 +30,11 @@ export class ImportLinksDialog {
     public data: {
       dir: number;
     }
-  ) {}
+  ) {
+    dialogRef.beforeClosed().subscribe(() => {
+      this.onClose();
+    });
+  }
 
   ngAfterViewInit() {
     this.fileInput.nativeElement.click();
@@ -61,6 +67,7 @@ export class ImportLinksDialog {
       }, []);
       return result;
     };
+
     this.linkService.removeImportedDirs(dirsToRemove).subscribe((res) => {
       const removedDirs = Object.keys(res)
         .filter((k) => res[Number(k)])
@@ -83,6 +90,7 @@ export class ImportLinksDialog {
         recursiveChange(value, this.lists[sd], obj);
       });
     };
+
     const recursiveUnselectParent = (id: number) => {
       delete newDirsToRemove[id];
       const parentId = this.lists[id]?.parent;
@@ -90,6 +98,7 @@ export class ImportLinksDialog {
         recursiveUnselectParent(parentId);
       }
     };
+
     recursiveChange(!newDirsToRemove[dir.id], dir, newDirsToRemove);
     if (!newDirsToRemove[dir.id]) recursiveUnselectParent(dir.id);
     this.dirsToRemove = newDirsToRemove;
@@ -105,10 +114,12 @@ export class ImportLinksDialog {
   onUpload(event: Event) {
     const target = event.currentTarget as HTMLInputElement;
     let file = target.files?.[0];
+    this.errors = [];
 
     if (!file) return;
     if (file.type !== 'application/json') {
       target.value = null as any;
+      this.errors = [['0', 'WRONG_FILE_EXTENSION']];
       return;
     }
 
@@ -118,11 +129,21 @@ export class ImportLinksDialog {
       next: (res) => {
         this.ids = res.ids;
         this.lists = res.lists;
+        this.errors = Object.entries(res.errors);
       },
       complete: () => {
         this.fileInProcess = false;
         this.fileProcessed = true;
       },
     });
+  }
+
+  formatError([idx, code]: [string, string]) {
+    const index = parseInt(idx, 10);
+    if (code === 'NO_PARSER') return `Parser not found for file: ${index + 1}`;
+    if (code === 'WRONG_FILE_EXTENSION') {
+      return `Only JSON file format supported`;
+    }
+    return 'Error while parsing file: ' + (index + 1);
   }
 }

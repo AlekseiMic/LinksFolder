@@ -1,4 +1,4 @@
-<app-default-dialog title="Directory Settings" class="large">
+<app-default-dialog title="Directory Settings" large>
   <div class="relative">
     <form
       class="flex gap-x-2 items-center"
@@ -47,8 +47,8 @@
           <div class="access__item" *ngFor="let code of codes">
             <div>{{ code.code }}</div>
             <div>{{ code.username ?? '-' }}</div>
-            <div>{{ code.expiresIn | date:'shortDate' }}</div>
-            <div>{{ code.updatedAt | date:'shortDate' }}</div>
+            <div>{{ code.expiresIn | date:'dd.MM.yyyy hh:mm' }}</div>
+            <div>{{ code.updatedAt | date:'dd.MM.yyyy' }}</div>
             <div class="access__item-actions flex gap-x-2">
               <button btn icon (click)="onEditAccess(code.id)">
                 <svg-icon class="w-3" name="pen-icon"></svg-icon>

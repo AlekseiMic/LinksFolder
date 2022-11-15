@@ -29,15 +29,31 @@ export class AuthService {
     return this.isAuth$.subscribe(callback);
   }
 
-  async login(username: string, password: string): Promise<boolean> {
+  async login(
+    username: string,
+    password: string
+  ): Promise<{ success: boolean; errors?: Record<string, string> }> {
     const req = this.http.post<{ token: string }>(`/auth/signin`, {
       username,
       password,
     });
 
-    const { token } = await lastValueFrom(req);
-    if (token) return this.processAccessToken(token);
-    return false;
+    try {
+      const { token } = await lastValueFrom(req);
+      this.processAccessToken(token);
+      return { success: true };
+    } catch (error: any) {
+      if (error.error.code === 'USER_NOT_FOUND') {
+        return {
+          success: false,
+          errors: { common: 'Incorrect login or password' },
+        };
+      }
+      return {
+        success: false,
+        errors: { common: 'Server error, try again later' },
+      };
+    }
   }
 
   async signup(

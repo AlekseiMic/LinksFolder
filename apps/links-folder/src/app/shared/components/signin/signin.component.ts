@@ -9,6 +9,7 @@ import { SignupComponent } from '../signup/signup.component';
   templateUrl: './signin.component.html',
 })
 export class SigninComponent implements OnInit {
+  public error?: string;
   public loginForm: FormGroup;
   public isSubmitting = false;
 
@@ -32,14 +33,21 @@ export class SigninComponent implements OnInit {
   }
 
   async submit() {
+    this.error = '';
     if (!this.loginForm.valid) return;
     const username = this.loginForm.value.login;
     const password = this.loginForm.value.password;
     if (!username || !password) return;
+
     this.isSubmitting = true;
-    if (await this.auth.login(username, password)) {
-      this.isSubmitting = false;
+    const result = await this.auth.login(username, password);
+    this.loginForm.reset();
+    this.isSubmitting = false;
+
+    if (result.success) {
       this.dialogRef.close();
+    } else if (result.errors?.['common']) {
+      this.error = result.errors['common'];
     }
   }
 }
