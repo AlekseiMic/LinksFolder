@@ -6,6 +6,7 @@ import { initValidators } from 'init-validators';
 
 const isDev = process.env['NODE_ENV'] === 'development';
 
+console.log(isDev);
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: isDev

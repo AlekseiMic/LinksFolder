@@ -5,7 +5,8 @@ import { User } from 'models';
 
 const refreshCookieOptions: CookieOptions = {
   secure: true,
-  sameSite: 'none',
+  sameSite: 'strict',
+  httpOnly: true,
   maxAge: 100 * 24 * 3600000,
 };
 

@@ -4,10 +4,9 @@
   "scripts": {
     "ng": "ng",
     "start": "nx run-many --target=serve --all",
-    "build": "nx build",
+    "build": "NODE_ENV=production nx run-many --target=build --all",
     "watch": "nx build --watch --configuration development",
-    "test": "nx test",
-    "postinstall": "node ./decorate-angular-cli.js"
+    "test": "nx test"
   },
   "private": true,
   "dependencies": {
@@ -34,7 +33,7 @@
     "ajv-formats": "^2.1.1",
     "ajv-keywords": "^5.1.0",
     "angular-svg-icon": "~13.0.0",
-    "angular-svg-icon-preloader": "^3.0.0",
+    "angular-svg-icon-preloader": "^4.0.0",
     "autoprefixer": "^10.4.13",
     "bcrypt": "^5.0.1",
     "cookie-parser": "^1.4.6",
@@ -61,19 +60,19 @@
     "tailwindcss": "^3.2.1",
     "tslib": "^2.3.0",
     "uuid": "^8.3.2",
+    "webpack-bundle-analyzer": "^4.7.0",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~13.3.5",
     "@angular/cli": "~13.3.5",
     "@angular/compiler-cli": "~13.3.0",
-    "@nestjs/schematics": "^8.0.11",
-    "@nestjs/testing": "^8.4.6",
+    "@nestjs/schematics": "9.0.3",
     "@nrwl/eslint-plugin-nx": "14.4.3",
     "@nrwl/jest": "14.4.3",
     "@nrwl/linter": "14.4.3",
     "@nrwl/nest": "14.4.3",
-    "@nrwl/node": "14.4.3",
+    "@nrwl/node": "^15.1.0",
     "@nrwl/workspace": "14.4.3",
     "@types/bcrypt": "^5.0.0",
     "@types/cookie-parser": "^1.4.3",

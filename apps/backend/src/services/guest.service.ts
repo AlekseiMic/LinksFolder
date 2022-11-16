@@ -7,7 +7,7 @@ export class GuestService {
   get cookieSettings() {
     return {
       path: '/',
-      secure: false,
+      secure: true,
       httpOnly: true,
       maxAge,
     };

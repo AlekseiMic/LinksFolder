@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 1,
   "projects": {
     "backend": "apps/backend",
     "links-folder": "apps/links-folder"
