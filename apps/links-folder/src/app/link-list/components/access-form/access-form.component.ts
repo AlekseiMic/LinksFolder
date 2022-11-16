@@ -29,7 +29,15 @@ export class AccessForm implements OnInit {
   });
 
   submit(): void {
-    this.onSubmit.emit(this.dirAccessForm.value);
+    const code = this.dirAccessForm.controls.code.value;
+    const username = this.dirAccessForm.controls.username.value;
+    const expiresIn = this.dirAccessForm.controls.expiresIn.value;
+    if (!expiresIn) return;
+    this.onSubmit.emit({
+      code: code || undefined,
+      username: username || undefined,
+      expiresIn,
+    });
   }
 
   ngOnInit(): void {

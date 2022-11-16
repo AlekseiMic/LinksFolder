@@ -43,12 +43,14 @@
 
   &[icon][primary] {
     color: var(--primary);
-    &:focus {
-      color: var(--primary-110);
-      outline-color: var(--primary-110);
-    }
-    &:hover {
-      color: var(--primary-90);
+    &:not([non-interactive]) {
+      &:focus {
+        color: var(--primary-110);
+        outline-color: var(--primary-110);
+      }
+      &:hover {
+        color: var(--primary-90);
+      }
     }
   }
 

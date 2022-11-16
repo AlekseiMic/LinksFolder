@@ -21,10 +21,10 @@ export class DirSettingsDialog {
   public availableParents: Variant[] = [];
 
   editForm = this.formBuilder.group({
-    name: new FormControl('', {
+    name: new FormControl<string>('', {
       validators: [Validators.required, Validators.minLength(4)],
     }),
-    parent: new FormControl(),
+    parent: new FormControl<number | null>(null),
   });
 
   get codes() {
@@ -62,8 +62,9 @@ export class DirSettingsDialog {
   }
 
   onEdit() {
-    const newName = this.editForm.value.name;
+    const newName = this.editForm.controls.name.value;
     const newParent = this.editForm.value.parent;
+    if (!newName) return;
     this.linkService
       .editDir(this.dir.id, newName, newParent || undefined)
       .subscribe(() => {

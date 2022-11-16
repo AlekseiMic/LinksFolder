@@ -17,8 +17,9 @@ export class EditAccessForm implements OnInit {
   });
 
   submit(): void {
-    if (!this.editAccessCodeForm.valid) return;
-    this.onSubmit.emit(this.editAccessCodeForm.value);
+    const code = this.editAccessCodeForm.value.code;
+    if (!code || !this.editAccessCodeForm.valid) return;
+    this.onSubmit.emit({ code });
   }
 
   ngOnInit(): void {

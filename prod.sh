@@ -15,7 +15,7 @@ if ! [ -d "$SERVER" ]; then
 fi
 
 
-if ! yarn > /dev/null 2>&1; then
+if ! npm install > /dev/null 2>&1; then
   echo "${RED}Could not update dependencies"
   exit 1
 fi
@@ -40,6 +40,10 @@ mkdir $SERVER/migrations
 
 cp -R dist/apps/links-folder/* $CLIENT
 cp -R dist/apps/backend/* $SERVER/src
+echo "#!/usr/bin/env node"|cat - $SERVER/src/main.js > /tmp/out && mv /tmp/out $SERVER/src/main.js
+
+chmod +x $SERVER/src/main.js
+
 cp -R apps/backend/src/migrations/* $SERVER/migrations
 cp -R apps/backend/src/sequelizeConfig.js $SERVER/config.js
 cp -R package.json.server $SERVER/package.json
@@ -47,11 +51,11 @@ cp -R package.json.server $SERVER/package.json
 cp dist/apps/backend/.env $SERVER
 
 cd $SERVER
-if ! yarn > /dev/null 2>&1; then
+if ! npm install > /dev/null 2>&1; then
   echo "${RED}Could not update server dependencies"
   exit 1;
 fi
+
 npx sequelize db:migrate --config config.js --env migration
-cd -
 
-
+systemctl restart linkfolder

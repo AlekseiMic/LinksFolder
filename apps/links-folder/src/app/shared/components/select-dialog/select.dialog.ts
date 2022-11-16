@@ -8,7 +8,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 })
 export class SelectDialog<T> {
   formControl = this.formBuilder.group({
-    variant: new FormControl(null, {
+    variant: new FormControl<T | null>(null, {
       validators: [Validators.required],
     }),
   });

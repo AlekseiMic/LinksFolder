@@ -20,7 +20,10 @@ export class EditLinkForm implements OnInit {
   });
 
   submit(): void {
-    this.onSubmit.emit(this.editLinkForm.value);
+    const url = this.editLinkForm.controls.url.value;
+    const text = this.editLinkForm.controls.text.value;
+    if (!url || !text) return;
+    this.onSubmit.emit({ url, text });
   }
 
   ngOnInit(): void {

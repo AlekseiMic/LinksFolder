@@ -8,6 +8,12 @@
     "target": "es2015",
     "rootDir": "./src"
   },
-  "exclude": ["sequelizeConfig.d.ts", "jest.config.ts", "migrations/*", "**/*.spec.ts", "**/*.test.ts"],
+  "exclude": [
+    "sequelizeConfig.d.ts",
+    "jest.config.ts",
+    "migrations/*",
+    "**/*.spec.ts",
+    "**/*.test.ts"
+  ],
   "include": ["**/*.ts"]
 }

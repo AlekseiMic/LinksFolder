@@ -17,7 +17,9 @@ export class CreateDirectoryForm implements OnInit {
   });
 
   submit(): void {
-    this.onSubmit.emit(this.createSubdirForm.value);
+    const name = this.createSubdirForm.controls.name.value;
+    if (!name) return;
+    this.onSubmit.emit({ name });
   }
 
   ngOnInit(): void {

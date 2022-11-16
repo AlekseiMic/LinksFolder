@@ -29,7 +29,7 @@ export class UserLinkForm implements OnInit {
   }
 
   directoryForm = this.formBuilder.group({
-    directory: new FormControl(null, {
+    directory: new FormControl<number | null>(null, {
       validators: [Validators.required],
     }),
   });
