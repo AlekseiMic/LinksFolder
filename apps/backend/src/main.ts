@@ -22,6 +22,7 @@ async function bootstrap() {
   app.enableVersioning({
     type: VersioningType.URI,
   });
+  app.setGlobalPrefix('api');
 
   initValidators();
 
