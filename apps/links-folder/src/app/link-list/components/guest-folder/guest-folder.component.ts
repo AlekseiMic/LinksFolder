@@ -37,6 +37,12 @@ export class GuestFolder {
     });
   }
 
+  getDirsInfo(list: List) {
+    return {
+      [list.id]: list,
+    };
+  }
+
   onEditLink(link: Link) {
     this.dialog.open(ChangeLinkDialog, { data: link });
   }

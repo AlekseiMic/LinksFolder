@@ -214,15 +214,15 @@ export class LinkService {
       } else toCheck.push(link.directoryId);
     });
 
-    // if (toCheck.length > 0) {
-    //   const checkResults = await this.hasAccess(toCheck, user, token);
-    //   links.forEach(({ id, directoryId }) => {
-    //     if (checkResults[directoryId]) {
-    //       valid.push(id);
-    //       dirs.add(directoryId);
-    //     }
-    //   });
-    // }
+    if (toCheck.length > 0) {
+      const checkResults = await this.hasAccess(toCheck, user, token);
+      links.forEach(({ id, directoryId }) => {
+        if (checkResults[directoryId]) {
+          valid.push(id);
+          dirs.add(directoryId);
+        }
+      });
+    }
 
     return { ids: valid, dirs: [...dirs] };
   }
@@ -265,7 +265,7 @@ export class LinkService {
       let hasAccess = dir.createdBy === user?.id;
       if (!hasAccess) {
         hasAccess = !!dir.access.find(
-          (a) => a.userId === user?.id || a.token === token
+          (a) => /* a.userId === user?.id || */ a.token === token
         );
       }
       return hasAccess;

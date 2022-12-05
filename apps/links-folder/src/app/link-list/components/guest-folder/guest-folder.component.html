@@ -28,6 +28,7 @@
     *ngIf="list.links.length"
     [links]="list.links"
     [selectable]="false"
+    [dirsInfo]="getDirsInfo(list)"
     class="block container max-w-[1200px] mt-[30px] mx-auto"
     (onEdit)="onEditLink($event)"
     (onDelete)="onDeleteLinks($event)"

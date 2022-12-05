@@ -286,12 +286,12 @@ export class DirectoryService {
     });
 
     if (!dir) throw new NotFoundException();
-    const hasAccess = dir.createdBy === user?.id;
-    // if (!hasAccess) {
-    //   hasAccess = !!dir.access.find(
-    //     (a) => a.userId === user?.id || a.token === token
-    //   );
-    // }
+    let hasAccess = dir.createdBy === user?.id;
+    if (!hasAccess) {
+      hasAccess = !!dir.access.find(
+        (a) => /* a.userId === user?.id || */ a.token === token
+      );
+    }
     if (!hasAccess) throw new ForbiddenException();
     return hasAccess;
   }
