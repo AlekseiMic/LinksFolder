@@ -23,10 +23,6 @@ module.exports = {
           references: { model: 'Users', key: 'id' },
           onDelete: 'CASCADE'
         },
-        expiresIn: {
-          type: 'timestamp',
-          allowNull: false,
-        },
         createdAt: {
           type: 'timestamp',
           allowNull: false,

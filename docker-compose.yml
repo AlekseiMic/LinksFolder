@@ -23,9 +23,12 @@ services:
         image: mariadb
         container_name: dbLF
         environment:
-            - MARIADB_USER=root
-            - MARIADB_ROOT_PASSWORD=123qwe123
-            - MARIADB_DATABASE=linkfolder
+          MARIADB_USER: ${DB_USER}
+          MARIADB_PASSWORD: ${DB_PASSWORD}
+          MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+          MARIADB_DATABASE: ${DB_NAME}
+        volumes:
+            - linkfolderDb:/var/lib/mysql
         ports:
             - 3336:3306
         networks:
@@ -35,7 +38,5 @@ networks:
     linkfoldernet:
         name: linkfoldernet
 volumes:
-    cache:
-        name: cache
-    linkfolder-db:
-        name: linkfolder-db
+    linkfolderDb:
+        name: linkfolderDb
