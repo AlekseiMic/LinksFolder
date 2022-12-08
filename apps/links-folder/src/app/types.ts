@@ -34,3 +34,5 @@ export type Variant = {
   value: number;
   label: string;
 };
+
+export type AllLists = null | Record<number | string, List>;

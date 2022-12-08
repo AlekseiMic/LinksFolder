@@ -3,7 +3,6 @@ import { LinksIndexPage } from './pages/links-index/links-index.page';
 import { LinkRoutingModule } from './link-list-routing.module';
 import { LinkFormComponent } from './components/link-form/link.form.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { LinkService } from './services/link.service';
 import { GuestFolder } from './components/guest-folder/guest-folder.component';
 import { EditLinkForm } from './components/edit-link-form/edit-link-form.component';
 import { SharedModule } from '../shared/shared.module';
@@ -22,9 +21,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { GuestLinkForm } from './components/guest-link-form/guest-link-form.component';
 import { UserLinkForm } from './components/user-link-form/user-link-form.component';
 import { AccessCode } from './components/access-code/access-code.component';
-import { Link } from './components/link/link.component';
 import { FolderTree } from './components/folder-tree/folder-tree.component';
-import { LinkList } from './components/link-list/link-list.component';
+import { NotifyModule } from '../features/notify/notify.module';
+import { LinksMainService } from './services/links-main.service';
+import { LinksCommonService } from './services/links-common.service';
+import { ListModule } from '../features/list/list.module';
+import { ButtonModule } from '../features/button/button.module';
 
 @NgModule({
   declarations: [
@@ -46,16 +48,17 @@ import { LinkList } from './components/link-list/link-list.component';
     GuestLinkForm,
     UserLinkForm,
     AccessCode,
-    Link,
     FolderTree,
-    LinkList,
   ],
   imports: [
+    NotifyModule,
     LinkRoutingModule,
     SharedModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
+    ListModule,
+    ButtonModule,
   ],
-  providers: [LinkService],
+  providers: [LinksCommonService, LinksMainService],
 })
 export class LinkListModule {}

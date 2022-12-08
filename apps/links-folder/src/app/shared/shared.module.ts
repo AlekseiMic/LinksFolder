@@ -7,7 +7,6 @@ import { SignupComponent } from './components/signup/signup.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DefaultLayoutComponent } from './components/defaultLayout/default.layout.component';
 import { HeaderComponent } from './components/header/header.component';
-import { AppButton } from './components/button/button.component';
 import { DefaultDialogComponent } from './components/default-dialog/default-dialog.component';
 import { AngularSvgIconModule } from 'angular-svg-icon';
 import { CustomMatDialog } from '../core/CustomMatDialog';
@@ -17,6 +16,7 @@ import { TextfieldComponent } from './components/textfield/textfield.component';
 import { FieldErrorsPipe } from './pipes/field-errors.pipe';
 import { SelectComponent } from './components/select/select.component';
 import { SelectDialog } from './components/select-dialog/select.dialog';
+import { ButtonModule } from '../features/button/button.module';
 
 @NgModule({
   declarations: [
@@ -24,7 +24,6 @@ import { SelectDialog } from './components/select-dialog/select.dialog';
     SignupComponent,
     DefaultLayoutComponent,
     HeaderComponent,
-    AppButton,
     DefaultDialogComponent,
     FieldWrapperComponent,
     TextfieldComponent,
@@ -33,6 +32,7 @@ import { SelectDialog } from './components/select-dialog/select.dialog';
     SelectDialog,
   ],
   imports: [
+    ButtonModule,
     AngularSvgIconModule,
     CommonModule,
     ReactiveFormsModule,
@@ -44,7 +44,6 @@ import { SelectDialog } from './components/select-dialog/select.dialog';
     SelectDialog,
     SelectComponent,
     FieldWrapperComponent,
-    AppButton,
     TextfieldComponent,
     SigninComponent,
     DefaultLayoutComponent,

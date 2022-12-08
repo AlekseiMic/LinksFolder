@@ -1,8 +1,9 @@
 import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { LinkService } from '../../services/link.service';
-import { List } from '../../types';
+import { LinksMainService } from '../../services/links-main.service';
+import { List } from '../../../types';
 
+/** !TODO::REFACTOR!!! */
 @Component({
   selector: 'app-import-links-dialog',
   templateUrl: 'import-links.dialog.html',
@@ -25,7 +26,7 @@ export class ImportLinksDialog {
 
   constructor(
     private dialogRef: MatDialogRef<ImportLinksDialog>,
-    private linkService: LinkService,
+    private linkService: LinksMainService,
     @Inject(MAT_DIALOG_DATA)
     public data: {
       dir: number;

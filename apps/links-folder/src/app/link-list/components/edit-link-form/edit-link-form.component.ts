@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { linkRegex } from '../../linkRegex';
-import { SimpleLink } from '../../types';
+import { SimpleLink } from '../../../types';
 
 @Component({
   selector: 'app-edit-link-form',

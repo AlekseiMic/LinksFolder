@@ -7,7 +7,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { FormBuilder, FormControl, Validators } from '@angular/forms';
-import { Variant, SimpleLink } from '../../types';
+import { Variant, SimpleLink } from '../../../types';
 
 @Component({
   selector: 'app-user-link-form',

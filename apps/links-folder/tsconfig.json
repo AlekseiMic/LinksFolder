@@ -4,6 +4,7 @@
     "outDir": "../../dist/out-tsc",
     "types": [],
     "target": "es2020",
+    "experimentalDecorators": true,
     "baseUrl": "."
   },
   "files": [

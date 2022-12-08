@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { AllLists } from '../../services/link.service';
+import { AllLists } from '../../../types';
 
 type TogglePayload = { dir: number; clear: boolean };
 type ActionPayload = [number, 'create' | 'update' | 'delete' | 'import'];

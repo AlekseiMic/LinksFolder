@@ -1,13 +1,13 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormControl, FormBuilder, Validators } from '@angular/forms';
 import {
   MatDialog,
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
-import { LinkService } from '../../services/link.service';
 import * as dayjs from 'dayjs';
-import { List, Variant } from '../../types';
+import { LinksMainService } from '../../services/links-main.service';
+import { List, Variant } from '../../../types';
 import { AccessDialog } from '../access.dialog/access.dialog';
 
 @Component({
@@ -15,7 +15,7 @@ import { AccessDialog } from '../access.dialog/access.dialog';
   templateUrl: 'dir-settings.dialog.html',
   styleUrls: ['dir-settings.dialog.scss'],
 })
-export class DirSettingsDialog {
+export class DirSettingsDialog implements OnInit {
   public dir: List;
 
   public availableParents: Variant[] = [];
@@ -33,25 +33,23 @@ export class DirSettingsDialog {
 
   constructor(
     public dialogRef: MatDialogRef<DirSettingsDialog>,
-    private linkService: LinkService,
+    private linkService: LinksMainService,
     private formBuilder: FormBuilder,
-    @Inject(MAT_DIALOG_DATA)
-    public data: {
-      dir: number;
-    },
+    @Inject(MAT_DIALOG_DATA) public data: { dir: number },
     private dialog: MatDialog
-  ) {
+  ) {}
+
+  ngOnInit(): void {
     const list = this.linkService.list$.getValue();
-    const dir = list?.[data.dir];
-    if (!dir) {
-      this.dialogRef.close();
-      return;
-    }
+    const dir = list?.[this.data.dir];
+
+    if (!dir) return this.dialogRef.close();
+
     this.dir = { ...dir };
     const allDirs = this.linkService.list$.getValue();
     this.availableParents = allDirs
       ? Object.values(allDirs).reduce((acc: Variant[], d) => {
-          if (d.owned && !d.isGuest && d.id !== data.dir) {
+          if (d.owned && !d.isGuest && d.id !== this.data.dir) {
             acc.push({ value: d.id, label: `${d.name ?? d.id}` });
           }
           return acc;
@@ -68,10 +66,7 @@ export class DirSettingsDialog {
     this.linkService
       .editDir(this.dir.id, newName, newParent || undefined)
       .subscribe(() => {
-        this.editForm.reset({
-          name: newName,
-          parent: newParent,
-        });
+        this.editForm.reset({ name: newName, parent: newParent });
       });
   }
 
@@ -117,12 +112,9 @@ export class DirSettingsDialog {
           username?: string;
           expiresIn: Date;
         }) => {
-          this.linkService
-            .addAccessRule(this.dir.id, values)
-            .subscribe((result) => {
-              dialogRef.close();
-              if (result === false) return;
-            });
+          this.linkService.addAccessRule(this.dir.id, values).subscribe(() => {
+            dialogRef.close();
+          });
         },
       },
     });

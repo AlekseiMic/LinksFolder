@@ -12,6 +12,7 @@
     [style.height.px]="height"
     autocomplete="off"
     formControlName="field"
+    appAutofocus
     placeholder="https:// ..."
     (keyup.enter)="onCreateLink()"
     id="link"
@@ -21,12 +22,13 @@
   class="submit mt-[-1px] flex justify-center !ring-0"
   btn
   primary
-  rounded
-  [disabled]="!formGroup.controls['field'].dirty || !formGroup.valid"
+  [disabled]="!formGroup.controls['field'].dirty || errors.length > 0 || formGroup.controls.field.value?.length === 0"
   [style.borderTopLeftRadius.px]="0"
+  [style.borderTopRightRadius.px]="roundedLeft"
   [style.borderBottomLeftRadius.px]="0"
+  [style.borderBottomRightRadius.px]="roundedLeft"
   [style.height.px]="height + 2"
-  [style.width.px]="50"
+  [style.width.px]="80"
   (click)="onCreateLink()"
 >
   <svg-icon

@@ -15,7 +15,7 @@
       <app-user-link-form
         *ngIf="vm.variants.length > 0"
         (onSubmit)="onCreateLinks($event)"
-        (onImport)="onImport($event)"
+        (onImport)="openImport($event)"
         [directories]="vm.variants"
       ></app-user-link-form>
     </div>

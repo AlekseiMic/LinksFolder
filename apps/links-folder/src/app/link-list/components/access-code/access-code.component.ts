@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Code } from '../../types';
+import { Code } from '../../../types';
 import { Location } from '@angular/common';
 import { Clipboard } from '@angular/cdk/clipboard';
 

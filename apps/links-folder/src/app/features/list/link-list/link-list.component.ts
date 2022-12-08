@@ -6,8 +6,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { AllLists } from '../../services/link.service';
-import { Link } from '../../types';
+import { Link, AllLists } from '../../../types';
 
 @Component({
   selector: 'app-link-list',

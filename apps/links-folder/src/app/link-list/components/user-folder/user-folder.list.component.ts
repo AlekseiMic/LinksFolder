@@ -1,28 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { ChangeLinkDialog } from '../../dialogs/change-link.dialog/change-link.dialog';
-import { AllLists, LinkService } from '../../services/link.service';
-import { DirSettingsDialog } from '../../dialogs/dir-settings-dialog/dir-settings.dialog';
-import { ImportLinksDialog } from '../../dialogs/import-links-dialog/import-links.dialog';
-import { Link, Variant, SimpleLink } from '../../types';
+import { LinksMainService } from '../../services/links-main.service';
+import { AllLists, Link, Variant, SimpleLink } from '../../../types';
 import {
   BehaviorSubject,
   combineLatest,
-  distinctUntilChanged,
   filter,
   map,
-  merge,
-  of,
-  switchMap,
   take,
-  tap,
   throttleTime,
 } from 'rxjs';
-import { SelectDialog } from '../../../shared/components/select-dialog/select.dialog';
-import { MergeListDialog } from '../../dialogs/merge-list.dialog/merge-list.dialog';
-import { CreateDirectoryDialog } from '../../dialogs/create-directory.dialog/create-directory.dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { getSnackbarProps } from 'src/app/shared/helpers/getSnackbarProps';
+import { LinksCommonService } from '../../services/links-common.service';
 
 @Component({
   selector: 'app-user-folder',
@@ -44,6 +31,11 @@ export class UserFolder implements OnInit {
     })
   );
 
+  constructor(
+    private service: LinksMainService,
+    private common: LinksCommonService
+  ) {}
+
   private prepareData(openned: number[], lists: AllLists) {
     return openned.reduce(
       (acc: [Link[], string[], Variant[]], id) => {
@@ -62,12 +54,6 @@ export class UserFolder implements OnInit {
     );
   }
 
-  constructor(
-    private dialog: MatDialog,
-    private service: LinkService,
-    private snackBar: MatSnackBar
-  ) {}
-
   ngOnInit() {
     this.service.root$
       .pipe(
@@ -76,38 +62,19 @@ export class UserFolder implements OnInit {
       )
       .subscribe((root) => this.openned$.next([root!]));
 
-    combineLatest([
-      this.service.guestDir$.pipe(
-        filter((a) => a !== null),
-        distinctUntilChanged((a, b) => {
-          return a?.id === b?.id;
-        })
-      ),
-      this.service.root$.pipe(
-        filter((a) => a !== null),
-        distinctUntilChanged()
-      ),
-    ])
-      .pipe(
-        switchMap(([guest, root]) => {
-          if (!guest || !root || guest.links.length === 0) return of(false);
-          const ref = this.dialog.open(MergeListDialog);
-          return merge(
-            ref.componentInstance.onAccept.pipe(
-              switchMap(() => this.service.mergeDirs(guest.id, root))
-            ),
-            ref.componentInstance.onDecline.pipe(
-              switchMap(() => this.service.removeDir(guest.id))
-            )
-          ).pipe(tap(() => ref.close()));
-        }),
-        take(1)
-      )
-      .subscribe(() => {});
+    this.common.checkMerge();
   }
 
   onCreateLinks(data: { dir: number; links: SimpleLink[] }) {
-    this.service.addLinks(data.dir, data.links);
+    this.common.createLinks(data);
+  }
+
+  delete(links: Link[]) {
+    this.common.deleteLinks(links);
+  }
+
+  edit(link: Link) {
+    this.common.editLink(link);
   }
 
   onSelect({ dir, clear }: { dir: number; clear: boolean }) {
@@ -123,62 +90,26 @@ export class UserFolder implements OnInit {
     this.openned$.next(next);
   }
 
-  delete(links: Link[]) {
-    this.service.deleteLinks(links).subscribe({
-      next: (r) => this.notify(r > 0 ? `Removed ${r} links` : 'Error', r > 0),
-      error: () => this.notify('Something went wrong!', false),
-    });
-  }
-
-  edit(link: Link) {
-    this.dialog.open(ChangeLinkDialog, { data: link });
-  }
-
   move(links: Link[]) {
     const variants = Object.values(this.service.list$.getValue() || {}).map(
       (d) => ({ label: d.name || d.id, value: d.id })
     );
-    const ref = this.dialog.open(SelectDialog, { data: { variants } });
-
-    ref.componentInstance.onChange
-      .pipe(
-        take(1),
-        switchMap((dir) => this.service.moveLinks(links, Number(dir)))
-      )
-      .subscribe(() => {
-        ref.close();
-      });
+    this.common.moveLinks(variants, links);
   }
 
   onAction([dir, action]: [number, 'create' | 'update' | 'delete' | 'import']) {
     switch (action) {
       case 'create':
-        return this.createDir(dir);
+        return this.common.createDir(dir);
       case 'update':
-        return this.editDir(dir);
+        return this.common.editDir(dir);
       case 'delete':
         return this.deleteDir(dir);
       case 'import':
-        return this.onImport(dir);
+        return this.openImport(dir);
       default:
         break;
     }
-  }
-
-  createDir(parent: number) {
-    const ref = this.dialog.open(CreateDirectoryDialog);
-    ref.componentInstance.onChange
-      .pipe(
-        take(1),
-        switchMap((name) => this.service.createDir(parent, name))
-      )
-      .subscribe(() => {
-        ref.close();
-      });
-  }
-
-  editDir(dir: number) {
-    this.dialog.open(DirSettingsDialog, { data: { dir } });
   }
 
   deleteDir(id: number) {
@@ -189,11 +120,7 @@ export class UserFolder implements OnInit {
     });
   }
 
-  onImport(dir: number) {
-    this.dialog.open(ImportLinksDialog, { data: { dir } });
-  }
-
-  private notify(text: string, success: boolean) {
-    this.snackBar.open(text, undefined, getSnackbarProps(success));
+  openImport(dir: number) {
+    this.common.openImport(dir);
   }
 }

@@ -6,10 +6,10 @@ import {
   combineLatest,
   distinctUntilChanged,
 } from 'rxjs';
-import { LinkService } from '../../services/link.service';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../shared/services/auth.service';
-import { List } from '../../types';
+import { List } from '../../../types';
+import { LinksMainService } from '../../services/links-main.service';
 
 @Component({
   selector: 'app-link-list-index',
@@ -24,7 +24,7 @@ export class LinksIndexPage implements OnInit {
 
   constructor(
     private auth: AuthService,
-    private links: LinkService,
+    private links: LinksMainService,
     private routingParam: ActivatedRoute
   ) {}
 

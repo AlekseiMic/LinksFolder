@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Link as LinkType } from '../../types';
+import { Link as LinkType } from '../../../types';
 
 type EventPayload = LinkType;
 

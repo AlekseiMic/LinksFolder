@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Code } from '../../types';
+import { Code } from '../../../types';
 
 @Component({
   selector: 'edit-access-dialog',
