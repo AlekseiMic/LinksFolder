@@ -79,7 +79,7 @@ html.dark {
   --default-110: #fff;
   --default-110-inv: #333;
 
-  --primary-90: #9274e5;
+  --primary-90: #b9a6ee;
   --primary: #734ddd;
   --primary-inv: #fff;
   --primary-110: #5227cc;
@@ -104,27 +104,6 @@ html.dark {
 
   --shadow: 0 1px 3px 1px #555, 0 1px 2px -1px #444;
   --shadow-primary: 0 1px 3px 1px #5227cc, 0 1px 2px -1px #5227cc;
-
-  // --default-100: #fff;
-  //
-  // --bg-default-100: #222;
-  // --bg-primary-10: #333;
-  // --bg-primary-5: #3d3d3d;
-  //
-  // --bg-primary-100: #444; // button, header
-  //
-  // --bg-sidebar: #404040;
-  // --bg-sidebar-lim: transparent;
-  //
-  // --lightbulb: yellow;
-  //
-  // --b-default: #777;
-  // --bg-input: #555;
-  // --accent-100: #9274e5;
-  //
-  // --bg-dialog: #434343;
-  // --default-60: #888; // title in dialog,
-  // --dialog: #fff;
 }
 
 .mat-menu-item {
@@ -135,6 +114,15 @@ html.dark {
 .success {
   background: #20c997;
   color: #fff;
+}
+.error {
+  background: var(--danger);
+  color: var(--danger-inv);
+}
+
+.warning {
+  background: var(--warning);
+  color: var(--warning-inv);
 }
 .custom-dialog-component {
   .mat-dialog-container {

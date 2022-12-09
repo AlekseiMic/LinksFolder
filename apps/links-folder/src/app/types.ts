@@ -8,15 +8,6 @@ export type Link = SimpleLink & {
   id: number;
 };
 
-export type Code = {
-  id: number;
-  code: string;
-  owned: boolean;
-  username?: string;
-  expiresIn: Date;
-  updatedAt: Date;
-};
-
 export type List = {
   id: number;
   parent?: number;
@@ -25,7 +16,7 @@ export type List = {
   isGuest: boolean | undefined;
   owned: boolean;
   name?: string;
-  codes: Code[];
+  codes: AccessRule[];
   sublists?: number[];
   links: Link[];
 };
@@ -36,3 +27,17 @@ export type Variant = {
 };
 
 export type AllLists = null | Record<number | string, List>;
+
+export type SimpleAccessRule = {
+  code?: string | undefined;
+  username?: string | undefined | null;
+  expiresIn?: Date;
+};
+
+export type AccessRule = SimpleAccessRule & {
+  id: number;
+  owned: boolean;
+  updatedAt: Date;
+  expiresIn: Date;
+  extend?: number;
+};

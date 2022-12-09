@@ -41,7 +41,9 @@ export class TextfieldComponent implements ControlValueAccessor {
 
   @Input('type') type = 'text';
 
-  constructor(private controlContainer: ControlContainer) {}
+  constructor(private controlContainer: ControlContainer) {
+    console.log('??');
+  }
 
   writeValue(obj: any): void {
     this.formControlDerictive.valueAccessor?.writeValue(obj);

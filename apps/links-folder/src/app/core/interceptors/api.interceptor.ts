@@ -5,7 +5,7 @@ import {
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { from, lastValueFrom } from 'rxjs';
-import { AuthService } from '../../shared/services/auth.service';
+import { AuthService } from 'app/modules/auth/services/auth.service';
 import { environment } from '../../../environments/environment';
 
 const API = environment.api;

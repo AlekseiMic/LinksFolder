@@ -5,7 +5,11 @@
     "types": [],
     "target": "es2020",
     "experimentalDecorators": true,
-    "baseUrl": "."
+    "rootDir":"./src/",
+    "baseUrl": "./src/"
+  },
+  "paths": {
+    "@modules": ["app/modules"]
   },
   "files": [
     "src/main.ts",
