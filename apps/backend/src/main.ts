@@ -9,13 +9,13 @@ const isDev = process.env['NODE_ENV'] === 'development';
 console.log(process.env['NODE_ENV']);
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    cors: isDev
-      ? {
-          origin: ['http://localhost:4200'],
-          allowedHeaders: ['set-cookie', 'authorization', 'content-type'],
-          credentials: true,
-        }
-      : true,
+    cors: {
+      origin: isDev
+        ? ['http://localhost:4200']
+        : ['http://link-folder.ru', 'https://link-folder.ru'],
+      allowedHeaders: ['set-cookie', 'authorization', 'content-type'],
+      credentials: true,
+    },
   });
 
   app.use(cookieParser());

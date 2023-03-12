@@ -40,6 +40,8 @@ mkdir $SERVER/migrations
 
 cp -R dist/apps/links-folder/* $CLIENT
 cp -R dist/apps/backend/* $SERVER/src
+
+rm /tmp/out
 echo "#!/usr/bin/env node"|cat - $SERVER/src/main.js > /tmp/out && mv /tmp/out $SERVER/src/main.js
 
 chmod +x $SERVER/src/main.js
