@@ -3,6 +3,7 @@
   <div class="flex-grow"></div>
   <button
     class="mr-3 text-themeSwitch hover:text-themeSwitchHover focus:text-themeSwitchFocus transition"
+    aria-label="toggle-theme"
     (click)="onToggleTheme()"
   >
     <svg-icon
@@ -13,6 +14,7 @@
   </button>
   <button
     *ngIf="!isLogged"
+    aria-label="signin or signup"
     class="hover:text-loginHover text-login transition focus:text-loginFocus"
     (click)="onSignin()"
   >
@@ -24,6 +26,7 @@
   </button>
   <button
     *ngIf="isLogged"
+    aria-label="logout"
     (click)="onLogout()"
     class="text-logout hover:logoutHover transition focus:logoutFocus"
   >

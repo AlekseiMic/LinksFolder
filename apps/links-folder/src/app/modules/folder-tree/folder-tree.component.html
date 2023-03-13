@@ -26,6 +26,7 @@
     <button
       btn
       icon
+      aria-label="hide or expand directory tree"
       *ngIf="hasChilds(dir)"
       [ngClass]="{ 'expand-chevron': true, expanded: isOpen(dir) }"
       (click)="toggleTree(dir)"

@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "NODE_ENV=development nx run-many --target=serve --all",
     "build": "NODE_ENV=production nx run-many --target=build --all --configuration production --skip-nx-cache",
+    "build:stats": "NODE_ENV=production nx run-many --target=build --all --configuration production --skip-nx-cache --stats-json",
     "watch": "nx build --watch --configuration development",
     "test": "nx test"
   },

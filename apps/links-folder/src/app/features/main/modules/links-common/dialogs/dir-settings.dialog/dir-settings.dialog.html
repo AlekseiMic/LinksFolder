@@ -50,10 +50,10 @@
             <div>{{ code.expiresIn | date:'dd.MM.yyyy hh:mm' }}</div>
             <div>{{ code.updatedAt | date:'dd.MM.yyyy' }}</div>
             <div class="access__item-actions flex gap-x-2">
-              <button btn icon (click)="onEditAccess(code.id)">
+              <button btn icon aria-label="edit access" (click)="onEditAccess(code.id)">
                 <svg-icon class="w-3" name="pen-icon"></svg-icon>
               </button>
-              <button btn icon (click)="onDeleteAccess(code)">
+              <button btn icon aria-label="delete access" (click)="onDeleteAccess(code)">
                 <svg-icon class="w-3" name="trash-icon"></svg-icon>
               </button>
             </div>

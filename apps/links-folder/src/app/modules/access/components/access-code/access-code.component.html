@@ -5,14 +5,14 @@
   </a>
 </div>
 <div class="actions">
-  <button btn primary rounded class="action" (click)="copy(code.code!)">
+  <button btn primary rounded class="action" aria-label="copy access code" (click)="copy(code.code!)">
     <svg-icon name="copy-icon"></svg-icon>
   </button>
   <ng-container *ngIf="editable">
-    <button btn primary rounded class="action" (click)="edit()">
+    <button btn primary rounded class="action" aria-label="edit access code" (click)="edit()">
       <svg-icon name="pen-icon"></svg-icon>
     </button>
-    <button btn primary rounded class="action" (click)="prolong()">
+    <button btn primary rounded class="action" aria-label="expand access life" (click)="prolong()">
       <svg-icon name="clock-icon"></svg-icon>
     </button>
   </ng-container>

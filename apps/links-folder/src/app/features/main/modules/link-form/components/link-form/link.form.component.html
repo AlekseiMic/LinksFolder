@@ -22,6 +22,7 @@
   class="submit mt-[-1px] flex justify-center !ring-0"
   btn
   primary
+  aria-label="create link"
   [disabled]="!formGroup.controls['field'].dirty || errors.length > 0 || formGroup.controls.field.value?.length === 0"
   [style.borderTopLeftRadius.px]="0"
   [style.borderTopRightRadius.px]="roundedLeft"
