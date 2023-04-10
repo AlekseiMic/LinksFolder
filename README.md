@@ -1,4 +1,5 @@
-
 # Links Folder
 
-Simple pet-project to learn angular
+Simple project I created while learning basics of Angular
+
+Site: https://link-folder.ru/
